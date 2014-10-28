@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% from 'helpers/helpers.html' import form_field, quick_form %}
+{% block body %}
+    <h1>{{ page.name }}</h1>
+
+    {{ quick_form(page_form) }}
+
+{% endblock %}

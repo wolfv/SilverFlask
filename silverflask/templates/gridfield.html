@@ -1,0 +1,25 @@
+<table id="example" class="display" cellspacing="0" width="100%">
+    <thead>
+    <tr>
+        <th>id</th>
+        <th>created_on</th>
+        <th>name</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+
+        <script>
+            $(document).ready(function () {
+                $('#example').DataTable({
+                    ajax: "data",
+                    "columns": [
+                        { "data": "id" },
+                        { "data": "created_on" },
+                        { "data": "name" }
+                    ]
+
+                });
+            });
+        </script>
+</table>
