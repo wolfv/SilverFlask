@@ -14,7 +14,6 @@ def home():
     return render_template('index.html')
 
 
-
 @main.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()

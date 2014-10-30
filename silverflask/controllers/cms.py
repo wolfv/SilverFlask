@@ -82,10 +82,10 @@ def upload():
     THIS_FOLDER = "silverflask/"
     UPLOAD_FOLDER = "static/uploads/"
     for f in request.files.getlist("file"):
-        filename = f.filename
-        url = os.path.join(UPLOAD_FOLDER, filename)
-        f.save(os.path.join(THIS_FOLDER, url))
-        fo = FileObject(url)
+        # filename = f.filename
+        # url = os.path.join(UPLOAD_FOLDER, filename)
+        # f.save(os.path.join(THIS_FOLDER, url))
+        fo = FileObject(f)
         db.session.add(fo)
         db.session.commit()
 
