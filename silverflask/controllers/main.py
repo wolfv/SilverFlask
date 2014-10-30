@@ -11,16 +11,8 @@ main = Blueprint('main', __name__)
 @main.route('/')
 @cache.cached(timeout=1000)
 def home():
-    s = SiteTree()
-    db.session.add(s)
-    s.name = "Test!"
-    s.parent_id = None
-    db.session.commit()
-    st = SiteTree.get_sitetree()
-    print(st)
-
-    return s.get_cms_form()
     return render_template('index.html')
+
 
 
 @main.route("/login", methods=["GET", "POST"])
@@ -60,3 +52,17 @@ def data():
     ss = SiteTree.query.limit(100)
     data = [s.as_dict() for s in ss]
     return jsonify(data=data)
+
+
+@main.route('/<urlsegment>')
+def get_page(urlsegment):
+    print(urlsegment)
+    pages = SiteTree.query.limit(100)
+    for p in pages:
+        print("urlseg %s" % p.urlsegment)
+    page = SiteTree.query \
+        .filter(SiteTree.urlsegment == urlsegment) \
+        .first()
+    if not page:
+        return "Not found", 404
+    return render_template('page.html', **page.as_dict())

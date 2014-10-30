@@ -1,5 +1,7 @@
 from wtforms.fields import FileField, TextAreaField
 from wtforms.widgets.core import HTMLString, html_params
+from flask import render_template
+
 
 class AsyncFileUpload(object):
     """
@@ -8,23 +10,22 @@ class AsyncFileUpload(object):
 
     def __call__(self, field, **kwargs):
         kwargs.setdefault('id', field.id)
-        return HTMLString("""<div id="filelist">Your browser doesn't have Flash, Silverlight or HTML5 support.</div>
-<br />
+        return render_template("forms/AsyncFileUploadWidget.html")
 
-<div id="container">
-    <a id="pickfiles" href="javascript:;">[Select files]</a>
-    <a id="uploadfiles" href="javascript:;">[Upload files]</a>
-</div>
-<div id="console"></div>
-
-""")
 
 class LivingDocsWidget(object):
-    def __call__(self, *args, **kwargs):
-        return HTMLString("""<div class="doc-toolbar"></div><div class="editor-section"></div>""")
+    def __call__(self, field, **kwargs):
+        print(kwargs)
+        print(field._value())
+        return render_template("forms/LivingDocsWidget.html",
+                               field_name=field.id,
+                               value=field._value(),
+                               **kwargs)
+
 
 class AsyncFileField(FileField):
     widget = AsyncFileUpload()
+
 
 class LivingDocsField(TextAreaField):
     widget = LivingDocsWidget()

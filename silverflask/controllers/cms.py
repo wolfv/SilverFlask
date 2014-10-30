@@ -18,7 +18,7 @@ def get_sitetree():
     return resp
     return jsonify(data=s)
 
-@bp.route("/main")
+@bp.route("/")
 def main():
     sitetree = SiteTree.get_sitetree()
     print(sitetree)
@@ -31,6 +31,8 @@ def edit_page(page_id):
     page_form = page_form(request.form, obj=page)
     if page_form.validate_on_submit():
         page_form.populate_obj(page)
+        db.session.commit()
+
     return render_template("edit_page.html",
                            page=page,
                            page_form=page_form)
@@ -43,7 +45,8 @@ def add_page(page_type):
     page.content = "Super Düper"
     page.name = "Hammerseite"
     parent_id = request.args.get('parent', None)
-    page.parent_id = int(parent_id)
+    if parent_id:
+        page.parent_id = int(parent_id)
     page_form = page.get_cms_form()
     page_form = page_form(request.form, obj=page)
     if page_form.validate_on_submit():
@@ -57,25 +60,42 @@ def add_page(page_type):
 @bp.route("/testform")
 def testform():
     from silverflask.fields import AsyncFileField, LivingDocsField
-    from wtforms.fields import StringField
+    from wtforms.fields import StringField, SubmitField
     form = Form
     form.testfield = StringField("Whatever")
     form.testfield = LivingDocsField("Whatever")
     form.uploadfield = AsyncFileField("test")
+    form.submit = SubmitField("submit that fucker")
     return render_template("add_page.html", page_form=form())
+
+@bp.route("/filemanager/delete/<int:file_id>")
+def filemanager_delete(self, file_id):
+    fo = FileObject.query.get(file_id)
+    fo.delete_file_and_self()
+
 
 @bp.route("/upload", methods=["POST"])
 def upload():
     print(request.files)
     import os
 
-    UPLOAD_FOLDER = "uploads"
-    if len(request.files):
-        f = request.files['file']
+    THIS_FOLDER = "silverflask/"
+    UPLOAD_FOLDER = "static/uploads/"
+    for f in request.files.getlist("file"):
         filename = f.filename
-        f.save(os.path.join(UPLOAD_FOLDER, filename))
-        fo = FileObject(os.path.join(UPLOAD_FOLDER, filename))
+        url = os.path.join(UPLOAD_FOLDER, filename)
+        f.save(os.path.join(THIS_FOLDER, url))
+        fo = FileObject(url)
         db.session.add(fo)
         db.session.commit()
-        return jsonify(fo.as_dict())
+
+        return_dict = {
+            "name": fo.name,
+            "url": fo.url(),
+            "thumbnailUrl": "",
+            "deleteUrl": url_for(".filemanager_delete", file_id=fo.id),
+            "deleteType": "DELETE"
+        }
+
+        return jsonify(files=[return_dict])
     return "No File uploaded"
