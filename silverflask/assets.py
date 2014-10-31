@@ -16,7 +16,7 @@ common_css = Bundle(
 common_js = Bundle(
     'js/vendor/livingdocs-engine/components/jquery/jquery.js',
     'js/vendor/bootstrap.min.js',
-    'js/vendor/jquery.dataTables.min.js',
+    'js/vendor/jquery.dataTables.js',
     'js/vendor/tree/jstree.min.js',
     'js/vendor/plupload-2.1.2/js/moxie.js',
     'js/vendor/plupload-2.1.2/js/plupload.dev.js',

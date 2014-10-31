@@ -1,4 +1,4 @@
-from wtforms.fields import FileField, TextAreaField
+from wtforms.fields import FileField, TextAreaField, Field
 from wtforms.widgets.core import HTMLString, html_params
 from flask import render_template
 
@@ -14,6 +14,7 @@ class AsyncFileUpload(object):
 
 
 class LivingDocsWidget(object):
+    input_type = 'livingdocs'
     def __call__(self, field, **kwargs):
         print(kwargs)
         print(field._value())
@@ -22,6 +23,11 @@ class LivingDocsWidget(object):
                                value=field._value(),
                                **kwargs)
 
+class GridFieldWidget(object):
+    def __call__(self, field, **kwargs):
+        return render_template("forms/GridFieldWidget.html",
+                               field_name=field.id,
+                               **kwargs)
 
 class AsyncFileField(FileField):
     widget = AsyncFileUpload()
@@ -29,3 +35,6 @@ class AsyncFileField(FileField):
 
 class LivingDocsField(TextAreaField):
     widget = LivingDocsWidget()
+
+class GridField(Field):
+    widget = GridFieldWidget()

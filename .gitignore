@@ -11,7 +11,7 @@ build/
 eggs
 bin
 sdist
-
+.idea/
 #Sphinx builds
 _build
 

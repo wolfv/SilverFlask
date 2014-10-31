@@ -303,5 +303,19 @@ $(document).ready(function() {
             $("#" + lvd.for_id).val(rendered_html);
             $("#" + lvd.for_id + "_json").val(lvd.toJson());
         });
-    })
+    });
+
+    $('.gridfield').each(function () {
+        var t = $(this);
+        var c = [];
+        t.find("th").each(function (idx, el) {
+            c.push({"data": $(el).data('col')})
+        });
+        var gf_url = "/admin/gridfield/" + t.attr("id");
+        t.DataTable({
+            ajax: gf_url,
+            "columns": c
+        })
+    });
+
 });

@@ -53,15 +53,13 @@ def data():
     return jsonify(data=data)
 
 
-@main.route('/<urlsegment>')
+@main.route('/<path:urlsegment>')
 def get_page(urlsegment):
     print(urlsegment)
     pages = SiteTree.query.limit(100)
     for p in pages:
         print("urlseg %s" % p.urlsegment)
-    page = SiteTree.query \
-        .filter(SiteTree.urlsegment == urlsegment) \
-        .first()
+    page = SiteTree.get_by_url(urlsegment)
     if not page:
         return "Not found", 404
     return render_template('page.html', **page.as_dict())

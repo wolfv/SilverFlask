@@ -71,8 +71,10 @@ class FileObject(DataObject, db.Model):
         self.name = "DELETED"
 
     def as_dict(self):
-        return {
+        d = super().as_dict()
+        d.update({
             "id": self.id,
             "name": self.name,
             "location": self.location
-        }\
+        })
+        return d

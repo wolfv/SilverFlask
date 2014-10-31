@@ -56,10 +56,9 @@
                     {% endfor %}
                 {% endif %}
             {% endwith %}
-
-            {% block body %}
-            {% endblock %}
         </div>
+        {% block body %}
+        {% endblock %}
 
         {% assets "common_js" %}
             <script type="text/javascript" src="{{ ASSET_URL }}"></script>
@@ -67,6 +66,8 @@
 
         {% block js %}
         {% endblock %}
+        <script>
+        </script>
 
     </body>
 </html>

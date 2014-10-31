@@ -7,3 +7,19 @@
 {
     text-align: center;
 }
+
+.editor-container {
+    /*position: absolute;*/
+    /*top: 0;*/
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: #FFF;
+    z-index: 20000;
+}
+
+.doc-toolbar {
+    width: 200px;
+    float: left;
+    overflow: hidden;
+}

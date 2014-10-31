@@ -1,4 +1,6 @@
-from flask import Blueprint, render_template, flash, request, json, redirect, make_response, url_for
+from flask import Blueprint, render_template, flash, request, json, \
+    redirect, make_response, url_for, \
+    abort
 from flask.ext.login import login_user, logout_user, login_required
 from flask.ext.sqlalchemy import SQLAlchemy
 from silverflask import cache
@@ -24,9 +26,20 @@ def main():
     print(sitetree)
     return render_template("cms.html")
 
+
+@bp.route("/testedit", methods=["GET", "POST"])
+def testedit():
+    page = SiteTree.query.get_or_404(1)
+    page.urlsegment = "drolf"
+    db.session.commit()
+    db.session.flush()
+
+
 @bp.route("/edit/page/<int:page_id>", methods=["GET", "POST"])
 def edit_page(page_id):
-    page = SiteTree.query.get(page_id)
+    page = db.session.query(SiteTree).get(page_id)
+    if not page:
+        abort(404)
     page_form = page.get_cms_form()
     page_form = page_form(request.form, obj=page)
     if page_form.validate_on_submit():

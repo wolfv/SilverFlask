@@ -1,4 +1,5 @@
 from .DataObject import DataObject
+from flask import abort
 
 from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
@@ -42,7 +43,7 @@ class SiteTree(DataObject, db.Model):
 
     @staticmethod
     def recursive_build_tree(root_node, dest_dict):
-        dest_dict.update(root_node.to_dict())
+        dest_dict.update(root_node.jqtree_dict())
         children = root_node.children
         if children:
             dest_dict['children'] = []
@@ -53,7 +54,19 @@ class SiteTree(DataObject, db.Model):
         else:
             return
 
-    def to_dict(self):
+    def append_child(self, child):
+        self.children.append(child)
+
+    def as_dict(self):
+        d = super().as_dict()
+        d.update({
+            "parent_id": self.parent_id,
+            "name": self.name,
+            "type": self.type
+        })
+        return d
+
+    def jqtree_dict(self):
         return {
             "text": self.name,
             "parent_id": self.parent_id,
@@ -66,8 +79,19 @@ class SiteTree(DataObject, db.Model):
             }
         }
 
-    def append_child(self, child):
-        self.children.append(child)
+    @staticmethod
+    def get_by_url(url):
+        vars = url.split('/')
+        node = SiteTree.query.filter(SiteTree.urlsegment == vars[0]).first()
+        if not node:
+            abort(404)
+
+        for var in vars[1:]:
+            node = SiteTree.query.filter(SiteTree.urlsegment == var,
+                                         SiteTree.parent_id == node.id).first()
+            if not node:
+                abort(404)
+        return node
 
     def set_parent(self, parent_id):
         self.parent_id = parent_id

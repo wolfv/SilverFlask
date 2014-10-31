@@ -33,7 +33,9 @@
                     horizontal_columns=('lg', 2, 10),
                     button_map={},
                     class_map={}) %}
-    {% if field.widget.input_type == 'checkbox' %}
+    {% if field.widget.input_type == 'livingdocs' %}
+        {{ field()|safe }}
+    {%- elif field.widget.input_type == 'checkbox' -%}
         {% call _hz_form_wrap(horizontal_columns, form_type, True) %}
             <div class="checkbox">
                 <label>
