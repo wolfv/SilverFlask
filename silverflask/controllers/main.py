@@ -1,9 +1,8 @@
 from flask import Blueprint, render_template, flash, request, redirect, url_for
 from flask.ext.login import login_user, logout_user, login_required
-from flask.ext.sqlalchemy import SQLAlchemy
-from silverflask import cache
+from silverflask import cache, db
 from silverflask.forms import LoginForm
-from silverflask.models import db, User, SiteTree
+from silverflask.models import User, SiteTree
 from flask import jsonify
 
 main = Blueprint('main', __name__)

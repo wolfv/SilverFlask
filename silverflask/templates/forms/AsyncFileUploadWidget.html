@@ -1,8 +1,16 @@
-<div id="filelist">Your browser doesn't have Flash, Silverlight or HTML5 support.</div>
-<br/>
-
-<div id="container">
-    <a id="pickfiles" href="javascript:;">[Select files]</a>
+<div class="async-upload-container">
+    <h1>{{ elem.name }}</h1>
+    <input type="hidden" name="{{ id }}" value="{{ value }}"/>
+    <a class="open-file-dialog btn btn-primary">Select files</a>
     <a id="uploadfiles" href="javascript:;">[Upload files]</a>
+    <div class="preview_image">
+        {% if elem %}
+        <img src="{{ elem.url() }}">
+        {% endif %}
+
+    </div>
+    <div class="dropzone" style="height: 200px; width: 200px; border: 3px solid #002a80;">
+
+    </div>
 </div>
 <div id="console"></div>

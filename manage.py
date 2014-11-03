@@ -2,8 +2,9 @@
 import os
 
 from flask.ext.script import Manager, Server
-from silverflask import create_app
-from silverflask.models import db, User
+from silverflask import create_app, db
+from silverflask.models import User
+
 
 # default to dev config because no one should use this in
 # production anyway

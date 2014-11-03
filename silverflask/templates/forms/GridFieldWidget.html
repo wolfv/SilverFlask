@@ -1,9 +1,16 @@
-<table id="assets" class="gridfield" cellspacing="0" width="100%">
+{% for button in buttons %}
+<a href="{{ urls["add"] }}">{{ button.name }}</a>
+{% endfor %}
+<table id="assets" class="gridfield"
+       data-ajax-url="{{ urls["get"] }}"
+       data-sort-url="{{ urls["sort"] }}"
+       cellspacing="0" width="100%">
     <thead>
     <tr>
-        <th data-col="id">id</th>
-        <th data-col="created_on">created_on</th>
-        <th data-col="name">name</th>
+        {% for row in display_rows %}
+            <th data-col="{{ row.name }}">{{ row.label if row.label else row.name }}</th>
+        {% endfor %}
+        <th data-col="edit_url">edit_url</th>
     </tr>
     </thead>
     <tbody>

@@ -58,55 +58,96 @@ $(document).ready(function() {
 
     /// Upload
 
-    var uploader = new plupload.Uploader({
-        runtimes: 'html5',
-        browse_button: 'pickfiles', // you can pass in id...
-        container: $('container')[0], // ... or DOM Element itself
-        max_file_size: '10mb',
+//    var uploader = new plupload.Uploader({
+//        runtimes: 'html5',
+//        browse_button: 'pickfiles', // you can pass in id...
+//        container: $('container')[0], // ... or DOM Element itself
+//        max_file_size: '10mb',
+//
+//        // Fake server response here
+//        // url : '../upload.php',
+//        url: "/admin/upload",
+//
+//        filters: [
+//            {title: "Image files", extensions: "jpg,gif,png"},
+//            {title: "Zip files", extensions: "zip"}
+//        ],
+//
+//        init: {
+//            PostInit: function () {
+//                document.getElementById("filelist").innerHTML = "";
+//                $('#uploadfiles').click(function () {
+//                    uploader.start();
+//                    return false;
+//                });
+//            },
+//
+//            FilesAdded: function (up, files) {
+//                console.log(files)
+//                plupload.each(files, function (file) {
+//                    document.getElementById("filelist").innerHTML += '<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></div>';
+//                });
+//            },
+//
+//            UploadProgress: function (up, file) {
+//                document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
+//            },
+//            FileUploaded: function(up, file) {
+//                $(ajax)
+//                $(this).parent().children("input").val()
+//            },
+//            Error: function (up, err) {
+//                $('console')[0].innerHTML += "\nError #" + err.code + ": " + err.message;
+//            }
+//        }
+//    });
+//
+//    uploader.init();
 
-        // Fake server response here
-        // url : '../upload.php',
-        url: "/admin/upload",
+    $(".async-upload-container").each(function(el, idx) {
+        console.log("Doing this ", $(this))
+        var self = $(this);
+        var input = $("<input/>").prop("type", "file").addClass("hidden").prop("name", "file")
+        $("body").append(input)
+        input.fileupload({
+            dataType: 'json',
+            url: '/admin/upload',
+            dropZone: self.children('.dropzone'),
+            progressall: function () {
+                console.log("progresstinating.")
+            },
+            add: function (e, data) {
+                data.context = $('<p/>').text('Uploading...').appendTo($(this).parent());
+                var img = document.createElement("img")
+                img.file = data.files[0]
+                img.classList.add("obj");
+                $(this).parent()[0].appendChild(img)
 
-        filters: [
-            {title: "Image files", extensions: "jpg,gif,png"},
-            {title: "Zip files", extensions: "zip"}
-        ],
-
-        init: {
-            PostInit: function () {
-                document.getElementById("filelist").innerHTML = "";
-                $('#uploadfiles').click(function () {
-                    uploader.start();
-                    return false;
+                var reader = new FileReader();
+                reader.onload = (function (aImg) {
+                    return function (e) {
+                        aImg.src = e.target.result;
+                    };
+                })(img);
+                reader.readAsDataURL(data.files[0]);
+                data.submit();
+            },
+            done: function (e, data) {
+                url = "http://" + window.location.host + data.result.files[0].url;
+                self.children("input[type=\"hidden\"]").val(data.result.files[0].id)
+                $.each(data.result.files, function (index, file) {
+                    $('<p/>').text(file.name).appendTo(document.body);
                 });
-            },
-
-            FilesAdded: function (up, files) {
-                console.log(files)
-                plupload.each(files, function (file) {
-                    document.getElementById("filelist").innerHTML += '<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></div>';
-                });
-            },
-
-            UploadProgress: function (up, file) {
-                document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
-            },
-
-            Error: function (up, err) {
-                $('console')[0].innerHTML += "\nError #" + err.code + ": " + err.message;
             }
-        }
+        });
+        self.children('.open-file-dialog').click(function() {
+            input.trigger("click")
+        });
     });
-
-    uploader.init();
 
     // Setup the design and the document
 //    doc.config({livingDocsCss: "static/js/vendor/livingdocs-engine/public/assets/css/livingdocs.css"})
     doc.design.load(design.bootstrap);
-
-
-
 
     // Create Views
     window.lvds = []
@@ -311,10 +352,23 @@ $(document).ready(function() {
         t.find("th").each(function (idx, el) {
             c.push({"data": $(el).data('col')})
         });
-        var gf_url = "/admin/gridfield/" + t.attr("id");
+        c.pop()
+        c.push({"data": "edit_url", render: function(data, type, row) {
+            return "<a href=\"" + data + "\">Edit</a>"
+        }});
+        var gf_url = $(this).data('ajax-url');
         t.DataTable({
             ajax: gf_url,
-            "columns": c
+            columns: c,
+//            ordering: false,
+            "order": [2, "asc"]
+        })
+        t.rowReordering({
+            sURL: $(this).data("sort-url"),
+            iIndexColumn: 2,
+            fnUpdateAjaxRequest: function(oAjaxRequest, properties, $dataTable) {
+                console.log(oAjaxRequest)
+            }
         })
     });
 

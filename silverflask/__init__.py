@@ -5,7 +5,6 @@ from flask import Flask
 from webassets.loaders import PythonLoader as PythonAssetsLoader
 
 from silverflask import assets
-from silverflask.models import db
 
 from silverflask.extensions import (
     cache,
@@ -13,6 +12,9 @@ from silverflask.extensions import (
     debug_toolbar,
     login_manager
 )
+
+from flask.ext.sqlalchemy import SQLAlchemy
+db = SQLAlchemy()
 
 
 def create_app(object_name, env="prod"):

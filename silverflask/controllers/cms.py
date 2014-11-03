@@ -5,7 +5,8 @@ from flask.ext.login import login_user, logout_user, login_required
 from flask.ext.sqlalchemy import SQLAlchemy
 from silverflask import cache
 from silverflask.forms import LoginForm
-from silverflask.models import db, User, SiteTree, Page, SuperPage, FileObject
+from silverflask.models import User, SiteTree, Page, SuperPage, FileObject, GalleryImage
+from silverflask import db
 from flask import jsonify
 
 from wtforms import Form
@@ -19,6 +20,16 @@ def get_sitetree():
     resp.headers['Content-Type'] = 'application/json'
     return resp
     return jsonify(data=s)
+
+
+@bp.route("/add_gallery")
+def add_gallery():
+    gi = GalleryImage()
+    gi.image = FileObject.query.get(1)
+    db.session.add(gi)
+    db.session.commit()
+    return jsonify(data=[(g.image.url(), g.sort_order)for g in GalleryImage.query.limit(1000)])
+
 
 @bp.route("/")
 def main():
@@ -81,6 +92,7 @@ def testform():
     form.submit = SubmitField("submit that fucker")
     return render_template("add_page.html", page_form=form())
 
+
 @bp.route("/filemanager/delete/<int:file_id>")
 def filemanager_delete(self, file_id):
     fo = FileObject.query.get(file_id)
@@ -95,14 +107,11 @@ def upload():
     THIS_FOLDER = "silverflask/"
     UPLOAD_FOLDER = "static/uploads/"
     for f in request.files.getlist("file"):
-        # filename = f.filename
-        # url = os.path.join(UPLOAD_FOLDER, filename)
-        # f.save(os.path.join(THIS_FOLDER, url))
         fo = FileObject(f)
         db.session.add(fo)
         db.session.commit()
-
         return_dict = {
+            "id": fo.id,
             "name": fo.name,
             "url": fo.url(),
             "thumbnailUrl": "",
@@ -112,3 +121,12 @@ def upload():
 
         return jsonify(files=[return_dict])
     return "No File uploaded"
+
+@bp.route("/testsort")
+def testsort():
+    gi = db.session.query(GalleryImage).get(1)
+    gi.move_after(4)
+    gi = db.session.query(GalleryImage).get(2)
+    gi.move_after(0)
+    db.session.commit()
+    return jsonify(data=[(g.image.url(), g.sort_order) for g in GalleryImage.query.limit(1000)])

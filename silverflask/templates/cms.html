@@ -1,9 +1,17 @@
 {% extends "base.html" %}
 {% from 'helpers/helpers.html' import form_field, quick_form %}
 {% block body %}
-    This will be the CMS one day.
-
-    <div id="tree" class="demo">
-    </div>
-
+<div class="cms-container">
+<nav id="side-nav">
+    <ul>
+        <li><a href="/pages">Pages</a></li>
+        <li><a href="/assets">Assets</a></li>
+        <li><a href="/security">Security</a></li>
+    </ul>
+</nav>
+<div id="edit-pane">
+{% block edit_pane %}
+{% endblock %}
+</div>
+</div>
 {% endblock %}

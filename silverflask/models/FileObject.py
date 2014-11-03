@@ -2,8 +2,7 @@ from .DataObject import DataObject
 import os
 from werkzeug.datastructures import FileStorage
 
-from flask.ext.sqlalchemy import SQLAlchemy
-db = SQLAlchemy()
+from silverflask import db
 
 
 class FileStorageBackend(object):
@@ -54,6 +53,12 @@ storage_backend = LocalFileStorageBackend("/static/uploads/")
 class FileObject(DataObject, db.Model):
     location = db.Column(db.String(250))
     name = db.Column(db.String(250))
+    type = db.Column(db.String(50))
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'fileobject',
+        'polymorphic_on': type
+    }
 
     def __init__(self, file, location=None):
         if not location and isinstance(file, FileStorage):
@@ -78,3 +83,14 @@ class FileObject(DataObject, db.Model):
             "location": self.location
         })
         return d
+
+
+class ImageObject(FileObject):
+    __tablename__ = "imageobject"
+    __mapper_args__ = {
+        'polymorphic_identity': __tablename__
+    }
+    # Specifies special operations on Image Files
+    id = db.Column(db.Integer, db.ForeignKey('fileobject.id'), primary_key=True)
+    def resize(self):
+        pass

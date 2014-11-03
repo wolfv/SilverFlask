@@ -8,7 +8,6 @@ from wtforms.ext.sqlalchemy.orm import model_form
 from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
-
 class DataObject(object):
     @declared_attr
     def __tablename__(cls):
@@ -21,25 +20,29 @@ class DataObject(object):
     has_many = {}
     many_many = {}
     belongs_many_many = {}
+
+    default_order = ""
+
     __mapper_args__ = {'always_refresh': True}
+
     database = ["id", "created_on", "last_modified"]
 
     # class CMSForm(Form):
     # name = fields.StringField("asdsadsa")
     #     submit = fields.SubmitField("Submit")
 
-    def get_cms_form(self):
-        if hasattr(self, "CMSForm"):
-            return self.CMSForm
-        FormClass = model_form(self.__class__, db.session, base_class=Form)
+    @classmethod
+    def query_factory(cls):
+        return db.session.query(cls).order_by(cls.last_modified.desc())
+
+    @classmethod
+    def get_cms_form(cls):
+        if hasattr(cls, "CMSForm"):
+            return cls.CMSForm
+        FormClass = model_form(cls, db.session, base_class=Form)
         FormClass.submit = fields.SubmitField()
-        del FormClass.children
-        del FormClass.parent
         del FormClass.last_modified
         del FormClass.created_on
-        # FormClass.gridfield = GridField()
-        return FormClass
-        return render_template("cms.html", form=FormClass(obj=self))
         return FormClass
 
     def as_dict(self):

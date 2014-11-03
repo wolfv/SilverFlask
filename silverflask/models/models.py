@@ -1,15 +1,11 @@
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask import render_template
 from flask.ext.login import UserMixin, AnonymousUserMixin
+from silverflask.fields import LivingDocsField, AsyncFileUploadField, GridField
+from .SiteTree import SiteTree
+from sqlalchemy.sql import func, select, text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import inspect
-from silverflask.fields import LivingDocsField, AsyncFileUpload
-from wtforms import fields
-from .SiteTree import SiteTree
-from flask_wtf import Form
-from wtforms.ext.sqlalchemy.orm import model_form
-
-db = SQLAlchemy()
+from .GalleryImage import  GalleryImage
+from silverflask import db
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -41,11 +37,6 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return '<User %r>' % self.username
 
-class GridField(fields.Field):
-    def __call__(self, *args, **kwargs):
-        return render_template("gridfield.html")
-
-
 class Page(SiteTree):
     __tablename__ = 'page'
 
@@ -63,6 +54,7 @@ class Page(SiteTree):
         return cms_form
 
 class SuperPage(SiteTree):
+
     __tablename__ = 'superpage'
 
     id = db.Column(db.Integer, db.ForeignKey('sitetree.id'), primary_key=True)
@@ -74,4 +66,16 @@ class SuperPage(SiteTree):
         'polymorphic_identity': __tablename__
     }
 
+    images = db.relationship("GalleryImage")
 
+    def get_cms_form(self):
+        form = super().get_cms_form()
+        button_list = []
+        button_list.append(GridField.AddButton())
+        form.images = GridField(
+            parent_record=self,
+            query=lambda: GalleryImage.query_factory().filter(GalleryImage.page_id == self.id),
+            buttons=button_list,
+            field_name="images",
+            display_rows=["id", "caption", "sort_order"])
+        return form

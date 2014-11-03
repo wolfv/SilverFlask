@@ -1,16 +1,15 @@
 from .DataObject import DataObject
 from flask import abort
+from slugify import slugify
 
-from flask.ext.sqlalchemy import SQLAlchemy
-db = SQLAlchemy()
+from silverflask import db
 
 class SiteTree(DataObject, db.Model):
-    __tablename__ = "sitetree"
     parent_id = db.Column(db.Integer, db.ForeignKey('sitetree.id'))
     name = db.Column(db.String)
     database = ["parent_id", "name"]
     type = db.Column(db.String(50))
-    urlsegment = db.Column(db.String(250))
+    urlsegment = db.Column(db.String(250), nullable=False)
     sort = db.Column(db.Integer)
 
     __mapper_args__ = {
@@ -29,6 +28,10 @@ class SiteTree(DataObject, db.Model):
 
     def get_siblings(self):
         return SiteTree.query.filter(SiteTree.parent_id == self.parent_id)
+
+    @classmethod
+    def default_template(cls):
+        return cls.__name__.lower() + ".html"
 
     @staticmethod
     def get_sitetree():
@@ -92,6 +95,10 @@ class SiteTree(DataObject, db.Model):
             if not node:
                 abort(404)
         return node
+
+    @staticmethod
+    def get_slug_for_string(name):
+        return slugify(name)
 
     def set_parent(self, parent_id):
         self.parent_id = parent_id
