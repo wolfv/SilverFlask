@@ -5,11 +5,18 @@ from flask import render_template, jsonify, url_for
 from silverflask.fields import GridField
 from silverflask import db
 
+@bp.route("/assets/edit/<int:record_id>")
+def assets_edit(record_id):
+    pass
 
 @bp.route("/assets/gridfield")
 def assets_get():
     q = FileObject.query.all()
-    return jsonify(data=[r.as_dict() for r in q])
+    def get_return_dict(elem):
+        return elem.as_dict().update({
+            "edit_url": url_for(".assets_edit", record_id=elem.id)
+        })
+    return jsonify(data=[get_return_dict(r) for r in q])
 
 
 @bp.route("/assets")
