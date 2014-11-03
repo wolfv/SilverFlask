@@ -3,6 +3,9 @@
 
 {% block edit_pane %}
     <h1>Manage your Assets</h1>
+    {% if elem.type == "imageobject" %}
+    <img src="{{ elem.resize(200, 200) }}" alt=""/>
+    {% endif %}
     {{ quick_form(page_form) }}
 
 {% endblock %}
