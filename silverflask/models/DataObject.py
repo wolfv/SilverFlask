@@ -9,57 +9,6 @@ from sqlalchemy import event
 
 db = SQLAlchemy()
 
-class OrderedFieldList():
-    class TabNode():
-        name = ""
-        children = []
-        tabs = []
-        def __init__(self, name):
-            self.name = name
-
-        def get_tab(self, tabname):
-            for c in self.tabs:
-                if c.name == tabname:
-                    return c
-            return None
-
-        def find(self, name):
-            idx = 0
-            for idx, child in enumerate(self.children):
-                if child.name == name:
-                    return idx
-            return len(self.children)
-
-    def __init__(self):
-        self.root = self.TabNode("Root")
-
-    def add_to_tab(self, tabname, field, before=None):
-        location = tabname.split('.')
-        prev_node = self.root
-        if location[0] == "Root":
-            del location[0]
-        else:
-            raise UserWarning("Error: Root must be in location")
-        for l in location:
-            node = prev_node.get_tab(l)
-            if not node:
-                node = self.TabNode(l)
-                prev_node.tabs.append(node)
-            prev_node = node
-
-        index = node.find(before)
-        node.children.insert(index, field)
-
-
-class OrderedForm(Form):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self._fields = OrderedFieldList()
-
-    def add_to_tab(self, tabname, field, before=None):
-        return self._fields.add_to_tab(tabname, field, before)
-
-
 class DataObject(object):
     @declared_attr
     def __tablename__(cls):

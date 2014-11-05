@@ -1,0 +1,69 @@
+{% from "helpers/helpers.html" import form_field, form_errors %}
+
+{# valid form types are "basic", "inline" and "horizontal" #}
+
+{% macro quick_form(form,
+                    action="",
+                    method="post",
+                    extra_classes=None,
+                    role="form",
+                    form_type="basic",
+                    horizontal_columns=('lg', 2, 10),
+                    enctype=None,
+                    button_map={},
+                    class_map={}) %}
+    <form
+            {%- if action %} action="{{ action }}"{% endif -%}
+            {%- if method %} method="{{ method }}"{% endif %}
+                             class="form
+    {%- if extra_classes %} {{ extra_classes }}{% endif -%}
+    {%- if form_type == "horizontal" %} form-horizontal
+    {%- elif form_type == "inline" %} form-inline
+    {%- endif -%}
+  "
+            {%- if enctype %} enctype="{{ enctype }}"{% endif -%}
+            {%- if role %} role="{{ role }}"{% endif -%}
+            >
+        {#        {{ form.hidden_tag() }}#}
+
+        {{ form_errors(form, hiddens='only') }}
+        {% if not ordered_form  %}
+            <ul class="nav nav-tabs" role="tablist">
+
+            {% for tab in form.get_root().tabs if not tab.name == "Buttons" %}
+                <li role="presentation" class="{{ "active" if loop.first }}"><a href="#{{ tab.name }}" role="tab" data-toggle="tab">{{ tab.name }}</a></li>
+            {% endfor %}
+            </ul>
+            <div class="tab-content">
+            {% for tab in form.get_root().tabs if not tab.name == "Buttons" %}
+                <div role="tabpanel" class="tab-pane active" id="{{ tab.name }}">
+                {%- for field in tab.children %}
+                {{ form_field(field,
+                    form_type=form_type,
+                    horizontal_columns=horizontal_columns,
+                    ubutton_map=button_map,
+                    class_map=class_map) }}
+                {%- endfor %}
+                </div>
+            {% endfor %}
+            </div>
+            <div class="row button-row">
+                {% for button in form.get_tab("Root.Buttons").children %}
+                    {{ form_field(button,
+                        form_type=form_type,
+                        horizontal_columns=horizontal_columns,
+                        ubutton_map=button_map,
+                        class_map=class_map) }}
+                {% endfor %}
+            </div>
+        {% else %}
+            {%- for field in form %}
+                {{ form_field(field,
+                    form_type=form_type,
+                    horizontal_columns=horizontal_columns,
+                    ubutton_map=button_map,
+                    class_map=class_map) }}
+            {%- endfor %}
+        {% endif %}
+    </form>
+{%- endmacro %}

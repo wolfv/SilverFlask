@@ -50,7 +50,7 @@ def gridfield_add_record(cls, record_id, form, fieldname):
         return "elem " + str(elem.__dict__)
     element_form.page_id.kwargs["default"] = record_id
 
-    return render_template("add_page.html",
+    return render_template("page/add.html",
                            page_form=element_form_instance)
 
 
@@ -72,7 +72,7 @@ def gridfield_edit_record(cls, record_id, form, fieldname, id):
         element_form_instance.populate_obj(elem)
         db.session.commit()
 
-    return render_template("add_page.html",
+    return render_template("page/add.html",
                            page_form=element_form_instance)
 
 @bp.route("/gridfield/<cls>/<int:record_id>/<form>/<fieldname>/sort", methods=["POST"])

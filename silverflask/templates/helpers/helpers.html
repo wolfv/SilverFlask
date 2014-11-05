@@ -96,39 +96,3 @@
     {% endif %}
 {% endmacro %}
 
-{# valid form types are "basic", "inline" and "horizontal" #}
-{% macro quick_form(form,
-                    action="",
-                    method="post",
-                    extra_classes=None,
-                    role="form",
-                    form_type="basic",
-                    horizontal_columns=('lg', 2, 10),
-                    enctype=None,
-                    button_map={},
-                    class_map={}) %}
-    <form
-            {%- if action %} action="{{ action }}"{% endif -%}
-            {%- if method %} method="{{ method }}"{% endif %}
-                             class="form
-    {%- if extra_classes %} {{ extra_classes }}{% endif -%}
-    {%- if form_type == "horizontal" %} form-horizontal
-    {%- elif form_type == "inline" %} form-inline
-    {%- endif -%}
-  "
-            {%- if enctype %} enctype="{{ enctype }}"{% endif -%}
-            {%- if role %} role="{{ role }}"{% endif -%}
-            >
-{#        {{ form.hidden_tag() }}#}
-        {{ form_errors(form, hiddens='only') }}
-
-        {%- for field in form %}
-                {{ form_field(field,
-                    form_type=form_type,
-                    horizontal_columns=horizontal_columns,
-                    ubutton_map=button_map,
-                    class_map=class_map) }}
-        {%- endfor %}
-
-    </form>
-{%- endmacro %}

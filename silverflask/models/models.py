@@ -1,42 +1,13 @@
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from silverflask.fields import LivingDocsField, AsyncFileUploadField, GridField
-from wtforms.fields import HiddenField
+from wtforms.fields import HiddenField, StringField, SubmitField
 from .SiteTree import SiteTree
 from sqlalchemy.sql import func, select, text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import inspect
 from .GalleryImage import  GalleryImage
 from silverflask import db
-
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String)
-    password = db.Column(db.String)
-
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
-
-    def is_authenticated(self):
-        if isinstance(self, AnonymousUserMixin):
-            return False
-        else:
-            return True
-
-    def is_active(self):
-        return True
-
-    def is_anonymous(self):
-        if isinstance(self, AnonymousUserMixin):
-            return True
-        else:
-            return False
-
-    def get_id(self):
-        return self.id
-
-    def __repr__(self):
-        return '<User %r>' % self.username
+from .OrderedForm import OrderedForm
 
 class Page(SiteTree):
     __tablename__ = 'page'
@@ -50,10 +21,13 @@ class Page(SiteTree):
     }
 
     def get_cms_form(self):
-        cms_form = super().get_cms_form()
-        cms_form.content = LivingDocsField()
-        cms_form.content_json = HiddenField()
-        return cms_form
+        form = OrderedForm
+        form.add_to_tab("Root.Main", StringField(name="name"))
+        form.add_to_tab("Root.Main", LivingDocsField(name="content"))
+        form.add_to_tab("Root.Main", HiddenField(name="content_json"))
+        form.add_to_tab("Root.Settings", StringField(name="urlsegment"))
+        form.add_to_tab("Root.Buttons", SubmitField("Submit", name="Submit"))
+        return form
 
 class SuperPage(SiteTree):
 
@@ -71,11 +45,11 @@ class SuperPage(SiteTree):
     images = db.relationship("GalleryImage")
 
     def get_cms_form(self):
-        from .DataObject import OrderedForm
         from wtforms import fields
-        form = OrderedForm()
-        form.add_to_tab("Root.Main", fields.StringField(name="Text mich voll"))
-        form.add_to_tab("Root.Main", fields.StringField(name="Nochsoeintext"))
+        form = OrderedForm
+        form.add_to_tab("Root.Main", fields.StringField(name="name", default=1))
+        form.add_to_tab("Root.Main", fields.TextAreaField(name="content"), before="asdasd")
+        form.add_to_tab("Root.Main", fields.SubmitField("Submit", name="Submit"))
         return form
         form = super().get_cms_form()
         button_list = []

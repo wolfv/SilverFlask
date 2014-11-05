@@ -12,6 +12,7 @@ from flask import jsonify
 from sqlalchemy import event
 
 from wtforms import Form
+from silverflask.models.OrderedForm import OrderedForm
 
 bp = Blueprint('cms', __name__)
 
@@ -36,18 +37,10 @@ def add_gallery():
 @bp.route("/")
 def main():
     return redirect(url_for(".pages"))
-    return render_template("cms.html")
 
 @bp.route("/pages")
 def pages():
-    return render_template("cms_pages.html")
-
-@bp.route("/testedit", methods=["GET", "POST"])
-def testedit():
-    page = SiteTree.query.get_or_404(1)
-    page.urlsegment = "drolf"
-    db.session.commit()
-    db.session.flush()
+    return render_template("page/index.html")
 
 
 @bp.route("/edit/page/<int:page_id>", methods=["GET", "POST"])
@@ -56,14 +49,15 @@ def edit_page(page_id):
     if not page:
         abort(404)
     page_form = page.get_cms_form()
-    # page_form = page_form(request.form, obj=page)
-    # if page_form.validate_on_submit():
-    #     page_form.populate_obj(page)
-    #     db.session.commit()
-
-    return render_template("edit_page.html",
+    page_form = page_form(request.form, obj=page)
+    if page_form.validate_on_submit():
+        page_form.populate_obj(page)
+        db.session.commit()
+    print("ISINSTANCE: %s" % isinstance(page_form, OrderedForm))
+    return render_template("page/edit.html",
                            page=page,
-                           page_form=page_form)
+                           page_form=page_form,
+                           tabbed_form=isinstance(page_form, OrderedForm))
 
 @bp.route("/add_page/<page_type>", methods=["GET", "POST"])
 def add_page(page_type):
@@ -76,13 +70,15 @@ def add_page(page_type):
     if parent_id:
         page.parent_id = int(parent_id)
     page_form = page.get_cms_form()
-    page_form = page_form(request.form, obj=page)
+    print(page_form)
+    page_form = page_form()
+    page_form.process(request.form, obj=page)
     if page_form.validate_on_submit():
         page_form.populate_obj(page)
         db.session.add(page)
         db.session.commit()
         return redirect(url_for("admin.main"))
-    return render_template("add_page.html",
+    return render_template("page/add.html",
                            page_form=page_form)
 
 @bp.route("/testform")
@@ -94,7 +90,7 @@ def testform():
     form.testfield = LivingDocsField("Whatever")
     form.uploadfield = AsyncFileField("test")
     form.submit = SubmitField("submit that fucker")
-    return render_template("add_page.html", page_form=form())
+    return render_template("page/add.html", page_form=form())
 
 
 @bp.route("/filemanager/delete/<int:file_id>")
