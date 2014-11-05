@@ -9,7 +9,7 @@ Flask-WTF==0.10.0
 Jinja2==2.7.3
 MarkupSafe==0.23
 Pygments==1.6
-SQLAlchemy==0.9.6
+SQLAlchemy
 Sphinx==1.2b1
 WTForms==2.0.1
 Werkzeug==0.9.6

@@ -28,8 +28,6 @@ class AsyncFileUploadWidget(object):
 class LivingDocsWidget(object):
     input_type = 'livingdocs'
     def __call__(self, field, **kwargs):
-        print(kwargs)
-        print(field._value())
         return render_template("forms/LivingDocsWidget.html",
                                field_name=field.id,
                                value=field._value(),

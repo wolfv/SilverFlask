@@ -1,12 +1,11 @@
 {% extends "cms.html" %}
 {% from 'helpers/helpers.html' import form_field, quick_form %}
 
-{% block edit_pane %}
-    <div class="page-tree">
-        <div id="tree">
-        </div>
-    </div>
-    </div>
+{% block aside_two %}
+    {% include "includes/pagetree.html" %}
+{% endblock %}
+
+{% block body %}
     <div class="page-edit">
     <h1>{{ page.name }}</h1>
 

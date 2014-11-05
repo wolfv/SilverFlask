@@ -1,5 +1,6 @@
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from silverflask.fields import LivingDocsField, AsyncFileUploadField, GridField
+from wtforms.fields import HiddenField
 from .SiteTree import SiteTree
 from sqlalchemy.sql import func, select, text
 from sqlalchemy.ext.declarative import declared_attr
@@ -51,6 +52,7 @@ class Page(SiteTree):
     def get_cms_form(self):
         cms_form = super().get_cms_form()
         cms_form.content = LivingDocsField()
+        cms_form.content_json = HiddenField()
         return cms_form
 
 class SuperPage(SiteTree):
@@ -69,6 +71,12 @@ class SuperPage(SiteTree):
     images = db.relationship("GalleryImage")
 
     def get_cms_form(self):
+        from .DataObject import OrderedForm
+        from wtforms import fields
+        form = OrderedForm()
+        form.add_to_tab("Root.Main", fields.StringField(name="Text mich voll"))
+        form.add_to_tab("Root.Main", fields.StringField(name="Nochsoeintext"))
+        return form
         form = super().get_cms_form()
         button_list = []
         button_list.append(GridField.AddButton())

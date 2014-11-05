@@ -1,0 +1,49 @@
+.container
+  margin-top: 60px
+
+.text-center
+  text-align: center
+
+.editor-section
+  height: 100%
+
+.editor-container
+  height: 700px
+.doc-toolbar
+  height: 100%
+
+.wrapper
+  display: flex
+  display: -webkit-flex
+  flex-flow: row wrap
+  & > *
+    flex: 1 100%
+  .main
+    flex: 3 0px
+  .aside-1
+    order: 1
+    flex: 1 100px
+    min-height: 100%
+    max-width: 150px
+
+  .aside-2
+    order: 2
+    flex: 1 auto
+    max-width: 200px
+  .main
+    order: 3
+
+  .aside-1
+    background: #0081c2
+    ul
+      margin: 0
+      padding: 0
+      li
+        display: block
+        border-bottom: 1px solid #F3f3f3
+        list-style: none
+      a
+        color: #fff
+        padding: 10px 10px
+        display: block
+        text-decoration: none

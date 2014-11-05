@@ -5,7 +5,20 @@ from silverflask.forms import LoginForm
 from silverflask.models import User, SiteTree
 from flask import jsonify
 
+from .. import app
+
+
 main = Blueprint('main', __name__)
+
+@app.context_processor
+def get_menu():
+    def menu(parent=None):
+        if parent == 0:
+            parent = None
+        print("Getting Menu for parent: %r" % parent)
+        return [r for r in
+                db.session.query(SiteTree).filter(SiteTree.parent_id == parent)]
+    return dict(menu=menu)
 
 @main.route('/')
 @cache.cached(timeout=1000)

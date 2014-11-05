@@ -3,7 +3,7 @@ from silverflask import db
 from sqlalchemy import func, text
 
 class OrderableMixin(object):
-    sort_order = db.Column(db.Integer, nullable=False)
+    sort_order = db.Column(db.Integer, nullable=False, default=1)
 
     @classmethod
     def query_factory(cls):
@@ -29,5 +29,4 @@ class OrderableMixin(object):
             if v[0]:
                 self.sort_order = v[0] + 1
             else:
-                self.sort_order = 1
-
+                self.sort_order = 11

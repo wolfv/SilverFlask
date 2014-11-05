@@ -24,50 +24,15 @@
     </head>
 
     <body>
-        <div class="navbar navbar-inverse navbar-fixed-top">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#">Flask Foundation</a>
-            </div>
-            <div class="collapse navbar-collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="{{ url_for('main.home') }}">Home</a></li>
-
-                    {% if not current_user.is_authenticated() %}
-                        <li><a href="{{ url_for('main.login') }}">Login</a></li>
-                    {% else %}
-                        <li><a href="{{ url_for('main.logout') }}">Logout</a></li>
-                    {% endif %}
-
-                    <li><a href="{{ url_for('main.restricted') }}">Login Restricted Page</a></li>
-                </ul>
-            </div><!--/.nav-collapse -->
-        </div>
-
-        <div class="container">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-        </div>
         {% block body %}
+        
         {% endblock %}
-
         {% assets "common_js" %}
             <script type="text/javascript" src="{{ ASSET_URL }}"></script>
         {% endassets %}
 
         {% block js %}
         {% endblock %}
-        <script>
-        </script>
 
     </body>
 </html>

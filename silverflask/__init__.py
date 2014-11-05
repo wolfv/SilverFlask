@@ -16,6 +16,7 @@ from silverflask.extensions import (
 from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
+app = Flask(__name__)
 
 def create_app(object_name, env="prod"):
     """
@@ -28,8 +29,6 @@ def create_app(object_name, env="prod"):
 
         env: The name of the current environment, e.g. prod or dev
     """
-
-    app = Flask(__name__)
 
     app.config.from_object(object_name)
 
@@ -56,13 +55,12 @@ def create_app(object_name, env="prod"):
     from silverflask.controllers.cms import bp as cms_bp
     app.register_blueprint(main)
     app.register_blueprint(cms_bp, url_prefix='/admin')
-
     return app
 
 if __name__ == '__main__':
     # Import the config for the proper environment using the
     # shell var APPNAME_ENV
     env = os.environ.get('APPNAME_ENV', 'prod')
-    app = create_app('appname.settings.%sConfig' % env.capitalize(), env=env)
+    create_app('appname.settings.%sConfig' % env.capitalize(), env=env)
 
     app.run()

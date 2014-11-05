@@ -25,7 +25,6 @@ class FileStorageBackend(object):
         raise NotImplementedError()
 
 
-
 class LocalFileStorageBackend(FileStorageBackend):
     def __init__(self, upload_folder):
         self.upload_folder = upload_folder
@@ -135,7 +134,6 @@ class ImageObject(FileObject):
             return orig_folder + self.__cache_dir__ + new_fn
         rl = resized_location()
         if storage_backend.exists(rl):
-            print(rl)
             return rl
         else:
             fp = storage_backend.retrieve(self.location)

@@ -1,7 +1,13 @@
-{% extends "base.html" %}
+{% extends "cms.html" %}
 {% from 'helpers/helpers.html' import form_field, quick_form %}
+
+{% block aside_two %}
+    {% include "includes/pagetree.html" %}
+{% endblock %}
+
 {% block body %}
-
-    {{ quick_form(page_form) }}
-
+    <div class="page-edit">
+        <h1>New Page</h1>
+        {{ quick_form(page_form) }}
+    </div>
 {% endblock %}

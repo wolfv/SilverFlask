@@ -6,8 +6,10 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from silverflask import cache
 from silverflask.forms import LoginForm
 from silverflask.models import User, SiteTree, Page, SuperPage, FileObject, GalleryImage
+from silverflask.models import DataObject
 from silverflask import db
 from flask import jsonify
+from sqlalchemy import event
 
 from wtforms import Form
 
@@ -33,10 +35,12 @@ def add_gallery():
 
 @bp.route("/")
 def main():
-    sitetree = SiteTree.get_sitetree()
-    print(sitetree)
+    return redirect(url_for(".pages"))
     return render_template("cms.html")
 
+@bp.route("/pages")
+def pages():
+    return render_template("cms_pages.html")
 
 @bp.route("/testedit", methods=["GET", "POST"])
 def testedit():
@@ -52,10 +56,10 @@ def edit_page(page_id):
     if not page:
         abort(404)
     page_form = page.get_cms_form()
-    page_form = page_form(request.form, obj=page)
-    if page_form.validate_on_submit():
-        page_form.populate_obj(page)
-        db.session.commit()
+    # page_form = page_form(request.form, obj=page)
+    # if page_form.validate_on_submit():
+    #     page_form.populate_obj(page)
+    #     db.session.commit()
 
     return render_template("edit_page.html",
                            page=page,

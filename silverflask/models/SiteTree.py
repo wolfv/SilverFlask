@@ -1,16 +1,18 @@
 from .DataObject import DataObject
 from flask import abort
 from slugify import slugify
+from .OrderableMixin import OrderableMixin
+from sqlalchemy import event
 
 from silverflask import db
 
-class SiteTree(DataObject, db.Model):
+
+class SiteTree(DataObject, OrderableMixin, db.Model):
     parent_id = db.Column(db.Integer, db.ForeignKey('sitetree.id'))
     name = db.Column(db.String)
     database = ["parent_id", "name"]
     type = db.Column(db.String(50))
     urlsegment = db.Column(db.String(250), nullable=False)
-    sort = db.Column(db.Integer)
 
     __mapper_args__ = {
         'polymorphic_identity': 'sitetree',
@@ -19,7 +21,6 @@ class SiteTree(DataObject, db.Model):
 
     children = db.relationship('SiteTree',
                                cascade="all",
-
                                # many to one + adjacency list - remote_side
                                # is required to reference the 'remote'
                                # column in the join condition.
@@ -56,6 +57,15 @@ class SiteTree(DataObject, db.Model):
                 SiteTree.recursive_build_tree(child, temp_dict)
         else:
             return
+
+
+    @classmethod
+    def get_cms_form(cls):
+        form = super().get_cms_form()
+        del form.children
+        del form.sort_order
+        del form.urlsegment
+        return form
 
     def append_child(self, child):
         self.children.append(child)
@@ -96,6 +106,14 @@ class SiteTree(DataObject, db.Model):
                 abort(404)
         return node
 
+    def get_url(self):
+        url = "/" + self.urlsegment
+        el = self
+        while el.parent:
+            url = "/" + el.parent.url_segment  + url
+            el = el.parent
+        return url
+
     @staticmethod
     def get_slug_for_string(name):
         return slugify(name)
@@ -105,3 +123,12 @@ class SiteTree(DataObject, db.Model):
 
     def __init__(self):
         self.database.extend(super(SiteTree, self).database)
+
+    def before_insert(self, mapper, context, target):
+        possible_slug = slugify(target.name)
+        slug = possible_slug
+        count = 0
+        while self.query.filter(self.parent_id == target.parent_id,
+                                self.urlsegment == slug).count():
+            slug = "{0}-{1}".format(possible_slug, count)
+        target.urlsegment = slug

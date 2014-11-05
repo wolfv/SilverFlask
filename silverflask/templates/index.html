@@ -3,6 +3,9 @@
 {% block title %}Home{% endblock %}
 
 {% block body %}
+    {% for el in menu(0) %}
+        <a href="{{ el.get_url() }}">{{ el.name }}</a>
+    {% endfor %}
     <div class="jumbotron">
         <h1>Flask Foundation</h1>
         <p>The unopinionated flask framework</p>
