@@ -43,12 +43,12 @@ class LocalFileStorageBackend(FileStorageBackend):
         except OSError as exception:
             if exception.errno != errno.EEXIST:
                 raise
-
         if isinstance(read_pointer, FileStorage):
             read_pointer.save(path)
             return self.get_url(location)
 
         write_pointer = open(path, 'wb')
+        print(path)
         shutil.copyfileobj(read_pointer, write_pointer)
         return self.get_url(location)
 
@@ -120,12 +120,16 @@ class ImageObject(FileObject):
     __mapper_args__ = {
         'polymorphic_identity': __tablename__
     }
+
     # Specifies special operations on Image Files
     id = db.Column(db.Integer, db.ForeignKey('fileobject.id'), primary_key=True)
     __cache_dir__ = "/_resized/"
 
 
     def resize(self, width=None, height=None, mode='crop', background="white"):
+        if not height:
+            height = width
+
         def resized_location():
             orig_url = storage_backend.get_url(self.location)
             (orig_folder, tail) = os.path.split(orig_url)
@@ -142,6 +146,7 @@ class ImageObject(FileObject):
             tmp_file_path = "/tmp/" + str(uuid.uuid4()) + ext
             resized_img.save(tmp_file_path)
             tmp_file = open(tmp_file_path, "rb")
+            print("STORING RESIZED IMAGE")
             storage_backend.store(tmp_file, rl)
             return rl
 
@@ -198,3 +203,11 @@ class ImageObject(FileObject):
             img = img.resize((width, height), Image.ANTIALIAS)
 
         return img
+
+def create_file(f):
+    import mimetypes
+    mime = mimetypes.guess_type(f.filename)
+    if mime[0].startswith("image"):
+        return ImageObject(f)
+    else:
+        return FileObject(f)

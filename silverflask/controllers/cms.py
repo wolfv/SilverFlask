@@ -5,11 +5,13 @@ from flask.ext.login import login_user, logout_user, login_required
 from flask.ext.sqlalchemy import SQLAlchemy
 from silverflask import cache
 from silverflask.forms import LoginForm
-from silverflask.models import User, SiteTree, Page, SuperPage, FileObject, GalleryImage
+from silverflask.models import User, SiteTree, Page, SuperPage, \
+    FileObject, GalleryImage, SiteConfig
 from silverflask.models import DataObject
 from silverflask import db
 from flask import jsonify
 from sqlalchemy import event
+from silverflask.models.FileObject import create_file
 
 from wtforms import Form
 from silverflask.models.OrderedForm import OrderedForm
@@ -53,11 +55,9 @@ def edit_page(page_id):
     if page_form.validate_on_submit():
         page_form.populate_obj(page)
         db.session.commit()
-    print("ISINSTANCE: %s" % isinstance(page_form, OrderedForm))
     return render_template("page/edit.html",
                            page=page,
-                           page_form=page_form,
-                           tabbed_form=isinstance(page_form, OrderedForm))
+                           page_form=page_form)
 
 @bp.route("/add_page/<page_type>", methods=["GET", "POST"])
 def add_page(page_type):
@@ -77,7 +77,8 @@ def add_page(page_type):
         page_form.populate_obj(page)
         db.session.add(page)
         db.session.commit()
-        return redirect(url_for("admin.main"))
+        return redirect(url_for(".edit_page", page_id=page.id))
+    print("ISINSTANCE: %s" % isinstance(page_form, OrderedForm))
     return render_template("page/add.html",
                            page_form=page_form)
 
@@ -107,7 +108,7 @@ def upload():
     THIS_FOLDER = "silverflask/"
     UPLOAD_FOLDER = "static/uploads/"
     for f in request.files.getlist("file"):
-        fo = FileObject(f)
+        fo = create_file(f)
         db.session.add(fo)
         db.session.commit()
         return_dict = {
@@ -145,3 +146,33 @@ def sitetree_sort():
         page.insert_after(data["new_position"], SiteTree)
         db.session.commit()
     return "OK"
+
+class SiteConfigExtension(db.Model):
+    __tablename__ = SiteConfig.__tablename__
+    __table_args__ = {'extend_existing': True}
+    background_color = db.Column(db.String(50))
+
+    def __init__(self, baseclass):
+        """overwrite methods of parent class"""
+        pass
+
+@bp.route("/deduplicate")
+def deduplicate():
+    SiteTree.reindex()
+    return "Successful?"
+
+@bp.route("/siteconfig", methods=["POST", "GET"])
+def edit_siteconfig():
+    # In the current configuration there is only one SiteConfig
+    # This would change if more "Sites" are configured through one CMS
+    siteconfig = db.session.query(SiteConfig).first()
+    if not siteconfig:
+        siteconfig = SiteConfig()
+        db.session.add(siteconfig)
+        db.session.commit()
+    form = siteconfig.get_cms_form()
+    form = form(request.form, obj=siteconfig)
+    if form.validate_on_submit():
+        form.populate_obj(siteconfig)
+        db.session.commit()
+    return render_template("data_object/edit.html", form=form)

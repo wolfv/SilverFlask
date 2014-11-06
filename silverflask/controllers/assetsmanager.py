@@ -1,7 +1,7 @@
 from .cms import bp
 from silverflask.models import FileObject
 from flask_wtf import Form
-from flask import render_template, jsonify, url_for, abort, request
+from flask import render_template, jsonify, url_for, abort, request, redirect
 from silverflask.fields import GridField
 from silverflask import db
 
@@ -17,9 +17,9 @@ def assets_edit(record_id):
     if form.validate_on_submit():
         form.populate_obj(f)
         db.session.commit()
-        return "Succeeded"
+        return redirect(".assets_get")
 
-    return render_template("assetmanager/edit.html", elem=f, page_form=form)
+    return render_template("data_object/edit.html", elem=f, form=form)
 
 @bp.route("/assets/gridfield")
 def assets_get():
@@ -35,12 +35,11 @@ def assets_get():
 @bp.route("/assets")
 def assets():
     q = FileObject.query.limit(100)
-    assets_form = Form
-    assets_form.gridfield = GridField(
-        urls={"get": url_for(".assets_get")},
-        buttons=[],
-        display_rows=["id", "name"]
-    )
-    print(assets_form.gridfield)
-    return render_template("assetmanager.html", page_form=assets_form())
+    class AssetsForm(Form):
+        gridfield = GridField(
+            urls={"get": url_for(".assets_get")},
+            buttons=[],
+            display_rows=["id", "name"]
+        )
+    return render_template("assetmanager.html", form=AssetsForm())
 

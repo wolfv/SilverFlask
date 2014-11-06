@@ -46,18 +46,21 @@ class SuperPage(SiteTree):
 
     def get_cms_form(self):
         from wtforms import fields
-        form = OrderedForm
-        form.add_to_tab("Root.Main", fields.StringField(name="name", default=1))
-        form.add_to_tab("Root.Main", fields.TextAreaField(name="content"), before="asdasd")
-        form.add_to_tab("Root.Main", fields.SubmitField("Submit", name="Submit"))
-        return form
-        form = super().get_cms_form()
+        # Setup Gridfield
         button_list = []
         button_list.append(GridField.AddButton())
-        form.images = GridField(
+        g = GridField(
             parent_record=self,
             query=lambda: GalleryImage.query_factory().filter(GalleryImage.page_id == self.id),
             buttons=button_list,
             field_name="images",
-            display_rows=["id", "caption", "sort_order"])
+            display_rows=["id", "caption", "sort_order"],
+            name="images")
+
+        form = OrderedForm
+        form.add_to_tab("Root.Main", fields.StringField(name="name", default=1))
+        form.add_to_tab("Root.Main", fields.TextAreaField(name="content"), before="asdasd")
+        form.add_to_tab("Root.Gallery", g)
+        form.add_to_tab("Root.Buttons", fields.SubmitField("Submit", name="Submit"))
+
         return form

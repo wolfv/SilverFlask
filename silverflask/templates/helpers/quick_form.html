@@ -27,7 +27,7 @@
         {#        {{ form.hidden_tag() }}#}
 
         {{ form_errors(form, hiddens='only') }}
-        {% if not ordered_form  %}
+        {% if form.tabbed_form  %}
             <ul class="nav nav-tabs" role="tablist">
 
             {% for tab in form.get_root().tabs if not tab.name == "Buttons" %}

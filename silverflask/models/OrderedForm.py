@@ -75,9 +75,7 @@ class OrderedFieldList():
                 returnlist.append((c.name, c))
             for t in tab.tabs:
                 append_items(t)
-
         append_items(tab if tab else self.root)
-        print(returnlist)
         return returnlist
 
     def __iter__(self):
@@ -85,6 +83,7 @@ class OrderedFieldList():
 
 class OrderedForm(Form):
     _fields = OrderedFieldList()
+    tabbed_form = True
 
     def __init__(self, formdata=None, obj=None, data=None, csrf_enabled=None, prefix='', meta=DefaultMeta()):
 
@@ -142,3 +141,11 @@ class OrderedForm(Form):
 
     def get_root(self):
         return self._fields.root
+
+    def get_field(self, field_name):
+        all_fields = self._fields.items(self._fields.root)
+        print("all_fields", all_fields)
+        for name, field in all_fields:
+            print(name, field_name)
+            if name == field_name:
+                return field

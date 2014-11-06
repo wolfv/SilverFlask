@@ -27,6 +27,8 @@ class SiteTree(DataObject, OrderableMixin, db.Model):
                                backref=db.backref("parent", remote_side='SiteTree.id'),
     )
 
+    allowed_children = []
+
     def get_siblings(self):
         return SiteTree.query.filter(SiteTree.parent_id == self.parent_id)
 

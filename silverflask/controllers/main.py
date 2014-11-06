@@ -4,9 +4,9 @@ from silverflask import cache, db
 from silverflask.forms import LoginForm
 from silverflask.models import User, SiteTree
 from flask import jsonify
+from silverflask.models import SiteConfig
 
 from .. import app
-
 
 main = Blueprint('main', __name__)
 
@@ -19,6 +19,13 @@ def get_menu():
         return [r for r in
                 db.session.query(SiteTree).filter(SiteTree.parent_id == parent)]
     return dict(menu=menu)
+
+
+@app.context_processor
+def get_siteconfig():
+    siteconfig = SiteConfig.query.first()
+    return dict(siteconfig=siteconfig)
+
 
 @main.route('/')
 @cache.cached(timeout=1000)

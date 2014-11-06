@@ -44,7 +44,7 @@ class DataObject(object):
         event.listen(cls, 'before_insert', before_insert_listener)
         event.listen(cls, 'before_update', before_update_listener)
 
-        return super().__new__(cls, *args, **kwargs)
+        return super().__new__(cls)
 
 
     @classmethod

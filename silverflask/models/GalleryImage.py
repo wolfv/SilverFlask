@@ -2,7 +2,7 @@
 
 from .DataObject import DataObject
 from .OrderableMixin import OrderableMixin
-from . import FileObject
+from . import FileObject, ImageObject
 
 from silverflask import db
 from wtforms import fields
@@ -21,7 +21,7 @@ class GalleryImage(OrderableMixin, DataObject, db.Model):
     def get_cms_form(cls):
         form = Form
         form.caption = fields.StringField("Caption")
-        form.image_id = AsyncFileUploadField(relation=FileObject)
+        form.image_id = AsyncFileUploadField(relation=ImageObject)
         form.page_id = fields.IntegerField()
         form.submit = fields.SubmitField("Submit")
         return form

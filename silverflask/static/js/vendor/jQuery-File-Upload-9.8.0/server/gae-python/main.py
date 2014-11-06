@@ -24,7 +24,7 @@ MIN_FILE_SIZE = 1  # bytes
 MAX_FILE_SIZE = 5000000  # bytes
 IMAGE_TYPES = re.compile('image/(gif|p?jpeg|(x-)?png)')
 ACCEPT_FILE_TYPES = IMAGE_TYPES
-THUMBNAIL_MODIFICATOR = '=s80'  # max width / height
+THUMBNAIL_MODIFICATOR = '=s80'  # max width / heightselect * from imageobject where id = 10;
 EXPIRATION_TIME = 300  # seconds
 
 

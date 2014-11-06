@@ -2,6 +2,7 @@
 {% from 'helpers/quick_form.html' import quick_form %}
 
 {% block body %}
-    <h1>Manage your Assets</h1>
-    {{ quick_form(page_form) }}
+    <div class="page-edit">
+        {{ quick_form(form) }}
+    </div>
 {% endblock %}

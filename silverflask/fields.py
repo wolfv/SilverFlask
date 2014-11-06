@@ -16,6 +16,7 @@ class AsyncFileUploadWidget(object):
     def __call__(self, field, **kwargs):
         kwargs.setdefault('id', field.id)
         elem = None
+        print(field._value)
         if field._value():
             elem = db.session.query(self.relation).get(field._value())
 
