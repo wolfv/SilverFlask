@@ -130,3 +130,18 @@ def testsort():
     gi.move_after(0)
     db.session.commit()
     return jsonify(data=[(g.image.url(), g.sort_order) for g in GalleryImage.query.limit(1000)])
+
+@bp.route("/sitetree/sort", methods=["POST"])
+def sitetree_sort():
+    data = request.get_json()
+    if not data:
+        abort(403)
+    page_id = data["id"]
+    page = db.session.query(SiteTree).get(page_id)
+    if not page:
+        abort(404)
+    else:
+        page.parent_id = data["new_parent"]
+        page.insert_after(data["new_position"], SiteTree)
+        db.session.commit()
+    return "OK"

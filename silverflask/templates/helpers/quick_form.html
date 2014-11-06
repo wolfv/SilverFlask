@@ -36,7 +36,7 @@
             </ul>
             <div class="tab-content">
             {% for tab in form.get_root().tabs if not tab.name == "Buttons" %}
-                <div role="tabpanel" class="tab-pane active" id="{{ tab.name }}">
+                <div role="tabpanel" class="tab-pane {{ "active" if loop.first }}" id="{{ tab.name }}">
                 {%- for field in tab.children %}
                 {{ form_field(field,
                     form_type=form_type,
@@ -48,6 +48,9 @@
             {% endfor %}
             </div>
             <div class="row button-row">
+
+            <div class="col-sm-12">
+                <hr/>
                 {% for button in form.get_tab("Root.Buttons").children %}
                     {{ form_field(button,
                         form_type=form_type,
@@ -55,6 +58,7 @@
                         ubutton_map=button_map,
                         class_map=class_map) }}
                 {% endfor %}
+            </div>
             </div>
         {% else %}
             {%- for field in form %}

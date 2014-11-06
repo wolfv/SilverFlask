@@ -34,6 +34,7 @@ $(document).ready(function() {
 
     $('#tree').jstree({
         'core': {
+            "check_callback" : true,
             data: {
                 'url': function (node) {
                     return node.id === '#' ?
@@ -41,18 +42,45 @@ $(document).ready(function() {
                         '/admin/get_sitetree/' + node.id;
                 },
                 'data': function (node) {
-                    return { 'id': node.id };
+                    return { 'id': node.id,
+                        'abc': "asdjasljalksjdlasjkdajsdlkjasldja;lsj"
+                    };
                 }
             }
         },
-        'plugins': ['contextmenu'],
+        'plugins': ['contextmenu', 'dnd'],
         'contextmenu': {
             "items": customMenu
+        },
+        'dnd': {
+            "copy": false
         }
-    }).on('dblclick.jstree', function(e, data) {
+    })
+    $("#tree").on('dblclick.jstree', function(e, data) {
         var node = $(e.target).closest("a");
         window.location.href = node.attr("href")
-    });
+    })
+    $("#tree").on("move_node.jstree", function(e, data) {
+        var new_parent_id = null;
+        if(data.parent !== "#") {
+            new_parent_id = $("#" + data.parent).data("pageid");
+        }
+        var self_id = data.node.li_attr["data-pageid"]
+        var sort_url = $("#tree").data("sort_url")
+        var send_data = {
+            "new_parent": new_parent_id,
+            "id": self_id,
+            "new_position": data.position
+        }
+        $.ajax({
+            type: "POST",
+            url: sort_url,
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(send_data)
+        });
+        console.log("Drag finished.")
+    })
 
 
 
@@ -371,5 +399,7 @@ $(document).ready(function() {
             }
         })
     });
+
+    $("")
 
 });
