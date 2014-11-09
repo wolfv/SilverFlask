@@ -5,7 +5,6 @@ from flask.ext.script import Manager, Server
 from silverflask import create_app, db
 from silverflask.models import User
 
-
 # default to dev config because no one should use this in
 # production anyway
 env = os.environ.get('SILVERFLASK_ENV', 'dev')
@@ -31,6 +30,26 @@ def createdb():
     """
 
     db.create_all()
+    from silverflask.models import User
+    from silverflask.models.User import Role
+    if not len(Role.query.all()):
+        admin_role = Role("admin", "Admin has all privileges")
+        db.session.add(admin_role)
+        db.session.commit()
+    if not len(User.query.all()):
+        # create standard user
+        u = User("admin", "admin")
+        u.email = "admin"
+        db.session.add(u)
+        admin_role = Role.query.filter(Role.name == "admin").first()
+        u.roles.append(admin_role)
+        db.session.commit()
+
+    from silverflask.models import SiteConfig
+    if not len(SiteConfig.query.all()):
+        sc = SiteConfig()
+        db.session.add(sc)
+        db.session.commit()
 
 if __name__ == "__main__":
     manager.run()

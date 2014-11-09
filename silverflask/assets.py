@@ -15,6 +15,8 @@ common_css = Bundle(
 
 common_js = Bundle(
     'js/vendor/livingdocs-engine/components/jquery/jquery.js',
+    'js/bower_components/angular/angular.js',
+    'js/bower_components/angular-ui-tree/dist/angular-ui-tree.js',
     'js/vendor/bootstrap.min.js',
     'js/vendor/jquery.dataTables.js',
     'js/vendor/jquery-ui.js',

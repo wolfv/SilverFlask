@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, flash, request, redirect, url_for
-from flask.ext.login import login_user, logout_user, login_required
+from flask_user import login_required
 from silverflask import cache, db
 from silverflask.forms import LoginForm
 from silverflask.models import User, SiteTree
 from flask import jsonify
 from silverflask.models import SiteConfig
+from flask_user import current_user
 
 from .. import app
 
@@ -74,11 +75,11 @@ def data():
 
 @main.route('/<path:urlsegment>')
 def get_page(urlsegment):
-    print(urlsegment)
-    pages = SiteTree.query.limit(100)
-    for p in pages:
-        print("urlseg %s" % p.urlsegment)
     page = SiteTree.get_by_url(urlsegment)
+    if request.args.get("draft") and (current_user.is_authenticated() and current_user.has_roles("admin")):
+        page = page
+    else:
+        page = page.get_published()
     if not page:
         return "Not found", 404
     return render_template('page.html', **page.as_dict())

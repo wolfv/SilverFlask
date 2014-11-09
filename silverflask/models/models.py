@@ -8,10 +8,11 @@ from sqlalchemy import inspect
 from .GalleryImage import  GalleryImage
 from silverflask import db
 from .OrderedForm import OrderedForm
+from . import User
+
 
 class Page(SiteTree):
     __tablename__ = 'page'
-
     id = db.Column(db.Integer, db.ForeignKey('sitetree.id'), primary_key=True)
     content = db.Column(db.UnicodeText)
     content_json = db.Column(db.UnicodeText)
@@ -27,7 +28,10 @@ class Page(SiteTree):
         form.add_to_tab("Root.Main", HiddenField(name="content_json"))
         form.add_to_tab("Root.Settings", StringField(name="urlsegment"))
         form.add_to_tab("Root.Buttons", SubmitField("Submit", name="Submit"))
+        form.add_to_tab("Root.Buttons", SubmitField("Publish", name="Publish"))
+
         return form
+
 
 class SuperPage(SiteTree):
 

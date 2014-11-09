@@ -12,11 +12,24 @@ from silverflask import db
 from flask import jsonify
 from sqlalchemy import event
 from silverflask.models.FileObject import create_file
+from flask_user import current_user
 
 from wtforms import Form
 from silverflask.models.OrderedForm import OrderedForm
 
 bp = Blueprint('cms', __name__)
+
+@bp.before_request
+def restrict_access():
+    if not current_user.is_authenticated():
+        return redirect(url_for("user.login"))
+    elif not current_user.has_roles("admin"):
+        return abort(403)
+
+
+@bp.route("/angular")
+def render_ang():
+    return render_template("angular.html")
 
 @bp.route("/get_sitetree")
 def get_sitetree():
@@ -54,6 +67,9 @@ def edit_page(page_id):
     page_form = page_form(request.form, obj=page)
     if page_form.validate_on_submit():
         page_form.populate_obj(page)
+        if request.form.get("Publish"):
+            page.mark_as_published()
+
         db.session.commit()
     return render_template("page/edit.html",
                            page=page,
@@ -150,6 +166,7 @@ def sitetree_sort():
 class SiteConfigExtension(db.Model):
     __tablename__ = SiteConfig.__tablename__
     __table_args__ = {'extend_existing': True}
+
     background_color = db.Column(db.String(50))
 
     def __init__(self, baseclass):

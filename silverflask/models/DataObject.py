@@ -5,9 +5,7 @@ from flask_wtf import Form
 from wtforms.ext.sqlalchemy.orm import model_form
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import event
-
-
-db = SQLAlchemy()
+from silverflask import db
 
 class DataObject(object):
     @declared_attr

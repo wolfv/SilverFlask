@@ -2,12 +2,13 @@ from .DataObject import DataObject
 from flask import abort
 from slugify import slugify
 from .OrderableMixin import OrderableMixin
+from .VersionedMixin import VersionedMixin
 from sqlalchemy import event
 
 from silverflask import db
 
 
-class SiteTree(DataObject, OrderableMixin, db.Model):
+class SiteTree(DataObject, OrderableMixin, VersionedMixin, db.Model):
     parent_id = db.Column(db.Integer, db.ForeignKey('sitetree.id'))
     name = db.Column(db.String)
     database = ["parent_id", "name"]
@@ -116,9 +117,6 @@ class SiteTree(DataObject, OrderableMixin, db.Model):
             el = el.parent
         return url
 
-    @staticmethod
-    def get_slug_for_string(name):
-        return slugify(name)
 
     def set_parent(self, parent_id):
         self.parent_id = parent_id
@@ -126,11 +124,18 @@ class SiteTree(DataObject, OrderableMixin, db.Model):
     def __init__(self):
         self.database.extend(super(SiteTree, self).database)
 
-    def before_insert(self, mapper, context, target):
-        possible_slug = slugify(target.name)
+    @classmethod
+    def create_slug(cls, target):
+        possible_slug = slugify(target.name, to_lower=True)
         slug = possible_slug
         count = 0
-        while self.query.filter(self.parent_id == target.parent_id,
-                                self.urlsegment == slug).count():
+        while cls.query.filter(cls.parent_id == target.parent_id,
+                                cls.urlsegment == slug).count():
             slug = "{0}-{1}".format(possible_slug, count)
         target.urlsegment = slug
+
+    def before_insert(self, mapper, context, target):
+        self.create_slug(target)
+
+    def before_update(self, mapper, context, target):
+        self.create_slug(target)

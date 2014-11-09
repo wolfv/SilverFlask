@@ -2,6 +2,7 @@
 import os
 
 from flask import Flask
+from flask.ext.triangle import Triangle
 from webassets.loaders import PythonLoader as PythonAssetsLoader
 
 from silverflask import assets
@@ -12,11 +13,26 @@ from silverflask.extensions import (
     debug_toolbar,
     login_manager
 )
+from sqlalchemy_continuum import make_versioned
+from sqlalchemy_continuum.transaction import TransactionFactory
+from sqlalchemy_continuum.plugins import FlaskPlugin, TransactionMetaPlugin
+from sqlalchemy_continuum import (
+    make_versioned, remove_versioning, versioning_manager
+)
 
 from flask.ext.sqlalchemy import SQLAlchemy
+import sqlalchemy as sa
+
+from flask_user import UserManager, SQLAlchemyAdapter
+
 db = SQLAlchemy()
 
 app = Flask(__name__)
+Triangle(app)
+
+db.init_app(app)
+
+
 
 def create_app(object_name, env="prod"):
     """
@@ -29,7 +45,7 @@ def create_app(object_name, env="prod"):
 
         env: The name of the current environment, e.g. prod or dev
     """
-
+    print("CREATING APP :::\n\n")
     app.config.from_object(object_name)
 
     app.config['ENV'] = env
@@ -39,11 +55,10 @@ def create_app(object_name, env="prod"):
 
     debug_toolbar.init_app(app)
 
-    #init SQLAlchemy
-    db.init_app(app)
-
-    login_manager.init_app(app)
-
+    from silverflask.models import User
+    user_adapter = SQLAlchemyAdapter(db, User)
+    user_manager = UserManager(user_adapter, app)
+    user_manager.enable_login_without_confirm_email = True
     # Import and register the different asset bundles
     assets_env.init_app(app)
     assets_loader = PythonAssetsLoader(assets)
