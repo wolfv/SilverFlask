@@ -96,15 +96,17 @@ class SiteTree(DataObject, OrderableMixin, VersionedMixin, db.Model):
         }
 
     @staticmethod
-    def get_by_url(url):
+    def get_by_url(url, cls=None):
+        if not cls:
+            cls = SiteTree
         vars = url.split('/')
-        node = SiteTree.query.filter(SiteTree.urlsegment == vars[0]).first()
+        node = cls.query.filter(cls.urlsegment == vars[0]).first()
         if not node:
             abort(404)
 
         for var in vars[1:]:
-            node = SiteTree.query.filter(SiteTree.urlsegment == var,
-                                         SiteTree.parent_id == node.id).first()
+            node = cls.query.filter(cls.urlsegment == var,
+                                    cls.parent_id == node.id).first()
             if not node:
                 abort(404)
         return node

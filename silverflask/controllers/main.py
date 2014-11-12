@@ -13,12 +13,18 @@ main = Blueprint('main', __name__)
 
 @app.context_processor
 def get_menu():
+    print("IS THAT A DRAFT?")
+    if request.args.get("draft"):
+        print("DRAFT MENU")
+        cls = SiteTree
+    else:
+        cls = SiteTree.LiveType
     def menu(parent=None):
         if parent == 0:
             parent = None
         print("Getting Menu for parent: %r" % parent)
         return [r for r in
-                db.session.query(SiteTree).filter(SiteTree.parent_id == parent)]
+                cls.query.filter(cls.parent_id == parent)]
     return dict(menu=menu)
 
 
@@ -75,11 +81,10 @@ def data():
 
 @main.route('/<path:urlsegment>')
 def get_page(urlsegment):
-    page = SiteTree.get_by_url(urlsegment)
     if request.args.get("draft") and (current_user.is_authenticated() and current_user.has_roles("admin")):
-        page = page
+        page = SiteTree.get_by_url(urlsegment)
     else:
-        page = page.get_published()
+        page = SiteTree.get_by_url(urlsegment, SiteTree.LiveType)
     if not page:
         return "Not found", 404
     return render_template('page.html', **page.as_dict())

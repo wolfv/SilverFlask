@@ -14,7 +14,7 @@ class DevConfig(Config):
     ASSETS_DEBUG = True
 
     SQLALCHEMY_DATABASE_URI = 'sqlite:///../database.db'
-    SQLALCHEMY_ECHO = False
+    SQLALCHEMY_ECHO = True
 
     CACHE_TYPE = 'null'
 
