@@ -8,7 +8,7 @@ from sqlalchemy import event
 from silverflask import db
 
 
-class SiteTree(DataObject, OrderableMixin, VersionedMixin, db.Model):
+class SiteTree(VersionedMixin, DataObject, OrderableMixin, db.Model):
     parent_id = db.Column(db.Integer, db.ForeignKey('sitetree.id'))
     name = db.Column(db.String)
     database = ["parent_id", "name"]
@@ -124,7 +124,8 @@ class SiteTree(DataObject, OrderableMixin, VersionedMixin, db.Model):
         self.parent_id = parent_id
 
     def __init__(self):
-        self.database.extend(super(SiteTree, self).database)
+        pass
+        # self.database.extend(super(SiteTree, self).database)
 
     @classmethod
     def create_slug(cls, target):

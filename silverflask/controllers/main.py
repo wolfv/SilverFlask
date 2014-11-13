@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash, request, redirect, url_for
+from flask import Blueprint, render_template, flash, request, redirect, url_for, session
 from flask_user import login_required
 from silverflask import cache, db
 from silverflask.forms import LoginForm
@@ -13,9 +13,7 @@ main = Blueprint('main', __name__)
 
 @app.context_processor
 def get_menu():
-    print("IS THAT A DRAFT?")
-    if request.args.get("draft"):
-        print("DRAFT MENU")
+    if session["draft"]:
         cls = SiteTree
     else:
         cls = SiteTree.LiveType
@@ -24,7 +22,7 @@ def get_menu():
             parent = None
         print("Getting Menu for parent: %r" % parent)
         return [r for r in
-                cls.query.filter(cls.parent_id == parent)]
+                cls.query.filter(cls.parent_id == parent).all()]
     return dict(menu=menu)
 
 
@@ -81,7 +79,7 @@ def data():
 
 @main.route('/<path:urlsegment>')
 def get_page(urlsegment):
-    if request.args.get("draft") and (current_user.is_authenticated() and current_user.has_roles("admin")):
+    if session["draft"]:
         page = SiteTree.get_by_url(urlsegment)
     else:
         page = SiteTree.get_by_url(urlsegment, SiteTree.LiveType)

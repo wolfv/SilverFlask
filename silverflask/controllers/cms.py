@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, flash, request, json, \
     redirect, make_response, url_for, \
-    abort
+    abort, session
 from flask.ext.login import login_user, logout_user, login_required
 from flask.ext.sqlalchemy import SQLAlchemy
 from silverflask import cache
@@ -193,3 +193,13 @@ def edit_siteconfig():
         form.populate_obj(siteconfig)
         db.session.commit()
     return render_template("data_object/edit.html", form=form)
+
+@bp.route("/draft/activate")
+def activate_draft():
+    session["draft"] = True
+    return redirect("/")
+
+@bp.route("/draft/deactivate")
+def deactivate_draft():
+    session["draft"] = False
+    return redirect("/")

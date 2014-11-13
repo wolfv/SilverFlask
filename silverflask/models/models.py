@@ -66,5 +66,6 @@ class SuperPage(SiteTree):
         form.add_to_tab("Root.Main", fields.TextAreaField(name="content"), before="asdasd")
         form.add_to_tab("Root.Gallery", g)
         form.add_to_tab("Root.Buttons", fields.SubmitField("Submit", name="Submit"))
+        form.add_to_tab("Root.Buttons", SubmitField("Publish", name="Publish"))
 
         return form
