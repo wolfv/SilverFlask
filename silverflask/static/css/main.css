@@ -10,8 +10,42 @@
 .editor-container {
   height: 700px; }
 
+.cropArea {
+  width: 100%;
+  height: 600px; }
+
+.snippet-controls {
+  padding: 5px;
+  border: 1px solid #aaaaaa;
+  background: #f6f6f6; }
+  .snippet-controls h4 {
+    margin-top: 0; }
+  .snippet-controls .btn {
+    width: 100%; }
+  .snippet-controls .lvd-form {
+    margin-bottom: 10px; }
+    .snippet-controls .lvd-form input, .snippet-controls .lvd-form select {
+      width: 100%; }
+
+.living-docs-editor-addcontent-btns ul {
+  list-style: none;
+  margin: 0;
+  padding: 0; }
+  .living-docs-editor-addcontent-btns ul li {
+    display: block;
+    background: lightblue;
+    color: darkblue;
+    padding: 5px;
+    margin: 5px;
+    text-align: center;
+    cursor: pointer; }
+    .living-docs-editor-addcontent-btns ul li a {
+      text-decoration: none; }
+      .living-docs-editor-addcontent-btns ul li a:hover {
+        text-decoration: none; }
+
 .doc-toolbar {
-  height: 100%; }
+  overflow: auto; }
 
 .wrapper {
   display: flex;

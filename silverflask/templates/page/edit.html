@@ -9,6 +9,6 @@
     <div class="page-edit">
     <h1>{{ page.name }}</h1>
 
-    {{ quick_form(page_form) }}
+    {{ quick_form(page_form, class_map={"Submit": "btn-success"}) }}
     </div>
 {% endblock %}

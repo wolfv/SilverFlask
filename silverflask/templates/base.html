@@ -14,10 +14,12 @@
             <meta name="author" content="">
         {% endblock %}
 
-        {% assets "common_css" %}
-            <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
-        {% endassets %}
-        <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.3/css/jquery.dataTables.css"/>
+{#        {% assets "common_css" %}#}
+{#            <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />#}
+{#        {% endassets %}#}
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+{#        <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.3/css/jquery.dataTables.css"/>#}
 
         {% block css %}
         {% endblock %}

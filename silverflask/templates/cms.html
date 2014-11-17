@@ -27,18 +27,19 @@
 
 <body>
 
-<div class="wrapper">
-{#    <header class="header">#}
-{#        <div class="container">#}
-{#            {% with messages = get_flashed_messages(with_categories=true) %}#}
-{#                {% if messages %}#}
-{#                    {% for category, message in messages %}#}
-{#                        <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>#}
-{#                    {% endfor %}#}
-{#                {% endif %}#}
-{#            {% endwith %}#}
-{#        </div>#}
-{#    </header>#}
+<div class="wrapper" >
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <header class="header">
+            <div class="container">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+                        {% endfor %}
+            </div>
+        </header>
+        {% endif %}
+    {% endwith %}
+
     <article class="main">
         {% block body %}
 
@@ -46,10 +47,16 @@
     </article>
     <aside class="aside aside-1">
         <h3>SilverFlask</h3>
+        <p>{% if current_user %}
+            {{ current_user.name }}
+
+        {% endif %}
+        </p>
         <ul>
             <li><a href="/admin">Pages</a></li>
             <li><a href="/admin/assets">Assets</a></li>
             <li><a href="/admin/siteconfig">Site Config</a></li>
+            <li><a href="/admin/security">User</a></li>
         </ul>
     </aside>
     <aside class="aside aside-2">
@@ -57,6 +64,26 @@
         
         {% endblock %}
     </aside>
+</div>
+<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#cropModal">
+    Launch demo modal
+</button>
+
+<div class="modal" id="cropModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Crop Image
+            </div>
+            <div class="modal-body">
+                <div ng-controller="imageCropController">
+                    <div class="cropArea">
+                        <img-crop image="myImage" result-image="myCroppedImage"></img-crop>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 {% assets "common_js" %}

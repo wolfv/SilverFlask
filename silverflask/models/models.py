@@ -16,19 +16,19 @@ class Page(SiteTree):
     id = db.Column(db.Integer, db.ForeignKey('sitetree.id'), primary_key=True)
     content = db.Column(db.UnicodeText)
     content_json = db.Column(db.UnicodeText)
-
+    template = "page.html"
     __mapper_args__ = {
         'polymorphic_identity': __tablename__,
     }
 
     def get_cms_form(self):
-        form = OrderedForm
+        form = type("CMSOrderedForm", (OrderedForm, ), {})
         form.add_to_tab("Root.Main", StringField(name="name"))
         form.add_to_tab("Root.Main", LivingDocsField(name="content"))
         form.add_to_tab("Root.Main", HiddenField(name="content_json"))
         form.add_to_tab("Root.Settings", StringField(name="urlsegment"))
-        form.add_to_tab("Root.Buttons", SubmitField("Submit", name="Submit"))
-        form.add_to_tab("Root.Buttons", SubmitField("Publish", name="Publish"))
+        form.add_to_tab("Root.Buttons", SubmitField("Save", name="Submit"))
+        form.add_to_tab("Root.Buttons", SubmitField("Save & Publish", name="Publish"))
 
         return form
 
@@ -48,6 +48,8 @@ class SuperPage(SiteTree):
 
     images = db.relationship("GalleryImage")
 
+    template = "superpage.html"
+
     def get_cms_form(self):
         from wtforms import fields
         # Setup Gridfield
@@ -61,11 +63,11 @@ class SuperPage(SiteTree):
             display_rows=["id", "caption", "sort_order"],
             name="images")
 
-        form = OrderedForm
+        form = type("CMSOrderedForm", (OrderedForm, ), {})
         form.add_to_tab("Root.Main", fields.StringField(name="name", default=1))
         form.add_to_tab("Root.Main", fields.TextAreaField(name="content"), before="asdasd")
         form.add_to_tab("Root.Gallery", g)
-        form.add_to_tab("Root.Buttons", fields.SubmitField("Submit", name="Submit"))
+        form.add_to_tab("Root.Buttons", SubmitField("Save", name="Submit"))
         form.add_to_tab("Root.Buttons", SubmitField("Publish", name="Publish"))
 
         return form

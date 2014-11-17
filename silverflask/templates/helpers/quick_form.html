@@ -13,7 +13,10 @@
                     button_map={},
                     class_map={}) %}
     <form
-            {%- if action %} action="{{ action }}"{% endif -%}
+            {%- if action %} action="{{ action }}"
+            {% else %}
+                             action=""
+            {% endif -%}
             {%- if method %} method="{{ method }}"{% endif %}
                              class="form
     {%- if extra_classes %} {{ extra_classes }}{% endif -%}
@@ -21,6 +24,7 @@
     {%- elif form_type == "inline" %} form-inline
     {%- endif -%}
   "
+            ng-submit="alert('adsadsasdsa');"
             {%- if enctype %} enctype="{{ enctype }}"{% endif -%}
             {%- if role %} role="{{ role }}"{% endif -%}
             >
@@ -47,9 +51,6 @@
                 </div>
             {% endfor %}
             </div>
-            <div class="row button-row">
-
-            <div class="col-sm-12">
                 <hr/>
                 {% for button in form.get_tab("Root.Buttons").children %}
                     {{ form_field(button,
@@ -58,8 +59,6 @@
                         ubutton_map=button_map,
                         class_map=class_map) }}
                 {% endfor %}
-            </div>
-            </div>
         {% else %}
             {%- for field in form %}
                 {{ form_field(field,

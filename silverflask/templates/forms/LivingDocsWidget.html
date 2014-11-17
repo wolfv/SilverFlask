@@ -1,7 +1,29 @@
 <div class="hidden">
     <textarea name="{{ field_name }}" id="{{ field_name }}" cols="30" rows="10"></textarea>
 </div>
-<div class="editor-container">
-    <div class="doc-toolbar col-sm-3"></div>
+
+<script type="text/ng-template" id="editor-buttons.html">
+    <div class="snippet-controls" ng-show="elementSelected">
+        <h4>Snippet Settings</h4>
+        <div class="lvd-form">
+
+        </div>
+        <a class="btn btn-danger" ng-click="deleteSnippet()">Delete Snippet</a>
+    </div>
+
+    <ul class="">
+            <li ng-repeat="template in templates" class=""
+                ng-mousedown="newSnippetMousedownHandler(template.id)"
+                data-templateid="{{ template.id|angular }}">
+                <a href="#" class="" >{{ template.title|angular }}</a>
+            </li>
+    </ul>
+</script>
+
+<div class="editor-container" ng-controller="EditorController">
+    <div class="doc-toolbar col-sm-3" ng-controller="EditPane" >
+        <h3>Add Content</h3>
+        <div class="living-docs-editor-addcontent-btns" ng-include="'editor-buttons.html'"></div>
+    </div>
     <div class="col-sm-9 editor-section" data-for="{{ field_name }}"></div>
 </div>

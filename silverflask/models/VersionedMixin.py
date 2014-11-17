@@ -28,19 +28,19 @@ def create_live_table(cls):
         return
     created_tables.append(tablename)
     columns = []
+
     print("Creating Live table for: %s" % cls.__tablename__)
 
     ins = sainspect(cls)
 
     for c in cls.__table__.columns:
         if c.foreign_keys:
-            # print(c.__dict__)
+            # TODO Make this general
             columns.append(db.Column(c.key, db.Integer(),
                                      db.ForeignKey("sitetree_live.id"),
                                      primary_key=c.primary_key,
                                      default=c.default))
         else:
-            print(c.default)
             columns.append(c.copy())
 
     cls.LiveTable = table = sa.schema.Table(
@@ -53,7 +53,6 @@ def create_live_table(cls):
 
     for key, value in cls.__dict__.items():
         if type(value) is types.FunctionType:
-            print(key, value)
             args.update({key: value})
 
     args.update({

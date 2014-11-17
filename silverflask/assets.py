@@ -8,6 +8,7 @@ common_css = Bundle(
     'js/vendor/livingdocs-engine/public/assets/css/normalize.css',
     'js/vendor/livingdocs-engine/public/assets/css/livingdocs.css',
     'js/vendor/livingdocs-engine/public/assets/css/main.css',
+    'js/bower_components/ngImgCrop/compile/unminified/ng-img-crop.css',
     'css/main.css',
     filters='cssmin',
     output='public/css/common.css'
@@ -17,6 +18,7 @@ common_js = Bundle(
     'js/vendor/livingdocs-engine/components/jquery/jquery.js',
     'js/bower_components/angular/angular.js',
     'js/bower_components/angular-ui-tree/dist/angular-ui-tree.js',
+    'js/bower_components/ngImgCrop/compile/unminified/ng-img-crop.js',
     'js/vendor/bootstrap.min.js',
     'js/vendor/jquery.dataTables.js',
     'js/vendor/jquery-ui.js',
@@ -32,6 +34,8 @@ common_js = Bundle(
     'js/vendor/livingdocs-engine/dist/livingdocs-engine.js',
     Bundle(
         'js/main.js',
+        'js/editor.js',
+        'js/crop.js',
         filters='jsmin'
     ),
     output='public/js/common.js'

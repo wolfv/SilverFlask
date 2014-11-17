@@ -13,7 +13,7 @@ main = Blueprint('main', __name__)
 
 @app.context_processor
 def get_menu():
-    if session["draft"]:
+    if session.get("draft"):
         cls = SiteTree
     else:
         cls = SiteTree.LiveType
@@ -79,10 +79,13 @@ def data():
 
 @main.route('/<path:urlsegment>')
 def get_page(urlsegment):
-    if session["draft"]:
+    print("Getting Page \n\n\n\n")
+    if session.get("draft"):
         page = SiteTree.get_by_url(urlsegment)
     else:
         page = SiteTree.get_by_url(urlsegment, SiteTree.LiveType)
     if not page:
         return "Not found", 404
-    return render_template('page.html', **page.as_dict())
+    template = page.template
+    print(page.as_dict())
+    return render_template(template, page=page, **page.as_dict())

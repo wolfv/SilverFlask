@@ -17,7 +17,7 @@ class SiteConfig(DataObject, db.Model):
     theme = db.Column(db.String(250))
 
     def get_cms_form(cls):
-        form = Form
+        form = type("SiteConfigForm", (Form, ), {})
         form.title = fields.StringField()
         form.tagline = fields.StringField()
         form.theme = fields.SelectField(choices=[("Test", "Test")])

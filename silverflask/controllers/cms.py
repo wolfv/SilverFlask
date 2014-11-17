@@ -22,7 +22,7 @@ bp = Blueprint('cms', __name__)
 @bp.before_request
 def restrict_access():
     if not current_user.is_authenticated():
-        return redirect(url_for("user.login"))
+        return redirect(url_for("user.login", next=request.url))
     elif not current_user.has_roles("admin"):
         return abort(403)
 
@@ -98,17 +98,6 @@ def add_page(page_type):
     return render_template("page/add.html",
                            page_form=page_form)
 
-@bp.route("/testform")
-def testform():
-    from silverflask.fields import AsyncFileField, LivingDocsField
-    from wtforms.fields import StringField, SubmitField
-    form = Form
-    form.testfield = StringField("Whatever")
-    form.testfield = LivingDocsField("Whatever")
-    form.uploadfield = AsyncFileField("test")
-    form.submit = SubmitField("submit that fucker")
-    return render_template("page/add.html", page_form=form())
-
 
 @bp.route("/filemanager/delete/<int:file_id>")
 def filemanager_delete(self, file_id):
@@ -139,14 +128,6 @@ def upload():
         return jsonify(files=[return_dict])
     return "No File uploaded"
 
-@bp.route("/testsort")
-def testsort():
-    gi = db.session.query(GalleryImage).get(1)
-    gi.move_after(4)
-    gi = db.session.query(GalleryImage).get(2)
-    gi.move_after(0)
-    db.session.commit()
-    return jsonify(data=[(g.image.url(), g.sort_order) for g in GalleryImage.query.limit(1000)])
 
 @bp.route("/sitetree/sort", methods=["POST"])
 def sitetree_sort():

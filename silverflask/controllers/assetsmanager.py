@@ -17,7 +17,7 @@ def assets_edit(record_id):
     if form.validate_on_submit():
         form.populate_obj(f)
         db.session.commit()
-        return redirect(".assets_get")
+        return redirect(url_for(".assets"))
 
     return render_template("data_object/edit.html", elem=f, form=form)
 
@@ -34,7 +34,6 @@ def assets_get():
 
 @bp.route("/assets")
 def assets():
-    q = FileObject.query.limit(100)
     class AssetsForm(Form):
         gridfield = GridField(
             urls={"get": url_for(".assets_get")},

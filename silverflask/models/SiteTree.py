@@ -74,7 +74,11 @@ class SiteTree(VersionedMixin, DataObject, OrderableMixin, db.Model):
         self.children.append(child)
 
     def as_dict(self):
-        d = super().as_dict()
+        d = dict()
+        try:
+            d = super().as_dict()
+        except:
+            d = super(self.__class__, self).as_dict()
         d.update({
             "parent_id": self.parent_id,
             "name": self.name,
@@ -128,12 +132,17 @@ class SiteTree(VersionedMixin, DataObject, OrderableMixin, db.Model):
         # self.database.extend(super(SiteTree, self).database)
 
     @classmethod
-    def create_slug(cls, target):
+    def create_slug(cls, target, id=None):
         possible_slug = slugify(target.name, to_lower=True)
         slug = possible_slug
         count = 0
-        while cls.query.filter(cls.parent_id == target.parent_id,
-                                cls.urlsegment == slug).count():
+        def get_query(target, slug, id=None):
+            query = cls.query.filter(cls.parent_id == target.parent_id,
+                                     cls.urlsegment == slug)
+            if id:
+                query = query.filter(cls.id != id)
+            return query
+        while get_query(target, slug, id).count() > 0:
             slug = "{0}-{1}".format(possible_slug, count)
         target.urlsegment = slug
 
@@ -141,4 +150,4 @@ class SiteTree(VersionedMixin, DataObject, OrderableMixin, db.Model):
         self.create_slug(target)
 
     def before_update(self, mapper, context, target):
-        self.create_slug(target)
+        self.create_slug(target, self.id)
