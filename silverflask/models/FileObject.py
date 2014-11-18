@@ -11,27 +11,61 @@ from flask import abort
 
 class FileStorageBackend(object):
     """
-    FileStorageBackend
+    The file storage backend abstracts away different file storage providers.
 
-    implements
     """
     def store(self, filepointer, location):
+        """
+        Store a file in a given location
+
+        :param filepointer: filepointer which can be read
+        :param location: location where the file should be put, should be a string with slashes indicating folders
+        :return: url of stored file
+        """
         raise NotImplementedError()
 
     def exists(self, location):
+        """
+        Check if file exists at given location (i.e. for overwrite checking)
+
+        :param location: string with slash delimited location data (i.e. /folder/file.png)
+        :return: boolean True if file exists
+        """
         raise NotImplementedError()
 
     def retrieve(self, location):
+        """
+        Returns file pointer to file
+
+        :param location: string with slash delimited location data (i.e. /folder/file.png)
+        :return: filepointer to file at location or Null
+        """
         raise NotImplementedError()
 
     def delete(self, location):
+        """
+        Deletes file from storage
+
+        :param location: string with slash delimited location data (i.e. /folder/file.png)
+        :return: True if successful, otherwise raises error
+        """
         raise NotImplementedError()
 
     def get_url(self, location):
+        """
+        Return public url for file
+
+        :param location: string with slash delimited location data (i.e. /folder/file.png)
+        :return:
+        """
         raise NotImplementedError()
 
 
 class LocalFileStorageBackend(FileStorageBackend):
+    """
+    Currently the only implemented storage backend. Stores files in ``/static/uploads/`` folder in your flask
+    application folder
+    """
     def __init__(self, upload_folder):
         self.upload_folder = upload_folder
         self.program_folder = "./silverflask"
@@ -79,6 +113,14 @@ class LocalFileStorageBackend(FileStorageBackend):
 storage_backend = LocalFileStorageBackend("/static/uploads/")
 
 class FileObject(DataObject, db.Model):
+    """
+    Contains file information
+
+    :ivar location: Location of the file
+    :ivar name: Name of the file (usually filename without extension)
+    :ivar type: Contains
+    """
+
     location = db.Column(db.String(250))
     name = db.Column(db.String(250))
     type = db.Column(db.String(50))

@@ -8,13 +8,25 @@ from sqlalchemy import event
 from silverflask import db
 
 class DataObject(object):
+    """
+    The DataObject class is the basic building block of any CMS
+    Element. It is a mixin that provides three basic database columns:
+
+    Attributes:
+
+    :ivar id: Primary key, integer id (use for joins and relationships)
+    :ivar created_on: the datetime when the DataObject was created
+    :ivar last_modified: the datetime when the DataObject was last modified
+    """
     @declared_attr
     def __tablename__(cls):
+        """tablename, defaults to the classname in lowercase"""
         return cls.__name__.lower()
 
     id = db.Column(db.Integer(), primary_key=True)
     created_on = db.Column(db.DateTime, default=db.func.now())
     last_modified = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+
     has_one = {}
     has_many = {}
     many_many = {}
@@ -51,6 +63,19 @@ class DataObject(object):
 
     @classmethod
     def get_cms_form(cls):
+        """
+        Build and return Form class.
+
+        If you want to define your custom CMS Object, you likely want to override the default CMS Form. E.g.::
+
+            from wtforms import fields
+            def get_cms_form(cls):
+                form = super().get_cms_form()
+                form.textfield = fields.StringField("Textfield")
+                return form
+
+        :returns:  Form Class (has to be instantiated!).
+        """
         if hasattr(cls, "CMSForm"):
             return cls.CMSForm
         FormClass = model_form(cls, db.session, base_class=Form)
@@ -60,4 +85,8 @@ class DataObject(object):
         return FormClass
 
     def as_dict(self):
+        """
+        Get object as dict. Very useful for json responses.
+        :return: dict with all database columns
+        """
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
