@@ -67,7 +67,7 @@ def create_live_table(cls):
         if c != cls and c.__name__ == "SiteTree":
             print(c.__name__)
             baseclass = (c.LiveType, ) + baseclass
-        elif c != cls and cls.__name__ != "VersionedMixin":
+        elif c != cls and c.__name__ != "VersionedMixin":
             baseclass = (c, ) + baseclass
 
     # Reverse baseclass mro
@@ -117,6 +117,12 @@ def create_live_table(cls):
 
     if args.get("__create_live__"):
         del args["__create_live__"]
+
+    if args.get("before_insert"): del args["before_insert"]
+    if args.get("before_update"): del args["before_update"]
+    if args.get("__versioned__"): del args["__versioned__"]
+
+    args["template"] = getattr(cls, "template") if hasattr(cls, "template") else ""
 
     # print(methods)
     cls.LiveType = type(

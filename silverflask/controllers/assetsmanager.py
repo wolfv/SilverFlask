@@ -5,7 +5,6 @@ from flask import render_template, jsonify, url_for, abort, request, redirect
 from silverflask.fields import GridField
 from silverflask import db
 
-url_prefix = "/assets"
 
 @bp.route("/assets/edit/<int:record_id>", methods=["POST", "GET"])
 def assets_edit(record_id):

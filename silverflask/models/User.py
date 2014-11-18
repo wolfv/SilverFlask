@@ -23,9 +23,11 @@ class User(DataObject, UserMixin, db.Model):
     roles = db.relationship('Role', secondary='user_roles',
                              backref=db.backref('users', lazy='dynamic'))
 
-    def __init__(self, username, password):
+    def __init__(self, username, password, email=None, is_enabled=True):
         self.username = username
         self.password = app.user_manager.hash_password(password)
+        self.email = email
+        self.is_enabled = is_enabled
 
     @property
     def name(self):

@@ -1,6 +1,6 @@
 class Config(object):
     SECRET_KEY = 'secret key'
-
+    USER_LOGIN_TEMPLATE = "user/login.html"
 
 class ProdConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///../database.db'
@@ -14,7 +14,9 @@ class DevConfig(Config):
     ASSETS_DEBUG = True
 
     SQLALCHEMY_DATABASE_URI = 'sqlite:///../database.db'
-    SQLALCHEMY_ECHO = True
+    SQLALCHEMY_ECHO = False
+
+    HOME_URLSEGMENT = 'home'
 
     CACHE_TYPE = 'null'
 

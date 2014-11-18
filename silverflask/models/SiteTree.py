@@ -15,6 +15,8 @@ class SiteTree(VersionedMixin, DataObject, OrderableMixin, db.Model):
     type = db.Column(db.String(50))
     urlsegment = db.Column(db.String(250), nullable=False)
 
+    template = "page.html"
+
     __mapper_args__ = {
         'polymorphic_identity': 'sitetree',
         'polymorphic_on': type

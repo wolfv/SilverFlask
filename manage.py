@@ -3,7 +3,7 @@ import os
 
 from flask.ext.script import Manager, Server
 from silverflask import create_app, db
-from silverflask.models import User
+from silverflask.models import User, Page
 
 # default to dev config because no one should use this in
 # production anyway
@@ -50,6 +50,17 @@ def createdb():
         sc = SiteConfig()
         db.session.add(sc)
         db.session.commit()
+
+    if not len(Page.query.all()):
+        page = Page()
+        page.content = "<p>Please proceed to the admin interface at <a href='/admin'>admin</a>!</p>"
+        page.name = "home"
+        page.urlsegment = "home"
+        db.session.add(page)
+        db.session.commit()
+        page.mark_as_published()
+        db.session.commit()
+
 
 if __name__ == "__main__":
     manager.run()

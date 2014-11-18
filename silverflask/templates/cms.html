@@ -49,14 +49,14 @@
         <h3>SilverFlask</h3>
         <p>{% if current_user %}
             {{ current_user.name }}
-
+            <a href="{{ url_for("user.logout") }}">Logout</a>
         {% endif %}
         </p>
         <ul>
-            <li><a href="/admin">Pages</a></li>
-            <li><a href="/admin/assets">Assets</a></li>
-            <li><a href="/admin/siteconfig">Site Config</a></li>
-            <li><a href="/admin/security">User</a></li>
+            <li><a href="{{ url_for("cms.pages") }}">Pages</a></li>
+            <li><a href="{{ url_for("cms.assets") }}">Assets</a></li>
+            <li><a href="{{ url_for("cms.edit_siteconfig") }}">Site Config</a></li>
+            <li><a href="{{ url_for("cms.securitymanager") }}">User</a></li>
         </ul>
     </aside>
     <aside class="aside aside-2">
@@ -65,9 +65,6 @@
         {% endblock %}
     </aside>
 </div>
-<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#cropModal">
-    Launch demo modal
-</button>
 
 <div class="modal" id="cropModal">
     <div class="modal-dialog">

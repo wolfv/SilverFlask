@@ -1,0 +1,26 @@
+{% if current_user.is_authenticated() %}
+    <style>
+        #silverflask-navigator {
+            width: 100%; position: fixed; bottom: 0; background: #DDD; padding: 5px;
+        }
+        #silverflask-navigator a {
+            padding: 0 5px;
+        }
+        #silverflask-navigator-state-indicator {
+            position: absolute; top: 20px; right: 20px; padding: 10px; background: blue; color: #FFF; border:3px solid #0066cc;
+        }
+    </style>
+    <div id="silverflask-navigator" style=";">
+        <a href="{{ url_for("cms.deactivate_draft", page_id=page.id) }}">Live Page</a> |
+        <a href="{{ url_for("cms.activate_draft", page_id=page.id) }}">Draft Page</a> |
+        <a href="{{ url_for("cms.edit_page", page_id=page.id) }}">View in CMS</a>
+    </div>
+<div id="silverflask-navigator-state-indicator">
+    {% if session["draft"] %}
+        DRAFT
+    {% else %}
+        LIVE
+    {% endif %}
+</div>
+
+{% endif %}

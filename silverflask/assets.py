@@ -1,7 +1,7 @@
 from flask_assets import Bundle
 
 common_css = Bundle(
-    'css/vendor/flexboxgrid.css',
+    'css/vendor/bootstrap.min.css',
     'css/vendor/helper.css',
     'js/vendor/tree/themes/default/style.min.css',
     'js/vendor/livingdocs-engine/dist/css/livingdocs.css',

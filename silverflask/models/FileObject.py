@@ -7,8 +7,14 @@ from PIL import Image
 import uuid
 import errno
 import shutil
+from flask import abort
 
 class FileStorageBackend(object):
+    """
+    FileStorageBackend
+
+    implements
+    """
     def store(self, filepointer, location):
         raise NotImplementedError()
 
@@ -143,6 +149,9 @@ class ImageObject(FileObject):
             fp = storage_backend.retrieve(self.location)
             unused_var, ext = os.path.splitext(self.location)
             resized_img = self._resize(fp, width, height, mode, background)
+            if not resized_img:
+                return "" \
+                       ""
             tmp_file_path = "/tmp/" + str(uuid.uuid4()) + ext
             resized_img.save(tmp_file_path)
             tmp_file = open(tmp_file_path, "rb")
@@ -153,7 +162,10 @@ class ImageObject(FileObject):
     @staticmethod
     def _resize(filepointer, width=None, height=None, mode=None, background=None):
         print("resizing %r %r %r %r" % (filepointer, width, height, mode))
-        img = Image.open(filepointer)
+        try:
+            img = Image.open(filepointer)
+        except:
+            return False
         orig_width, orig_height = img.size
 
         width = min(width, orig_width) if width else None

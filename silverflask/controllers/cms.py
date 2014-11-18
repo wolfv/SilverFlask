@@ -27,10 +27,6 @@ def restrict_access():
         return abort(403)
 
 
-@bp.route("/angular")
-def render_ang():
-    return render_template("angular.html")
-
 @bp.route("/get_sitetree")
 def get_sitetree():
     s = SiteTree.get_sitetree()
@@ -176,11 +172,23 @@ def edit_siteconfig():
     return render_template("data_object/edit.html", form=form)
 
 @bp.route("/draft/activate")
-def activate_draft():
+@bp.route("/draft/activate/<int:page_id>")
+def activate_draft(page_id=None):
     session["draft"] = True
+    if page_id:
+        page = db.session.query(SiteTree).get(page_id)
+        if page:
+            redirect_url = page.get_url()
+            return redirect(redirect_url)
     return redirect("/")
 
 @bp.route("/draft/deactivate")
-def deactivate_draft():
+@bp.route("/draft/deactivate/<int:page_id>")
+def deactivate_draft(page_id=None):
     session["draft"] = False
+    if page_id:
+        page = db.session.query(SiteTree.LiveType).get(page_id)
+        if page:
+            redirect_url = page.get_url()
+            return redirect(redirect_url)
     return redirect("/")

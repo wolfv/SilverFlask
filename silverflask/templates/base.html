@@ -14,10 +14,9 @@
             <meta name="author" content="">
         {% endblock %}
 
-{#        {% assets "common_css" %}#}
-{#            <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />#}
-{#        {% endassets %}#}
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+        {% assets "common_css" %}
+            <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
+        {% endassets %}
 
 {#        <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.3/css/jquery.dataTables.css"/>#}
 
@@ -26,17 +25,33 @@
     </head>
 
     <body>
-        {% block body %}
-        
-        {% endblock %}
-        {% block content %}
-        {% endblock %}
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <nav class="navbar navbar-default">
+                    <ul class="nav navbar-nav">
+                        {% for el in menu(0) %}
+                            <li><a href="{{ el.get_url() }}">{{ el.name }}</a></li>
+                        {% endfor %}
+
+                    </ul>
+                    </nav>
+
+                </div>
+            </div>
+            {% block body %}
+
+            {% endblock %}
+            {% block content %}
+            {% endblock %}
+
+        </div>
         {% assets "common_js" %}
             <script type="text/javascript" src="{{ ASSET_URL }}"></script>
         {% endassets %}
 
         {% block js %}
         {% endblock %}
-
+        {% include "silverflask_navigator.html" %}
     </body>
 </html>
