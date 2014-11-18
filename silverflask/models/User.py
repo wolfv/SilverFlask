@@ -9,6 +9,9 @@ from wtforms import fields, validators
 
 
 class User(DataObject, UserMixin, db.Model):
+    """
+    The base User model.
+    """
     password = db.Column(db.String)
     username = db.Column(db.String, unique=True)
 

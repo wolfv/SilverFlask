@@ -43,7 +43,8 @@ DataObject
 SiteTree
 ----
 
-The SiteTree is the database model from which all pages have to inherit. It defines the parent/children relationships of the page tree. It also defines everything that's needed to get nice URL slugs working. 
+.. automodule:: silverflask.models.SiteTree
+    :members:
 
 User
 ----

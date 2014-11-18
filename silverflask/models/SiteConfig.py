@@ -10,6 +10,10 @@ class SiteConfig(DataObject, db.Model):
 
     Holds global variables such as theme selection,
     site title or tagline.
+
+    :ivar title: page title (shown in <title> tag)
+    :ivar tagline: tagline of the website, can be used in the template
+    :ivar theme: Not used now, could later hold the location of a template folder
     """
     __table_args__ = {'extend_existing': True}
     title = db.Column(db.String(250))

@@ -9,6 +9,12 @@ from silverflask import db
 
 
 class SiteTree(VersionedMixin, DataObject, OrderableMixin, db.Model):
+    """
+    The SiteTree is the database model from which all pages have to inherit.
+    It defines the parent/children relationships of the page tree.
+    It also defines everything that's needed to get nice URL slugs working.
+    """
+
     parent_id = db.Column(db.Integer, db.ForeignKey('sitetree.id'))
     name = db.Column(db.String)
     database = ["parent_id", "name"]

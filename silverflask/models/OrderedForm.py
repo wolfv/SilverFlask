@@ -82,6 +82,23 @@ class OrderedFieldList():
         yield self.items()
 
 class OrderedForm(Form):
+    """
+    An extension to the generic WTForm that can keep track of sorting in a manner different from the general
+    usage pattern of WTForms.
+
+    This class is useful for usage inside the CMS where its nice to not having to repeat all form code everytime.
+    It is a "forms-just-work approach".
+
+    The form is split into tabs. There is always a ``Root`` tab where all form elements and tabnodes are attached to.
+    E.g. ::
+
+        form = type(PageOrderedForm, (OrderedForm, ), {})
+        form.add_to_tab("Root.Main", new StringField("abc", name="abc"))
+        form.add_to_tab("Root.Main", new StringField("def", name="def"), "abc")
+        form.add_to_tab("Root.Settings", new BooleanField("booleansetting", name="booleansetting"))
+        return form
+
+    """
     _fields = OrderedFieldList()
     tabbed_form = True
 
@@ -134,15 +151,38 @@ class OrderedForm(Form):
 
     @classmethod
     def add_to_tab(cls, tabname, field, before=None):
+        """
+        Adds a form field to a tab.
+        :param tabname: The tabname is a dot-delimited tab location. The tab name should be a camel cased name. ``Root``
+                        is always existing and always the root tab.
+                        Examples: ``Root.Main``, ``Root.PageContent``, ``Root.Main.ImageGallery``
+        :param field:   An instantiated WTForm field. Note that field names have to be unique to the form
+        :param before:  Optional: sort the field before another field if it exists in a specific tab.
+        :return:        None
+        """
         return cls._fields.add_to_tab(tabname, field, before)
 
     def get_tab(self, location):
+        """
+        Get a specific tab by name indicator
+        :param location: e.g. ``Root.Main``
+        :return:
+        """
         return self._fields.get_tab(location)
 
     def get_root(self):
+        """
+        Get root tab
+        :return: root tab
+        """
         return self._fields.root
 
     def get_field(self, field_name):
+        """
+        Find a specific field by name in all tabs
+        :param field_name: name of the field
+        :return:
+        """
         all_fields = self._fields.items(self._fields.root)
         print("all_fields", all_fields)
         for name, field in all_fields:
