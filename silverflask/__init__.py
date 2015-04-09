@@ -13,24 +13,18 @@ from silverflask.extensions import (
     debug_toolbar,
     login_manager
 )
-from sqlalchemy_continuum import make_versioned
-from sqlalchemy_continuum.transaction import TransactionFactory
-from sqlalchemy_continuum.plugins import FlaskPlugin, TransactionMetaPlugin
-from sqlalchemy_continuum import (
-    make_versioned, remove_versioning, versioning_manager
-)
 
 from flask.ext.sqlalchemy import SQLAlchemy
-import sqlalchemy as sa
 
 from flask_user import UserManager, SQLAlchemyAdapter
 
 db = SQLAlchemy()
 
-app = Flask(__name__)
-Triangle(app)
+# Triangle(app)
 
-db.init_app(app)
+# db.init_app(app)
+db_adapter = SQLAlchemyAdapter(db, "User")
+user_manager = None
 
 
 
@@ -46,9 +40,16 @@ def create_app(object_name, env="prod"):
         env: The name of the current environment, e.g. prod or dev
     """
     print("CREATING APP :::\n\n")
+    app = Flask(__name__)
+
     app.config.from_object(object_name)
 
+    print(app.config)
     app.config['ENV'] = env
+
+    db.init_app(app)
+
+    print("DB INITIALIZED")
 
     #init the cache
     cache.init_app(app)
@@ -57,6 +58,7 @@ def create_app(object_name, env="prod"):
 
     from silverflask.models import User
     user_adapter = SQLAlchemyAdapter(db, User)
+    global user_manager
     user_manager = UserManager(user_adapter, app)
     user_manager.enable_login_without_confirm_email = True
     # Import and register the different asset bundles
@@ -67,15 +69,20 @@ def create_app(object_name, env="prod"):
 
     # register our blueprints
     from silverflask.controllers.main import main
+    from silverflask.controllers.main import setup_processors
+    setup_processors(app)
     from silverflask.controllers.cms import bp as cms_bp
     app.register_blueprint(main)
     app.register_blueprint(cms_bp, url_prefix='/admin')
+
+    with app.app_context():
+        db.create_all()
     return app
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # Import the config for the proper environment using the
     # shell var APPNAME_ENV
-    env = os.environ.get('APPNAME_ENV', 'prod')
-    create_app('appname.settings.%sConfig' % env.capitalize(), env=env)
-
-    app.run()
+    # env = os.environ.get('APPNAME_ENV', 'prod')
+    # create_app('silverflask.settings.%sConfig' % env.capitalize(), env=env)
+    #
+    # app.run()

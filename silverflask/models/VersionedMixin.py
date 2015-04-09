@@ -149,6 +149,12 @@ def create_live_table(cls):
     return cls.LiveTable
 
 
+class classproperty(object):
+    def __init__(self, f):
+        self.f = f
+    def __get__(self, obj, owner):
+        return self.f(owner)
+
 class VersionedMixin(object):
     """Base class for SQL Alchemy continuum objects that supports tagging"""
     __versioned__ = {
@@ -157,14 +163,22 @@ class VersionedMixin(object):
 
     __create_live__ = True
 
-    class __metaclass__(type):
-        @property
-        def query(cls):
-            print(request.args)
-            if request.args.get("draft"):
-                return db.session.query(cls)
-            return db.session.query(cls.LiveType)
+    # query_class = VersionedQuery
 
+    @classproperty
+    def test(self):
+        return "ads"
+
+    @classproperty
+    def query_live(cls):
+        return cls.LiveType.query
+
+    @classmethod
+    def query_factory(cls, stage="live"):
+        if stage == "live":
+            return super(cls.LiveType).query_factory()
+        else:
+            return super(cls).query_factory()
 
     @classmethod
     def live_table(cls):

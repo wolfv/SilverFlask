@@ -1,8 +1,9 @@
 from flask.ext.login import UserMixin, AnonymousUserMixin
+from flask import current_app
 from flask_user import UserMixin
+from silverflask import user_manager
 from silverflask import db
 from sqlalchemy.orm import synonym
-from .. import app
 from . import DataObject
 from wtforms import fields, validators
 
@@ -28,7 +29,7 @@ class User(DataObject, UserMixin, db.Model):
 
     def __init__(self, username, password, email=None, is_enabled=True):
         self.username = username
-        self.password = app.user_manager.hash_password(password)
+        self.password = current_app.user_manager.hash_password(password)
         self.email = email
         self.is_enabled = is_enabled
 
@@ -58,7 +59,7 @@ class User(DataObject, UserMixin, db.Model):
         return '<User %r>' % self.username
 
     def set_password(self, new_password):
-        self.password = app.user_manager.hash_password(new_password)
+        self.password = user_manager.hash_password(new_password)
 
     def as_dict(self):
         d = super().as_dict()

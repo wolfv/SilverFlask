@@ -159,3 +159,7 @@ class SiteTree(VersionedMixin, DataObject, OrderableMixin, db.Model):
 
     def before_update(self, mapper, context, target):
         self.create_slug(target, self.id)
+
+    @property
+    def stprop(self):
+        return "WAHZUP?"

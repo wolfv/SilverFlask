@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash, request, redirect, url_for, session
+from flask import Blueprint, render_template, abort, session, current_app
 from flask_user import login_required
 from silverflask import cache, db
 from silverflask.forms import LoginForm
@@ -7,39 +7,40 @@ from flask import jsonify
 from silverflask.models import SiteConfig
 from flask_user import current_user
 
-from .. import app
-
 main = Blueprint('main', __name__)
 
-@app.context_processor
-def get_menu():
-    if session.get("draft"):
-        cls = SiteTree
-    else:
-        cls = SiteTree.LiveType
-    def menu(parent=None):
-        if parent == 0:
-            parent = None
-        print("Getting Menu for parent: %r" % parent)
-        return [r for r in
-                cls.query.filter(cls.parent_id == parent).all()]
-    return dict(menu=menu)
+def setup_processors(app):
+
+    @app.context_processor
+    def get_menu():
+        if session.get("draft"):
+            cls = SiteTree
+        else:
+            cls = SiteTree.LiveType
+        def menu(parent=None):
+            if parent == 0:
+                parent = None
+            print("Getting Menu for parent: %r" % parent)
+            return [r for r in
+                    cls.query.filter(cls.parent_id == parent).all()]
+        return dict(menu=menu)
 
 
-@app.context_processor
-def get_siteconfig():
-    siteconfig = SiteConfig.query.first()
-    return dict(siteconfig=siteconfig)
+    @app.context_processor
+    def get_siteconfig():
+        siteconfig = SiteConfig.query.first()
+        return dict(siteconfig=siteconfig)
 
 
 @main.route('/')
 def home():
     page = SiteTree.query.filter(
         SiteTree.parent_id == None,
-        SiteTree.urlsegment == app.config["HOME_URLSEGMENT"]).scalar()
-    print(page)
+        SiteTree.urlsegment == current_app.config["HOME_URLSEGMENT"]).scalar()
     if not page:
         page = SiteTree.query.first()
+    if not page:
+        abort(404)
     return render_template(page.template, page=page, **page.as_dict()   )
 
 

@@ -22,3 +22,7 @@ class DevConfig(Config):
 
     # This allows us to test the forms from WTForm
     WTF_CSRF_ENABLED = False
+
+class TestConfig(DevConfig):
+    print("THIS IS THE TESTCONFIGN")
+    SQLALCHEMY_DATABASE_URI = 'sqlite://'
