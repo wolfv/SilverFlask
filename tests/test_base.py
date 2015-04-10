@@ -12,3 +12,34 @@ class BaseTest(TestCase):
         self.app = create_app("silverflask.settings.TestConfig", env="dev")
         return self.app
 
+    def setUp(self):
+        from silverflask.models import User
+        from silverflask.models.User import Role
+        if not len(Role.query.all()):
+            admin_role = Role("admin", "Admin has all privileges")
+            db.session.add(admin_role)
+            db.session.commit()
+        if not len(User.query.all()):
+            # create standard user
+            u = User("admin", "admin")
+            u.email = "admin"
+            db.session.add(u)
+            admin_role = Role.query.filter(Role.name == "admin").first()
+            u.roles.append(admin_role)
+            db.session.commit()
+
+        from silverflask.models import SiteConfig
+        if not len(SiteConfig.query.all()):
+            sc = SiteConfig()
+            db.session.add(sc)
+            db.session.commit()
+
+        if not len(Page.query.all()):
+            page = Page()
+            page.content = "<p>Please proceed to the admin interface at <a href='/admin'>admin</a>!</p>"
+            page.name = "home"
+            page.urlsegment = "home"
+            db.session.add(page)
+            db.session.commit()
+            page.mark_as_published()
+            db.session.commit()

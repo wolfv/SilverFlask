@@ -39,17 +39,15 @@ def create_app(object_name, env="prod"):
 
         env: The name of the current environment, e.g. prod or dev
     """
-    print("CREATING APP :::\n\n")
     app = Flask(__name__)
-
+    app.logger.debug("App Created")
     app.config.from_object(object_name)
 
     print(app.config)
     app.config['ENV'] = env
 
     db.init_app(app)
-
-    print("DB INITIALIZED")
+    app.logger.debug("DB Initialized")
 
     #init the cache
     cache.init_app(app)
@@ -58,9 +56,9 @@ def create_app(object_name, env="prod"):
 
     from silverflask.models import User
     user_adapter = SQLAlchemyAdapter(db, User)
-    global user_manager
     user_manager = UserManager(user_adapter, app)
     user_manager.enable_login_without_confirm_email = True
+
     # Import and register the different asset bundles
     assets_env.init_app(app)
     assets_loader = PythonAssetsLoader(assets)
