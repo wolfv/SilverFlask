@@ -7,6 +7,19 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import event
 from silverflask import db
 
+from flask import request
+from flask_user import current_user
+
+
+class CannotCreateError(PermissionError):
+    pass
+
+class CannotUpdateError(PermissionError):
+    pass
+
+class CannotDeleteError(PermissionError):
+    pass
+
 class DataObject(object):
     """
     The DataObject class is the basic building block of any CMS
@@ -54,6 +67,10 @@ class DataObject(object):
         event.listen(cls, 'before_insert', before_insert_listener)
         event.listen(cls, 'before_update', before_update_listener)
 
+        event.listen(cls, 'before_insert', lambda m, c, t: t.can_create(m, c))
+        event.listen(cls, 'before_update', lambda m, c, t: t.can_edit(m, c))
+        event.listen(cls, 'before_delete', lambda m, c, t: t.can_delete(m, c))
+
         return super().__new__(cls)
 
 
@@ -90,3 +107,21 @@ class DataObject(object):
         :return: dict with all database columns
         """
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+    def can_create(self, mapper, connection):
+        if request and not current_user:
+            raise CannotCreateError
+
+        return True
+
+    def can_edit(self, mapper, connection):
+        if request and not current_user:
+            raise CannotUpdateError
+
+        return True
+
+    def can_delete(self, mapper, connection):
+        if request and not current_user:
+            raise CannotDeleteError
+
+        return True

@@ -1,0 +1,124 @@
+j = jQuery
+class StateMachine:
+    current_state = ["nostate"]
+    current_snippet = None
+    controller_scopes =  []
+    def changeState(self, state, snippet=None):
+        self.current_state = state
+
+        if snippet:
+          self.current_snippet = snippet
+        #for c in self.controllerScopes
+        #("editorStateChanged")
+
+    def register_controller(self, controller):
+        self.controller_scopes.push(controller)
+
+    def get_current_state(self):
+        return self.current_state
+
+defaultContent = [
+  {
+    "component": "hero",
+    "content": { "title": "History Is Water Under The Bridge" }
+  },
+  {
+    "component": "p", "content": { "text": "On February 1, 2008, Toshio Suzuki stepped down from the position of Studio Ghibli president, which he had held since 2005, and Koji Hoshino (former president of Walt Disney Japan) took over. Suzuki said he wanted to improve films with his own hands as a producer, rather than demanding this from his employees. Suzuki decided to hand over the presidency to Hoshino because Hoshino has helped Studio Ghibli to sell its videos since 1996, also helping to release the Princess Mononoke film in the United States. Suzuki still serves on the company’s board of directors." }
+  },
+  {
+    "component": "main-and-sidebar",
+    "containers": {
+      "main": [
+        {
+          "component": "h2",
+          "content": { "title": "Understanding The Present Means Understanding Titles" }
+        },
+        {
+          "component": "p", "content": { "text": "Studio Ghibli has produced nineteen feature films, several short films, television commercials, and a television film. Eight of Studio Ghibli’s films are among the 15 highest-grossing anime films made in Japan, with Spirited Away being the highest, grossing over $274 million worldwide." }
+        },
+        { "component": "panel" }
+      ],
+      "sidebar": [
+        { "component": "quote" },
+        {
+          "component": "list-group",
+          "containers": {
+            "list": [
+              { "component": "list-group-item" },
+              { "component": "list-group-box-item" }
+            ]
+          }
+        }
+      ]
+    }
+  }
+]
+
+class Editor:
+    def __init__(self, node, design_name="boilerplate"):
+        self.selector_json_field = ".livingdocs-raw"
+        self.selector_html_field = ".livingdocs-field"
+        self.selector_editor_node = ".livingdocs-editor"
+
+        self.node = node
+        self.design = design_name
+        doc.design.load(design[self.design]);
+        self.json_field = j(self.selector_json_field, node)
+        self.html_field = j(self.selector_html_field, node)
+        self.editor_node = j(self.selector_editor_node, node)
+        self.load_content()
+        self.init_renderer()
+
+
+    def on_view_ready(self, view):
+        on_text_select = j.proxy(self.on_text_select, self)
+        on_component_focus = j.proxy(self.on_component_focus, self)
+
+
+        self.livingdoc.interactiveView.page.editableController.selection.add(on_text_select)
+        self.livingdoc.interactiveView.page.focus.componentFocus.add(on_component_focus)
+
+    def on_text_select(self, event):
+        console.log(event)
+        return None
+
+    def on_component_focus(self, event):
+        console.log(event)
+        return None
+
+    def init_renderer(self):
+        on_view_ready = j.proxy(self.on_view_ready, self)
+        ready = self.livingdoc.createView(
+            interactive=True,
+            iframe=True,
+            host='.editor-section')
+        ready.then(on_view_ready)
+
+    def load_content(self):
+        json = j(self.selector_json_field, self.node).first().val()
+        try:
+            parsed_json = JSON.parse(json)
+            self.livingdoc = doc.new(data=parsed_json)
+        except:
+            self.livingdoc = doc.new({
+                'data': {
+                    'content': defaultContent,
+                    'design': {
+                        'name': 'boilerplate',
+                        'version': '0.3.0'
+                    }
+                }
+            })
+            self.add_default_content()
+
+    def add_default_content(self):
+        return None
+
+
+def init_editors():
+    editors = []
+
+    for e in j(".livingdocs-editor-wrapper"):
+        editors.push(Editor(j(e)))
+
+j(document).ready(init_editors)

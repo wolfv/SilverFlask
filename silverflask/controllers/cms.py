@@ -19,6 +19,7 @@ from silverflask.models.OrderedForm import OrderedForm
 
 bp = Blueprint('cms', __name__)
 
+
 @bp.before_request
 def restrict_access():
     if not current_user.is_authenticated():

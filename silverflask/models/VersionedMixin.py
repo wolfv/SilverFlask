@@ -5,20 +5,27 @@ from sqlalchemy_continuum import get_versioning_manager, make_versioned, \
     versioning_manager, version_class, transaction_class
 from sqlalchemy_continuum.utils import version_obj
 from sqlalchemy_continuum.plugins import TransactionMetaPlugin
-from silverflask import db
 from sqlalchemy.orm import mapper
 from sqlalchemy import event
-from flask import request
+from flask import current_app
 import copy
 import types
 from sqlalchemy import inspect as  sainspect
 import inspect
+
+from silverflask import db
+from silverflask.helper import classproperty
+
 meta_plugin = TransactionMetaPlugin()
 
 make_versioned(plugins=[meta_plugin])
 
+import logging
+logger = logging.getLogger("SilverFlask")
 
-versioned_classes = ["sitetree"]
+
+versioned_classes = []
+versioned_tables = []
 created_tables = []
 
 def create_live_table(cls):
@@ -33,11 +40,25 @@ def create_live_table(cls):
 
     ins = sainspect(cls)
 
+    versioned_basetable = tablename
+    baseclass = tuple()
+    for c in inspect.getmro(cls):
+        if c != cls and c.__name__ in versioned_classes:
+            versioned_basetable = c.__table__.name + "_live"
+            baseclass = (c.LiveType, ) + baseclass
+        elif c != cls and c.__name__ != "VersionedMixin":
+            baseclass = (c, ) + baseclass
+
+    # Reverse baseclass mro
+    baseclass = baseclass[::-1]
+
+
     for c in cls.__table__.columns:
+        # What is happening
+        # TODO: Check if this also works with different relationships...
         if c.foreign_keys:
-            # TODO Make this general
             columns.append(db.Column(c.key, db.Integer(),
-                                     db.ForeignKey("sitetree_live.id"),
+                                     db.ForeignKey(versioned_basetable + ".id"),
                                      primary_key=c.primary_key,
                                      default=c.default))
         else:
@@ -62,18 +83,6 @@ def create_live_table(cls):
     for column in columns:
         args[column.name] = column
 
-    baseclass = tuple()
-    for c in inspect.getmro(cls):
-        if c != cls and c.__name__ == "SiteTree":
-            print(c.__name__)
-            baseclass = (c.LiveType, ) + baseclass
-        elif c != cls and c.__name__ != "VersionedMixin":
-            baseclass = (c, ) + baseclass
-
-    # Reverse baseclass mro
-    baseclass = baseclass[::-1]
-
-    print("FINDING RELATIONSHIPS %s" % cls.__name__)
     backrefs = []
     rs = [r for r in ins.relationships]
     for r in rs:
@@ -88,7 +97,7 @@ def create_live_table(cls):
 
             key = r.key
             target = ""
-            if r.target.fullname in versioned_classes:
+            if r.target.fullname in versioned_tables:
                 target = r.mapper.entity.__name__ + "Live"
             else:
                 primaryjoin = copy.copy(r.primaryjoin)
@@ -106,7 +115,7 @@ def create_live_table(cls):
                 if hasattr(backref["remote_side"].cls, "LiveType") or backref["remote_side"].cls == cls:
                     orig_arg = backref["remote_side"].arg
                     arg_v = orig_arg.split(".")
-                    arg_v[0] = arg_v[0] + "Live"
+                    arg_v[0] += "Live"
                     remote_side = ".".join(arg_v)
                     print(remote_side)
                     args[key] = db.relationship(target, backref=db.backref(backref_key, remote_side=remote_side), cascade="none, ")
@@ -140,20 +149,15 @@ def create_live_table(cls):
             # remap column!
             mapper_args[key] = table.columns[arg.name]
         elif key == "polymorphic_identity":
-            mapper_args[key] = mapper_args[key] + "_live"
+            mapper_args[key] += "_live"
 
     live_mapper = mapper(cls, cls.LiveTable,
                          non_primary=True,
                          **mapper_args)
+
     cls.live_mapper = live_mapper
     return cls.LiveTable
 
-
-class classproperty(object):
-    def __init__(self, f):
-        self.f = f
-    def __get__(self, obj, owner):
-        return self.f(owner)
 
 class VersionedMixin(object):
     """Base class for SQL Alchemy continuum objects that supports tagging"""
@@ -164,10 +168,6 @@ class VersionedMixin(object):
     __create_live__ = True
 
     # query_class = VersionedQuery
-
-    @classproperty
-    def test(self):
-        return "ads"
 
     @classproperty
     def query_live(cls):
@@ -187,13 +187,20 @@ class VersionedMixin(object):
     def get_published(self):
         return self
 
+
+    def can_publish(self):
+        return True
+
+
     def mark_as_published(self):
+        if not self.can_publish():
+            return False
         print("Publishing Page %d \n\n" % self.id)
+
         live_table_name = self.live_table()
 
         t = self.LiveType
         t_obj = db.session.query(t).get(self.id)
-        print(t_obj)
         new_object = False
         if not t_obj:
             t_obj = t()
@@ -202,7 +209,6 @@ class VersionedMixin(object):
         ins = sainspect(self.__class__)
 
         for column in ins.columns:
-            print("KEY: %s : %s" % (column.name, getattr(self, column.name)))
             setattr(t_obj, column.name, getattr(self, column.name))
         if new_object:
             db.session.add(t_obj)
@@ -212,11 +218,17 @@ class VersionedMixin(object):
 
 classes_to_create = []
 
+
 @event.listens_for(mapper, "instrument_class")
 def instrumented_class(mapper, cls):
     if cls is not None and hasattr(cls, "__create_live__") \
         and cls not in classes_to_create and not cls.__name__.endswith("Live"):
         classes_to_create.append(cls)
+        if not cls.__table__.name in versioned_tables:
+            if not (mapper.inherits and mapper.inherits.tables[0].name in versioned_tables):
+                versioned_tables.append(cls.__table__.name)
+                versioned_classes.append(cls.__name__)
+
 
 @event.listens_for(mapper, 'after_configured')
 def after_configured():

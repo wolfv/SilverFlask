@@ -1,3 +1,6 @@
+body {
+  min-height: 100vh; }
+
 .container {
   margin-top: 60px; }
 
@@ -16,7 +19,7 @@
 
 .snippet-controls {
   padding: 5px;
-  border: 1px solid #aaaaaa;
+  border: 1px solid #AAA;
   background: #f6f6f6; }
   .snippet-controls h4 {
     margin-top: 0; }
@@ -50,7 +53,8 @@
 .wrapper {
   display: flex;
   display: -webkit-flex;
-  flex-flow: row wrap; }
+  flex-flow: row wrap;
+  min-height: 100vh; }
   .wrapper > * {
     flex: 1 100%; }
   .wrapper .main {
@@ -73,10 +77,12 @@
       padding: 0; }
       .wrapper .aside-1 ul li {
         display: block;
-        border-bottom: 1px solid #f3f3f3;
+        border-bottom: 1px solid #F3f3f3;
         list-style: none; }
       .wrapper .aside-1 ul a {
-        color: white;
+        color: #fff;
         padding: 10px 10px;
         display: block;
         text-decoration: none; }
+
+/*# sourceMappingURL=main.css.map */

@@ -1,8 +1,6 @@
 #! ../env/bin/python
-import os
 
 from flask import Flask
-from flask.ext.triangle import Triangle
 from webassets.loaders import PythonLoader as PythonAssetsLoader
 
 from silverflask import assets
@@ -20,12 +18,11 @@ from flask_user import UserManager, SQLAlchemyAdapter
 
 db = SQLAlchemy()
 
-# Triangle(app)
-
-# db.init_app(app)
 db_adapter = SQLAlchemyAdapter(db, "User")
 user_manager = None
 
+import logging
+logger = logging.getLogger("silverflask")
 
 
 def create_app(object_name, env="prod"):
@@ -43,13 +40,12 @@ def create_app(object_name, env="prod"):
     app.logger.debug("App Created")
     app.config.from_object(object_name)
 
-    print(app.config)
     app.config['ENV'] = env
 
     db.init_app(app)
-    app.logger.debug("DB Initialized")
+    logger.debug("DB Initialized")
 
-    #init the cache
+    # init the cache
     cache.init_app(app)
 
     debug_toolbar.init_app(app)
@@ -76,11 +72,3 @@ def create_app(object_name, env="prod"):
     with app.app_context():
         db.create_all()
     return app
-
-# if __name__ == '__main__':
-    # Import the config for the proper environment using the
-    # shell var APPNAME_ENV
-    # env = os.environ.get('APPNAME_ENV', 'prod')
-    # create_app('silverflask.settings.%sConfig' % env.capitalize(), env=env)
-    #
-    # app.run()

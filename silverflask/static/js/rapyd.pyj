@@ -1,0 +1,205 @@
+j = jQuery
+import stdlib
+
+
+class DOMNode:
+    """
+    A Dom Node that can attach events and everything
+    """
+    def __init__(self, node):
+        self.node = node
+        return self
+
+    def connect(self, event, callback, capture=False):
+        self.node.addEventListener(event, callback, capture)
+
+
+class DOM:
+    """
+    A class wrapping several DOM methods
+    """
+    @staticmethod
+    def select(self, selector, context=document):
+        return DOMNode(context.querySelector(selector))
+
+
+class Request:
+
+    @staticmethod
+    def send_json(url, request_data, success_handler=None, error_handler=None):
+        return j.ajax({
+            'type': 'POST',
+            'url': url,
+            'dataType': 'json',
+            'contentType': 'application/json; charset=utf-8',
+            'data': JSON.stringify(request_data),
+            'success': success_handler,
+            'error': error_handler
+        })
+
+
+class SiteTree:
+
+    def get_url(self, node):
+        if node.id is '#':
+            return '/admin/get_sitetree'
+        else:
+            return '/admin/get_sitetree/' + node.id
+
+    def get_data(self, node):
+        return {'id': node.id}
+
+    def add_child_page(self):
+        return None
+
+    def delete_page(self):
+        return None
+
+    def get_menu_items(self):
+        return {
+            'renameItem': {
+                'label': 'Add Child Page',
+                'action': self.add_child_page
+            },
+            'deleteItem': {
+                'label': 'Delete Page',
+                'action': self.delete_page
+            }
+        }
+
+    def on_dblclick(self, event, data):
+        clicked_node = j(event.target).closest("a")
+        window.location.href = clicked_node.attr("href")
+
+    def on_move_node(self, event, data):
+        if data.parent is not "#":
+            new_parent_id = j("#" + data.parent).data("pageid")
+        else:
+            new_parent_id = None
+
+        node_id = data.node.li_attr["data-pageid"]
+
+        request_data = {
+            "new_parent": new_parent_id,
+            "id": node_id,
+            "new_position": data.position
+        }
+
+        Request.send_json(self.sort_url, request_data)
+
+
+    def __init__(self, node):
+        self.node = node
+        self.tree = node.jstree({
+            'core': {
+                'check_callback': True,
+                'data': {
+                    'url': self.get_url,
+                    data: self.get_data
+                },
+            },
+            'plugins': ['contextmenu', 'dnd'],
+            'contextmenu': {
+                "items": self.get_menu_items()
+            },
+            'dnd': {
+                "copy": False
+            }
+        })
+
+        self.sort_url = self.node.data("sort_url")
+
+        self.node.on('dblclick.jstree', self.on_dblclick)
+        self.node.on('move_node.jstree', self.on_move_node)
+
+class GridField:
+    """
+    Grid Field Class wrapping DataTable in a pythonic way
+    """
+    def __init__(self, node):
+        self.columns = []
+        self.node = node
+        for header in j('th', node):
+            self.columns.append({'data': j(header).data('col')})
+
+        self.table = self.node.DataTable(
+            ajax=self.node.data("ajax-url"),
+            columns=self.columns,
+            ordering=False,
+            order= [2, "asc"]
+        )
+        self.table.rowReordering({
+            "sURL": self.node.data("sort-url"),
+            "iIndexColumn": 2,
+            "fnUpdateAjaxRequest": None
+        })
+
+class UploadField:
+    """
+    Upload Field for async uploading of files and whatnot
+    """
+
+    input_template = """<input type="file" class="hidden" name="file"></input>"""
+    url = '/admin/upload'
+
+    def on_add(self, event, data):
+        data.context = j('<p>').text("Uploading ... ")
+        self.node.parent().append(data.context)
+
+        self.current_image = j("<img>").addClass("obj")
+        self.current_image.get(0).file = data.files[0]
+
+        self.node.parent().append(self.current_image)
+
+        reader = new FileReader()
+
+        reader.onload = def(event):
+            self.current_image.get(0).src = e.target.result
+
+        reader.readAsDataURL(data.files[0])
+        data.submit()
+
+    def on_progress(self, event, data):
+        print("Upload in progress")
+
+    def on_done(self, event, data):
+        url = "http://" + window.location.host + data.result.files[0].url
+        self.node.children("input").val(data.result.files[0].id)
+
+        for file in data.result.files:
+            j('<p/>').text(file.name).appendTo(j('body'))
+
+    def __init__(self, node):
+        self.node = node
+        self.input = j(self.input_template)
+        j("body").append(self.input)
+
+        self.input.fileupload({
+            'dataType': 'json',
+            'url': self.url,
+            'dropZone': self.node.children('.dropzone'),
+            'progress': self.on_progress,
+            'add': self.on_add,
+            'done': self.on_done
+        })
+
+        self.node.children('.open-file-dialog').on('click',
+            def(e): self.input.trigger(e)
+        )
+
+
+def init_gridfields():
+    gridfields = []
+    for field in j(".gridfield"):
+        gridfields.push(GridField(j(field)))
+    console.log(gridfields)
+
+def init_tree():
+    SiteTree(j("#tree"))
+
+def on_ready():
+    init_gridfields()
+    init_tree()
+
+
+DOMNode(document).connect("ready", on_ready())
