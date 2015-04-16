@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "dependencies": {
     "jquery": ">2.0.0",
-    "livingdocs-engine": "https://github.com/upfrontIO/livingdocs-engine",
+    "livingdocs-engine": "https://github.com/upfrontIO/livingdocs-engine.git",
     "editable": "~0.5.1",
     "datatables": "~1.10.6",
     "blueimp-file-upload": "~9.9.3",
