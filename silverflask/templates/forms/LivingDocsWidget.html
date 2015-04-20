@@ -1,26 +1,15 @@
-<div class="livingdocs-editor-wrapper">
-    <div class="hidden">
-        <div class="editor-container" ng-controller="EditorController">
-            <div class="doc-toolbar col-md-2" ng-controller="EditPane" >
-                <h3>Add Content</h3>
-                <div class="living-docs-editor-addcontent-btns" ng-include="'editor-buttons.html'"></div>
+<div class="livingdocs-editor-wrapper row"  data-name="{{ field_name }}">
+    <div class="editor-container">
+        <div class="doc-toolbar col-md-2">
+            <h3>Add Content</h3>
+            <div class="doc-blocks">
+
             </div>
-            <div class="col-md-10 editor-section" data-for="{{ field_name }}"></div>
+            <div class="doc-block-properties">
+
+            </div>
         </div>
-        <textarea name="{{ field_name }}" id="{{ field_name }}"  class="livingdocs-field" cols="30" rows="10"></textarea>
+        <div class="col-md-10 editor-section"></div>
+        <textarea name="{{ field_name }}" id="{{ field_name }}"  class="livingdocs-field hidden" cols="30" rows="10"></textarea>
     </div>
-
-    <script type="text/ng-template" id="editor-buttons.html">
-        <div class="snippet-controls" ng-show="elementSelected">
-            <h4>Snippet Settings</h4>
-            <div class="lvd-form">
-
-            </div>
-            <a class="btn btn-danger" ng-click="deleteSnippet()">Delete Snippet</a>
-        </div>
-
-        <ul class="ld-snippets">
-        </ul>
-    </script>
-
 </div>

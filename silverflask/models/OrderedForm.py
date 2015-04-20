@@ -27,6 +27,23 @@ class OrderedFieldList():
     def __init__(self):
         self.root = TabNode("Root")
 
+    def __getitem__(self, item):
+        i = self.find_by_name(item)
+        if not i:
+            raise(IndexError("No item named %s" % item))
+        return i
+
+    def __delitem__(self, item):
+        def delete_unbound_child(tab):
+            for c in tab.unbound_children:
+                if c.kwargs["name"] == item:
+                    tab.unbound_children.remove(c)
+                    return True
+            for t in tab.tabs:
+                return delete_unbound_child(t)
+
+        ret_val = delete_unbound_child(self.root)
+
     def get_tab(self, location, create_tabs=False):
         location = location.split('.')
         print(location)
@@ -49,20 +66,22 @@ class OrderedFieldList():
 
         return node
 
+    def find_by_name(self, name, tab=None, unbound=False):
+        if not tab:
+            tab = self.root
+        for c in tab.children:
+            if c.name == name:
+                return c
+        for t in tab.tabs:
+            return self.find_by_name(name, t)
+        return None
 
     def add_to_tab(self, tabname, field, before=None):
-
-        def find_by_name(name, tab):
-            for c in tab.children:
-                if c.name == name:
-                    return c
-            for t in tab.tabs:
-                return find_by_name(name, t)
-            return None
-
-        existing_child = find_by_name(field.kwargs["name"], self.root)
-        if existing_child:
-            del existing_child
+        fieldname = field.kwargs["name"]
+        try:
+            del self[fieldname]
+        except IndexError:
+            pass
 
         node = self.get_tab(tabname, True)
         index = node.find(before)
@@ -121,7 +140,6 @@ class OrderedForm(Form):
             csrf_context = {}
             self.SECRET_KEY = ''
 
-
         if prefix and prefix[-1] not in '-_;:/.':
             prefix += '-'
 
@@ -143,11 +161,17 @@ class OrderedForm(Form):
                 tab.children.append(field.bind(self, name))
             tab.unbound_children = []
             for t in tab.tabs:
-                bind_fields(t)
+                c = bind_fields(t)
+                if c == 0:
+                    print(t)
+                    print(t.name)
+                    del t
+                    print(tab.children)
+            return len(tab.children)
+
 
         bind_fields(self._fields.root)
         self.process(formdata, obj, data)
-
 
     @classmethod
     def add_to_tab(cls, tabname, field, before=None):
@@ -189,3 +213,27 @@ class OrderedForm(Form):
             print(name, field_name)
             if name == field_name:
                 return field
+
+
+class OrderedFormFactory:
+    def __init__(self):
+        self.fields = OrderedFieldList()
+    def __call__(self, *args, **kwargs):
+        return self.create()(*args, **kwargs)
+
+    def create(self):
+        return type('OrderedFactoryForm', (OrderedForm, ), {
+            "_fields": self.fields
+        })
+
+    def add_to_tab(self, tabname, field, before=None):
+        """
+        Adds a form field to a tab.
+        :param tabname: The tabname is a dot-delimited tab location. The tab name should be a camel cased name. ``Root``
+                        is always existing and always the root tab.
+                        Examples: ``Root.Main``, ``Root.PageContent``, ``Root.Main.ImageGallery``
+        :param field:   An instantiated WTForm field. Note that field names have to be unique to the form
+        :param before:  Optional: sort the field before another field if it exists in a specific tab.
+        :return:        None
+        """
+        return self.fields.add_to_tab(tabname, field, before)

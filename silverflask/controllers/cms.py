@@ -1,24 +1,19 @@
 from flask import Blueprint, render_template, flash, request, json, \
     redirect, make_response, url_for, \
-    abort, session
-from flask.ext.login import login_user, logout_user, login_required
-from flask.ext.sqlalchemy import SQLAlchemy
-from silverflask import cache
-from silverflask.forms import LoginForm
+    abort, session, current_app, send_from_directory
 from silverflask.models import User, SiteTree, Page, SuperPage, \
     FileObject, GalleryImage, SiteConfig
-from silverflask.models import DataObject
 from silverflask import db
 from flask import jsonify
-from sqlalchemy import event
 from silverflask.models.FileObject import create_file
 from flask_user import current_user
-
-from wtforms import Form
-from silverflask.models.OrderedForm import OrderedForm
+from silverflask.models.OrderedForm import OrderedFormFactory
 
 bp = Blueprint('cms', __name__)
 
+@bp.context_processor
+def pagetypes():
+    return dict(pagetypes=SiteTree.pagetypes())
 
 @bp.before_request
 def restrict_access():
@@ -54,14 +49,17 @@ def main():
 def pages():
     return render_template("page/index.html")
 
-
 @bp.route("/edit/page/<int:page_id>", methods=["GET", "POST"])
 def edit_page(page_id):
     page = db.session.query(SiteTree).get(page_id)
     if not page:
         abort(404)
     page_form = page.get_cms_form()
+    if type(page_form) == OrderedFormFactory:
+        page_form = page_form.create()
+
     page_form = page_form(request.form, obj=page)
+
     if page_form.validate_on_submit():
         page_form.populate_obj(page)
         if request.form.get("Publish"):
@@ -83,7 +81,10 @@ def add_page(page_type):
     if parent_id:
         page.parent_id = int(parent_id)
     page_form = page.get_cms_form()
-    print(page_form)
+
+    if type(page_form) == OrderedFormFactory:
+        page_form = page_form.create()
+
     page_form = page_form()
     page_form.process(request.form, obj=page)
     if page_form.validate_on_submit():
@@ -91,7 +92,8 @@ def add_page(page_type):
         db.session.add(page)
         db.session.commit()
         return redirect(url_for(".edit_page", page_id=page.id))
-    print("ISINSTANCE: %s" % isinstance(page_form, OrderedForm))
+
+
     return render_template("page/add.html",
                            page_form=page_form)
 
@@ -105,11 +107,8 @@ def filemanager_delete(self, file_id):
 @bp.route("/upload", methods=["POST"])
 def upload():
     print(request.files)
-    import os
-
-    THIS_FOLDER = "silverflask/"
-    UPLOAD_FOLDER = "static/uploads/"
-    for f in request.files.getlist("file"):
+    for f in request.files.getlist("files[]"):
+        print(f)
         fo = create_file(f)
         db.session.add(fo)
         db.session.commit()
@@ -121,7 +120,6 @@ def upload():
             "deleteUrl": url_for(".filemanager_delete", file_id=fo.id),
             "deleteType": "DELETE"
         }
-
         return jsonify(files=[return_dict])
     return "No File uploaded"
 
@@ -130,16 +128,23 @@ def upload():
 def sitetree_sort():
     data = request.get_json()
     if not data:
-        abort(403)
+        abort(403, 'No JSON data sent!')
     page_id = data["id"]
     page = db.session.query(SiteTree).get(page_id)
     if not page:
-        abort(404)
+        abort(404, 'Page not found!')
     else:
-        page.parent_id = data["new_parent"]
-        page.insert_after(data["new_position"], SiteTree)
+        try:
+            page.set_parent(data["new_parent"])
+        except Exception as e:
+            db.session.rollback()
+            abort(500, str(e))
+        page.insert_after(int(data["new_position"]), SiteTree,
+                          query=SiteTree.query.filter(SiteTree.parent_id == data["new_parent"]),
+                          index_absolute=False)
+        print(page.sort_order)
         db.session.commit()
-    return "OK"
+    return jsonify(message='Successfully sorted page tree', type="success")
 
 class SiteConfigExtension(db.Model):
     __tablename__ = SiteConfig.__tablename__

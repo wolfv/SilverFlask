@@ -27,4 +27,4 @@ class GalleryImage(OrderableMixin, DataObject, db.Model):
         return form
 
     def __init__(self):
-        self.init_order(GalleryImage)
+        self.init_order()

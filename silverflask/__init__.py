@@ -4,6 +4,7 @@ from flask import Flask
 from webassets.loaders import PythonLoader as PythonAssetsLoader
 
 from silverflask import assets
+import os
 
 from silverflask.extensions import (
     cache,
@@ -12,6 +13,7 @@ from silverflask.extensions import (
     login_manager
 )
 
+from silverflask.filestorage_backend import LocalFileStorageBackend
 from flask.ext.sqlalchemy import SQLAlchemy
 
 from flask_user import UserManager, SQLAlchemyAdapter
@@ -37,9 +39,12 @@ def create_app(object_name, env="prod"):
         env: The name of the current environment, e.g. prod or dev
     """
     app = Flask(__name__)
-    app.logger.debug("App Created")
+
     app.config.from_object(object_name)
 
+    upload_path = os.path.join(app.instance_path, app.config["SILVERFLASK_UPLOAD_FOLDER"])
+    app.config["SILVERFLASK_ABSOLUTE_UPLOAD_PATH"] = upload_path
+    app.storage_backend = LocalFileStorageBackend(upload_path)
     app.config['ENV'] = env
 
     db.init_app(app)

@@ -9,6 +9,11 @@
     "datatables": "~1.10.6",
     "blueimp-file-upload": "~9.9.3",
     "jstree": "~3.1.0",
-    "bootstrap": "~3.3.4"
+    "bootstrap": "~3.3.4",
+    "noty": "~2.3.5",
+    "animate.css": "~3.2.6",
+    "jquery-datatables-row-reordering": "https://github.com/wolfv/jquery-datatables-row-reordering.git",
+    "Plugins": "https://github.com/DataTables/Plugins.git#~1.10.6",
+    "jquery-ui": "~1.11.4"
   }
 }

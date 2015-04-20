@@ -52,6 +52,11 @@ body
           text-decoration: none
 
 
+.livingdocs-editor-wrapper
+  iframe
+    min-width: 100%
+    min-height: 100%
+
 .doc-toolbar
   overflow: auto
 
@@ -91,3 +96,49 @@ body
         padding: 10px 10px
         display: block
         text-decoration: none
+
+.async-upload-container
+  .preview_image
+    overflow: hidden
+    height: 100%
+    width: 100%
+    img
+      max-width: 100%
+      min-height: 100%
+
+//.button-row
+//  position: fixed
+//  bottom: 0
+//  height: 100px
+//  background: #ffffff
+//  width: 100%
+//.cms-form
+//  padding-bottom: 100px
+
+$btn-bar-height: 50px
+.main-flex
+  position: relative
+  height: 100vh
+  max-height: 100vh
+  .main-flex-top
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: $btn-bar-height
+    overflow-y: scroll
+    padding-right: 10px
+
+  .main-flex-bottom
+    position: absolute
+    bottom: 0
+    left: 0
+    right: 0
+    height: $btn-bar-height
+    background: #FAFAFA
+    padding-top: 5px
+    border-top: 1px solid #333333
+    box-shadow: 0 1px 0 #999
+
+
+@import '_livingdocs_field'

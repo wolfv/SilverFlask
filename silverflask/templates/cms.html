@@ -1,9 +1,5 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html class="no-js"> <!--<![endif]-->
+<html>
 <head>
     <title>{% block title %}{% endblock %}</title>
     <meta charset="utf-8">
@@ -18,8 +14,6 @@
     {% assets "common_css" %}
         <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"/>
     {% endassets %}
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.3/css/jquery.dataTables.css"/>
 
     {% block css %}
     {% endblock %}
@@ -30,20 +24,18 @@
 <div class="wrapper" >
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        <header class="header">
-            <div class="container">
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
-                        {% endfor %}
-            </div>
-        </header>
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} hidden" role="alert">{{ message }}</div>
+            {% endfor %}
         {% endif %}
     {% endwith %}
 
     <article class="main">
+        <div class="">
         {% block body %}
 
         {% endblock %}
+        </div>
     </article>
     <aside class="aside aside-1">
         <h3>SilverFlask</h3>
@@ -61,7 +53,6 @@
     </aside>
     <aside class="aside aside-2">
         {% block aside_two %}
-        
         {% endblock %}
     </aside>
 </div>

@@ -4,11 +4,12 @@
         <span class="caret"></span>
     </button>
     <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-        <li role="presentation"><a role="menuitem" tabindex="-1" href="/admin/add_page/Page">Page</a></li>
-        <li role="presentation"><a role="menuitem" tabindex="-1" href="/admin/add_page/SuperPage">SuperPage</a></li>
+        {% for pagetype in pagetypes %}
+            <li role="presentation"><a role="menuitem" tabindex="-1" href="/admin/add_page/{{ pagetype }}">{{ pagetype }}</a></li>
+        {% endfor %}
     </ul>
 </div>
 <div class="page-tree">
-    <div id="tree" data-sort_url="/admin/sitetree/sort">
+    <div id="tree" data-sort_url="{{ url_for("cms.sitetree_sort") }}" data-properties='{{ pagetypes|tojson }}'>
     </div>
 </div>

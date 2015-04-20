@@ -47,6 +47,10 @@ body {
       .living-docs-editor-addcontent-btns ul li a:hover {
         text-decoration: none; }
 
+.livingdocs-editor-wrapper iframe {
+  min-width: 100%;
+  min-height: 100%; }
+
 .doc-toolbar {
   overflow: auto; }
 
@@ -84,5 +88,64 @@ body {
         padding: 10px 10px;
         display: block;
         text-decoration: none; }
+
+.async-upload-container .preview_image {
+  overflow: hidden;
+  height: 100%;
+  width: 100%; }
+  .async-upload-container .preview_image img {
+    max-width: 100%;
+    min-height: 100%; }
+
+.main-flex {
+  position: relative;
+  height: 100vh;
+  max-height: 100vh; }
+  .main-flex .main-flex-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 50px;
+    overflow-y: scroll;
+    padding-right: 10px; }
+  .main-flex .main-flex-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: #FAFAFA;
+    padding-top: 5px;
+    border-top: 1px solid #333333;
+    box-shadow: 0 1px 0 #999; }
+
+.livingdocs_EditorField {
+  position: relative;
+  height: 900px;
+  overflow: hidden;
+  -webkit-backface-visibility: hidden; }
+
+.doc-toolbar {
+  background: #fafafa; }
+
+.toolbar-entry {
+  padding: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  margin: 5px 0;
+  cursor: move;
+  border-radius: 3px;
+  background: #0E74AF;
+  color: #FFF;
+  text-align: left; }
+  .toolbar-entry .toolbar-entry .add-button {
+    background: #0B6294;
+    float: right;
+    padding: 3px 6px;
+    margin-top: -3px;
+    border-radius: 2px;
+    cursor: pointer; }
+    .toolbar-entry .toolbar-entry .add-button .toolbar-entry .add-button:hover {
+      background: orange; }
 
 /*# sourceMappingURL=main.css.map */

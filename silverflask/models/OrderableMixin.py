@@ -14,7 +14,7 @@ class OrderableMixin(object):
         # query = super().query
         return db.session.query(cls).order_by(cls.sort_order.asc())
 
-    def insert_after(self, index, orderable_base_class=None):
+    def insert_after(self, index, orderable_base_class=None, index_absolute=True, query=None):
         """
         Inser after index variable
 
@@ -27,10 +27,17 @@ class OrderableMixin(object):
         else:
             cls = self.__class__
         cls.check_duplicates()
+        query = query if query else db.session.query(cls)
+        if not index_absolute:
+            index_el = query.order_by(cls.sort_order.asc()).limit(1).offset(index).scalar()
+            print(index_el.name)
+            index = index_el.sort_order
+            print("INDEX: ", index)
         db.session.query(cls)\
-            .filter(cls.sort_order >= index)\
+            .filter(cls.sort_order > index)\
             .update({cls.sort_order: cls.sort_order + 1})
-        self.sort_order = index
+        print(self.sort_order, self, index)
+        self.sort_order = index + 1
 
     @classmethod
     def reindex(cls):

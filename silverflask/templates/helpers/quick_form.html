@@ -3,6 +3,7 @@
 {# valid form types are "basic", "inline" and "horizontal" #}
 
 {% macro quick_form(form,
+                    page=None,
                     action="",
                     method="post",
                     extra_classes=None,
@@ -18,17 +19,19 @@
                              action=""
             {% endif -%}
             {%- if method %} method="{{ method }}"{% endif %}
-                             class="form
+                             class="form main-flex
     {%- if extra_classes %} {{ extra_classes }}{% endif -%}
     {%- if form_type == "horizontal" %} form-horizontal
     {%- elif form_type == "inline" %} form-inline
     {%- endif -%}
-  "
             {%- if enctype %} enctype="{{ enctype }}"{% endif -%}
             {%- if role %} role="{{ role }}"{% endif -%}
             >
-        {#        {{ form.hidden_tag() }}#}
-
+    <div class="cms-form main-flex-top ">
+{#        {{ form.hidden_tag() }}#}
+        {% if page %}
+            <h1>{{ page.name }}</h1>
+        {% endif %}
         {{ form_errors(form, hiddens='only') }}
         {% if form.tabbed_form  %}
             <ul class="nav nav-tabs" role="tablist">
@@ -37,7 +40,7 @@
                 <li role="presentation" class="{{ "active" if loop.first }}"><a href="#{{ tab.name }}" role="tab" data-toggle="tab">{{ tab.name }}</a></li>
             {% endfor %}
             </ul>
-            <div class="tab-content">
+            <div class="tab-content container-fluid">
             {% for tab in form.get_root().tabs if not tab.name == "Buttons" %}
                 <div role="tabpanel" class="tab-pane {{ "active" if loop.first }}" id="{{ tab.name }}">
                 {%- for field in tab.children %}
@@ -50,7 +53,10 @@
                 </div>
             {% endfor %}
             </div>
-                <hr/>
+        </div>
+
+        <div class="button-row main-flex-bottom">
+            <div class="col-md-12">
                 {% for button in form.get_tab("Root.Buttons").children %}
                     {{ form_field(button,
                         form_type=form_type,
@@ -58,6 +64,8 @@
                         ubutton_map=button_map,
                         class_map=class_map) }}
                 {% endfor %}
+            </div>
+        </div>
         {% else %}
             {%- for field in form %}
                 {{ form_field(field,
@@ -66,6 +74,17 @@
                     ubutton_map=button_map,
                     class_map=class_map) }}
             {%- endfor %}
+            <div class="button-row main-flex-bottom">
+                <div class="col-md-12">
+                    {% for action in form.actions %}
+                        {{ form_field(action,
+                            form_type=form_type,
+                            horizontal_columns=horizontal_columns,
+                            ubutton_map=button_map,
+                            class_map=class_map) }}
+                    {% endfor %}
+                </div>
+            </div>
         {% endif %}
     </form>
 {%- endmacro %}

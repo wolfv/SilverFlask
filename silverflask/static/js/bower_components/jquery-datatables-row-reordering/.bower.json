@@ -1,0 +1,14 @@
+{
+  "name": "jquery-datatables-row-reordering",
+  "homepage": "https://github.com/wolfv/jquery-datatables-row-reordering",
+  "_release": "29896519d6",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "29896519d6b36abe62d216b47b08df7d9a2d89d7"
+  },
+  "_source": "https://github.com/wolfv/jquery-datatables-row-reordering.git",
+  "_target": "*",
+  "_originalSource": "https://github.com/wolfv/jquery-datatables-row-reordering.git",
+  "_direct": true
+}

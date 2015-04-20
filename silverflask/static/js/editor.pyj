@@ -1,21 +1,5 @@
+import stdlib
 j = jQuery
-class StateMachine:
-    current_state = ["nostate"]
-    current_snippet = None
-    controller_scopes =  []
-    def changeState(self, state, snippet=None):
-        self.current_state = state
-
-        if snippet:
-          self.current_snippet = snippet
-        #for c in self.controllerScopes
-        #("editorStateChanged")
-
-    def register_controller(self, controller):
-        self.controller_scopes.push(controller)
-
-    def get_current_state(self):
-        return self.current_state
 
 defaultContent = [
   {
@@ -54,48 +38,197 @@ defaultContent = [
   }
 ]
 
-class Editor:
-    def __init__(self, node, design_name="boilerplate"):
-        self.selector_json_field = ".livingdocs-raw"
-        self.selector_html_field = ".livingdocs-field"
-        self.selector_editor_node = ".livingdocs-editor"
+class LivingDocsPropertyPanel:
+    """
+    Panel for rendering of properties
+    of LivingDocs components
+    """
 
+    def __init__(self, node, editor):
+        self.node = node
+        self.editor = editor
+        self.livingdoc = editor.livingdoc
+
+    def set_active_component(self, component):
+        self.active_component = component
+        self.update_panel()
+
+    def on_property_change(self, style, event):
+        self.active_component.setStyle(style.name, event.target.value)
+
+    def update_panel(self):
+        self.node.empty()
+
+        if self.active_component.template.styles.length:
+            self.node.append(j("<h5>").text('Properties'))
+
+        for style_name, style in dict.items(self.active_component.template.styles):
+            callback = j.proxy(self.on_property_change, self, style)
+            if style.type == 'select':
+                el = j('<select>')
+                for option in style.options:
+                    el.append(j('<option>').val(option.value).text(option.caption))
+                el.on('change', callback)
+            elif style.type == 'option':
+                el = j('<input>').attr(type=checkbox)
+                el.on('change', callback)
+            self.node.append(el)
+
+
+class LivingDocsImageUploader:
+    """
+    Handles DnD functionality for images
+    """
+    def __init__(self, snippet, snippet_view, directive):
+        self.snippet = snippet
+        self.snippet_view = snippet_view
+        self.directive = directive
+        self.input_field = j('<input>', {
+            'id': 'fileupload',
+            'class': 'hidden',
+            'name': 'file',
+            'type': 'file'
+        })
+
+        on_progress = j.proxy(self.on_progress, self)
+        on_add = j.proxy(self.on_add, self)
+        on_done = j.proxy(self.on_done, self)
+
+        self.input_field.fileupload({
+            'dataType': 'json',
+            'url': '/admin/upload',
+            'dropZone': self.snippet_view.$elem,
+            'progressall': on_progress,
+            'add': on_add,
+            'done': on_done
+        })
+
+    def on_add(self, event, data):
+        self.snippet_view.$elem.innerHTML = 'Uploading'
+        img = document.createElement('img')
+        img.file = data.files[0]
+        img.classList.add("obj")
+
+        self.add_progress_bar()
+
+        reader = new FileReader()
+        reader.onload =  def(event):
+            self.snippet.directives.get("image").setBase64Image(event.target.result)
+
+        reader.readAsDataURL(data.files[0])
+        data.submit()
+
+    def on_progress(self):
+        pass
+
+    def on_done(self, event, data):
+        url = "http://" + window.location.host + data.result.files[0].url
+        console.log(self.snippet, self.snippet_view)
+        console.log(self.snippet.directives.get("image"))
+        self.snippet.directives.get("image").setContent(url)
+        window.snippet = self.snippet
+        self.progress_bar_remove()
+
+    def progress_bar_update(self, val):
+        self.progress_bar_element.css('width', val + '%')
+
+    def progress_bar_remove(self):
+        self.progress_bar_container.remove()
+
+    def add_progress_bar(self):
+        self.progress_bar_container = j('<div>')
+
+class LivingDocsBlockPanel:
+    def __init__(self, node, editor):
+        self.node = node
+        self.livingdoc = editor.livingdoc
+        self.editor = editor
+        self.render()
+
+    def render(self):
+        for template in self.livingdoc.design.components:
+            callback = j.proxy(self.on_drag, self, template.name)
+            el = j('<div class="toolbar-entry">')
+            el.html(template.label)
+            self.node.append(el)
+            el.on('mousedown', callback)
+
+    def on_drag(self, component, event):
+        new_component = self.livingdoc.createComponent(component)
+        doc.startDrag({
+          'componentModel': new_component,
+          'event': event,
+          'config': {
+            'preventDefault': True,
+            'direct': True
+          }
+        })
+
+
+
+class LivingDocsEditor:
+    def __init__(self, node, design_name="boilerplate"):
+        self.field_name = node.data("name")
+        self.selector_json_field = self.field_name + "_json"
+        self.selector_html_field = self.field_name
+        self.selector_editor_node = ".livingdocs-editor"
         self.node = node
         self.design = design_name
-        doc.design.load(design[self.design]);
-        self.json_field = j(self.selector_json_field, node)
-        self.html_field = j(self.selector_html_field, node)
+        doc.design.load(design[self.design])
+        self.json_field = j("input[name=" + self.selector_json_field + "]").first()
+        self.html_field = j("textarea[name=" + self.selector_html_field + "]").first()
         self.editor_node = j(self.selector_editor_node, node)
         self.load_content()
         self.init_renderer()
+        self.property_panel = LivingDocsPropertyPanel(j('.doc-block-properties', self.node), self)
+        self.blocks_panel = LivingDocsBlockPanel(j('.doc-blocks', self.node), self)
 
+        callback = j.proxy(self.on_submit, self)
+        self.node.parents("form").on('submit', callback)
 
-    def on_view_ready(self, view):
+    def on_view_ready(self, renderer):
         on_text_select = j.proxy(self.on_text_select, self)
         on_component_focus = j.proxy(self.on_component_focus, self)
-
-
+        on_snippet_added = j.proxy(self.on_snippet_added, self)
         self.livingdoc.interactiveView.page.editableController.selection.add(on_text_select)
         self.livingdoc.interactiveView.page.focus.componentFocus.add(on_component_focus)
+        self.livingdoc.componentTree.componentAdded.add(on_snippet_added)
+        # self.livingdoc.interactiveView.renderer.componentAdded.add(on_snippet_added)
+        for snippet in self.livingdoc.componentTree.find("image"):
+            self.livingdoc.interactiveView.renderer.insertComponent(snippet)
+            view = self.livingdoc.interactiveView.renderer.componentViews[snippet.id]
+            view.uploader = new LivingDocsImageUploader(snippet, view)
+
+
+    def on_snippet_added(self, snippet_model):
+        if snippet_model.directives.image:
+            self.livingdoc.interactiveView.renderer.insertComponent(snippet_model)
+            view = snippet_model.getMainView()
+            view.uploader = new LivingDocsImageUploader(snippet_model, view)
+        return True
+    def on_submit(self, event):
+        self.json_field.val(self.livingdoc.toJson())
+        self.html_field.val(self.livingdoc.toHtml())
 
     def on_text_select(self, event):
         console.log(event)
         return None
 
     def on_component_focus(self, event):
-        console.log(event)
+        self.property_panel.set_active_component(event.model)
         return None
 
     def init_renderer(self):
-        on_view_ready = j.proxy(self.on_view_ready, self)
         ready = self.livingdoc.createView(
             interactive=True,
             iframe=True,
             host='.editor-section')
+
+        on_view_ready = j.proxy(self.on_view_ready, self)
         ready.then(on_view_ready)
 
     def load_content(self):
-        json = j(self.selector_json_field, self.node).first().val()
+        json = self.json_field.val()
         try:
             parsed_json = JSON.parse(json)
             self.livingdoc = doc.new(data=parsed_json)
@@ -109,16 +242,14 @@ class Editor:
                     }
                 }
             })
-            self.add_default_content()
 
-    def add_default_content(self):
-        return None
 
 
 def init_editors():
     editors = []
+    doc.config({'livingdocsCssFile': "/static/js/bower_components/livingdocs-engine/dist/css/livingdocs.css"})
 
     for e in j(".livingdocs-editor-wrapper"):
-        editors.push(Editor(j(e)))
+        editors.push(LivingDocsEditor(j(e)))
 
 j(document).ready(init_editors)

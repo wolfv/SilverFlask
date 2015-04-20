@@ -198,8 +198,10 @@
                 }*/
             }
             oTable.fnDraw();
-
-            $("tbody", oTable).disableSelection().sortable({
+            if ($("tbody", oTable).disableSelection) {
+                $("tbody", oTable).disableSelection();
+            }
+            $("tbody", oTable).sortable({
                 cursor: "move",
                 helper: tableFixHelper,
                 update: function (event, ui) {

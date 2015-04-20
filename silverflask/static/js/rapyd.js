@@ -38,10 +38,9 @@
         output = JSON.stringify(args);
         if ("console" in window) console.log(output.substr(1, output.length-2));
     }
-    var j, JSON, str;
+    var j, str;
     j = jQuery;
-            JSON = JSON || {};
-    if (!JSON.stringify) {
+            if (!JSON.stringify) {
         
     JSON.stringify = function(obj) {
         var t = typeof (obj);
@@ -344,6 +343,32 @@
             delete hash[key];
         }
     };
+        function Notification() {
+        Notification.prototype.__init__.apply(this, arguments);
+    }
+    Notification.prototype.__init__ = function __init__(text, type, timeout){
+        var self = this;
+        if (typeof timeout === "undefined") timeout = 2e3;
+        self.noty = noty({
+            "text": text,
+            "layout": "topRight",
+            "theme": "relax",
+            "type": type,
+            "animation": {
+                "open": "animated fadeInRight",
+                "close": "animated fadeOutRight",
+                "easing": "swing",
+                "speed": 500
+            },
+            "timeout": timeout,
+            "buttons": false
+        });
+    };
+    Notification.init_from_node = function init_from_node(node){
+        node.hide();
+        return new Notification(node.text(), node.data("type"));
+    };
+
     function DOMNode() {
         DOMNode.prototype.__init__.apply(this, arguments);
     }
@@ -365,132 +390,69 @@
         return new DOMNode(context.querySelector(selector));
     };
 
-    function Request() {
-    }
-    Request.send_json = function send_json(url, request_data, success_handler, error_handler){
-        if (typeof success_handler === "undefined") success_handler = null;
-        if (typeof error_handler === "undefined") error_handler = null;
-        return j.ajax({
-            "type": "POST",
-            "url": url,
-            "dataType": "json",
-            "contentType": "application/json; charset=utf-8",
-            "data": JSON.stringify(request_data),
-            "success": success_handler,
-            "error": error_handler
-        });
-    };
-
-    function SiteTree() {
-        SiteTree.prototype.__init__.apply(this, arguments);
-    }
-    SiteTree.prototype.get_url = function get_url(node){
-        var self = this;
-        if (node.id === "#") {
-            return "/admin/get_sitetree";
-        } else {
-            return "/admin/get_sitetree/" + node.id;
-        }
-    };
-    SiteTree.prototype.get_data = function get_data(node){
-        var self = this;
-        return {
-            "id": node.id
-        };
-    };
-    SiteTree.prototype.add_child_page = function add_child_page(){
-        var self = this;
-        return null;
-    };
-    SiteTree.prototype.delete_page = function delete_page(){
-        var self = this;
-        return null;
-    };
-    SiteTree.prototype.get_menu_items = function get_menu_items(){
-        var self = this;
-        return {
-            "renameItem": {
-                "label": "Add Child Page",
-                "action": self.add_child_page
-            },
-            "deleteItem": {
-                "label": "Delete Page",
-                "action": self.delete_page
-            }
-        };
-    };
-    SiteTree.prototype.on_dblclick = function on_dblclick(event, data){
-        var self = this;
-        var clicked_node;
-        clicked_node = j(event.target).closest("a");
-        window.location.href = clicked_node.attr("href");
-    };
-    SiteTree.prototype.on_move_node = function on_move_node(event, data){
-        var self = this;
-        var new_parent_id, node_id, request_data;
-        if (data.parent !== "#") {
-            new_parent_id = j("#" + data.parent).data("pageid");
-        } else {
-            new_parent_id = null;
-        }
-        node_id = data.node.li_attr["data-pageid"];
-        request_data = {
-            "new_parent": new_parent_id,
-            "id": node_id,
-            "new_position": data.position
-        };
-        Request.send_json(self.sort_url, request_data);
-    };
-    SiteTree.prototype.__init__ = function __init__(node){
-        var self = this;
-        self.node = node;
-        self.tree = node.jstree({
-            "core": {
-                "check_callback": true,
-                "data": {
-                    "url": self.get_url,
-                    data: self.get_data
-                }
-            },
-            "plugins": [ "contextmenu", "dnd" ],
-            "contextmenu": {
-                "items": self.get_menu_items()
-            },
-            "dnd": {
-                "copy": false
-            }
-        });
-        self.sort_url = self.node.data("sort_url");
-        self.node.on("dblclick.jstree", self.on_dblclick);
-        self.node.on("move_node.jstree", self.on_move_node);
-    };
-
     function GridField() {
         GridField.prototype.__init__.apply(this, arguments);
     }
+    GridField.render_actions = function render_actions(data, type, row){
+        return "<a href=\"" + data + "\">Edit</a>";
+    };
     GridField.prototype.__init__ = function __init__(node){
         var self = this;
-        var header;
+        var header, renderer;
         self.columns = [];
         self.node = node;
         var _$rapyd$_Iter6 = j("th", node);
         for (var _$rapyd$_Index6 = 0; _$rapyd$_Index6 < _$rapyd$_Iter6.length; _$rapyd$_Index6++) {
             header = _$rapyd$_Iter6[_$rapyd$_Index6];
+            header = j(header);
+            renderer = null;
+            if (header.data("renderer")) {
+                renderer = GridField[header.data("renderer")];
+            }
             self.columns.append({
-                "data": j(header).data("col")
+                "data": j(header).data("col"),
+                "render": renderer
             });
         }
         self.table = self.node.DataTable({ajax: self.node.data("ajax-url"), columns: self.columns, ordering: false, order: [ 2, "asc" ]});
-        self.table.rowReordering({
-            "sURL": self.node.data("sort-url"),
-            "iIndexColumn": 2,
-            "fnUpdateAjaxRequest": null
-        });
+        if (self.node.data("sortable")) {
+            self.node.dataTable().rowReordering({
+                "sURL": self.node.data("sort-url"),
+                "iIndexColumn": 2
+            });
+        }
     };
 
     function UploadField() {
         UploadField.prototype.__init__.apply(this, arguments);
     }
+    UploadField.prototype.__init__ = function __init__(node){
+        var self = this;
+        var on_add, on_progress, on_done, on_fail, input;
+        self.url = "/admin/upload";
+        self.node = node;
+        self.input = j("input[type='file']", self.node);
+        self.preview_container = j(".preview_image", self.node);
+        on_add = j.proxy(self.on_add, self);
+        on_progress = j.proxy(self.on_progress, self);
+        on_done = j.proxy(self.on_done, self);
+        on_fail = j.proxy(self.on_fail, self);
+        self.input.fileupload({
+            "dataType": "json",
+            "url": self.url,
+            "dropZone": self.node.children(".dropzone"),
+            "progress": on_progress,
+            "add": on_add,
+            "done": on_done,
+            "fail": on_fail
+        });
+        input = self.input;
+        window.input = input;
+    };
+    UploadField.prototype.on_fail = function on_fail(event, data){
+        var self = this;
+        console.log("Fail: ", event, data);
+    };
     UploadField.prototype.on_add = function on_add(event, data){
         var self = this;
         var reader;
@@ -498,10 +460,10 @@
         self.node.parent().append(data.context);
         self.current_image = j("<img>").addClass("obj");
         self.current_image.get(0).file = data.files[0];
-        self.node.parent().append(self.current_image);
+        self.preview_container.append(self.current_image);
         reader = new FileReader();
         reader.onload = function(event) {
-            self.current_image.get(0).src = e.target.result;
+            self.current_image.get(0).src = event.target.result;
         };
         reader.readAsDataURL(data.files[0]);
         data.submit();
@@ -513,30 +475,15 @@
     UploadField.prototype.on_done = function on_done(event, data){
         var self = this;
         var url, file;
+        console.log(event, data);
         url = "http://" + window.location.host + data.result.files[0].url;
-        self.node.children("input").val(data.result.files[0].id);
+        console.log("Setting val to ", data.result.files[0].id);
+        self.node.children("input[type='hidden']").val(data.result.files[0].id);
         var _$rapyd$_Iter7 = data.result.files;
         for (var _$rapyd$_Index7 = 0; _$rapyd$_Index7 < _$rapyd$_Iter7.length; _$rapyd$_Index7++) {
             file = _$rapyd$_Iter7[_$rapyd$_Index7];
             j("<p/>").text(file.name).appendTo(j("body"));
         }
-    };
-    UploadField.prototype.__init__ = function __init__(node){
-        var self = this;
-        self.node = node;
-        self.input = j(self.input_template);
-        j("body").append(self.input);
-        self.input.fileupload({
-            "dataType": "json",
-            "url": self.url,
-            "dropZone": self.node.children(".dropzone"),
-            "progress": self.on_progress,
-            "add": self.on_add,
-            "done": self.on_done
-        });
-        self.node.children(".open-file-dialog").on("click", function(e) {
-            self.input.trigger(e);
-        });
     };
 
     function init_gridfields() {
@@ -547,14 +494,27 @@
             field = _$rapyd$_Iter8[_$rapyd$_Index8];
             gridfields.push(new GridField(j(field)));
         }
-        console.log(gridfields);
     }
-    function init_tree() {
-        new SiteTree(j("#tree"));
+    function init_uploader() {
+        var uploaders, u;
+        uploaders = [];
+        var _$rapyd$_Iter9 = j(".async-upload-container");
+        for (var _$rapyd$_Index9 = 0; _$rapyd$_Index9 < _$rapyd$_Iter9.length; _$rapyd$_Index9++) {
+            u = _$rapyd$_Iter9[_$rapyd$_Index9];
+            uploaders.push(new UploadField(j(u)));
+        }
     }
     function on_ready() {
+        var notifications, el;
+        j(document).trigger("silverflask:panel_ready");
         init_gridfields();
-        init_tree();
+        init_uploader();
+        notifications = [];
+        var _$rapyd$_Iter10 = j(".alert");
+        for (var _$rapyd$_Index10 = 0; _$rapyd$_Index10 < _$rapyd$_Iter10.length; _$rapyd$_Index10++) {
+            el = _$rapyd$_Iter10[_$rapyd$_Index10];
+            notifications.push(Notification.init_from_node(j(el)));
+        }
     }
-    new DOMNode(document).connect("ready", on_ready());
+    j(document).on("ready", on_ready);
 })();

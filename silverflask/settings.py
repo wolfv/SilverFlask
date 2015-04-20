@@ -1,12 +1,11 @@
 class Config(object):
     SECRET_KEY = 'secret key'
     USER_LOGIN_TEMPLATE = "user/login.html"
-
+    SILVERFLASK_UPLOAD_FOLDER = "uploads/"
 
 class ProdConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///../database.db'
     CACHE_TYPE = 'simple'
-
 
 class DevConfig(Config):
     DEBUG = True
@@ -22,7 +21,6 @@ class DevConfig(Config):
 
     # This allows us to test the forms from WTForm
     WTF_CSRF_ENABLED = False
-
 
 class TestConfig(DevConfig):
     WTF_CSRF_ENABLED = False

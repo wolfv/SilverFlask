@@ -14,8 +14,8 @@ def user_edit(record_id):
     form = form_class(request.form, obj=user_obj)
     if form.validate_on_submit():
         form.populate_obj(user_obj)
-        if form.new_password.data:
-            user_obj.set_password(form.new_password.data)
+        if form['new_password'].data:
+            user_obj.set_password(form['new_password'].data)
 
         db.session.commit()
         return redirect(url_for(".securitymanager"))

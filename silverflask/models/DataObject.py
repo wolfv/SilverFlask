@@ -1,11 +1,10 @@
-from flask import render_template
 from sqlalchemy.ext.declarative import declared_attr
 from wtforms import fields
 from flask_wtf import Form
-from wtforms.ext.sqlalchemy.orm import model_form
-from flask.ext.sqlalchemy import SQLAlchemy
+from wtforms.ext.sqlalchemy.orm import model_fields
 from sqlalchemy import event
 from silverflask import db
+from silverflask.models.OrderedForm import OrderedFormFactory
 
 from flask import request
 from flask_user import current_user
@@ -13,7 +12,7 @@ from flask_user import current_user
 
 class CannotCreateError(PermissionError):
     pass
-
+Form
 class CannotUpdateError(PermissionError):
     pass
 
@@ -51,6 +50,7 @@ class DataObject(object):
 
     database = ["id", "created_on", "last_modified"]
 
+    auto_form_exclude = ['id', 'created_on', 'last_modified']
     # class CMSForm(Form):
     # name = fields.StringField("asdsadsa")
     #     submit = fields.SubmitField("Submit")
@@ -95,11 +95,15 @@ class DataObject(object):
         """
         if hasattr(cls, "CMSForm"):
             return cls.CMSForm
-        FormClass = model_form(cls, db.session, base_class=Form)
-        FormClass.submit = fields.SubmitField()
-        del FormClass.last_modified
-        del FormClass.created_on
-        return FormClass
+        form_factory = OrderedFormFactory()
+
+        form_fields = model_fields(cls, db_session=db.session, exclude=cls.auto_form_exclude)
+
+        for key in sorted(form_fields.keys()):
+            form_fields[key].kwargs['name'] = key
+            form_factory.add_to_tab("Root.Main", form_fields[key])
+        form_factory.add_to_tab("Root.Buttons", fields.SubmitField("Save", name="Save"))
+        return form_factory
 
     def as_dict(self):
         """

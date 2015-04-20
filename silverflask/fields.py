@@ -111,7 +111,7 @@ class GridField(Field):
     record_classname = None
 
     def __init__(self, parent_record=None, query=None, buttons=None,
-                 urls=None, display_rows=None, field_name=None, **kwargs):
+                 urls=None, display_rows=None, field_name=None, sortable=False, **kwargs):
         super().__init__(**kwargs)
         if parent_record:
             self.record_id = parent_record.id
@@ -124,5 +124,6 @@ class GridField(Field):
                                       record_classname=self.record_classname,
                                       display_rows=display_rows,
                                       field_name=field_name,
+                                      sortable=sortable,
                                       urls=urls,
                                       **kwargs)

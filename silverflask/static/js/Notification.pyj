@@ -1,0 +1,21 @@
+class Notification:
+    def __init__(self, text, type, timeout=2000):
+        self.noty = noty({
+            'text': text,
+            'layout': 'topRight',
+            'theme': 'relax',
+            'type': type,
+            'animation': {
+                'open': 'animated fadeInRight',
+                'close': 'animated fadeOutRight',
+                'easing': 'swing',
+                'speed': 500
+            },
+            'timeout': timeout,
+            'buttons': False
+        })
+
+    @staticmethod
+    def init_from_node(node):
+        node.hide()
+        return Notification(node.text(), node.data('type'))

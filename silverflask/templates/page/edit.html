@@ -6,9 +6,5 @@
 {% endblock %}
 
 {% block body %}
-    <div class="page-edit">
-    <h1>{{ page.name }}</h1>
-
-    {{ quick_form(page_form, class_map={"Submit": "btn-success"}) }}
-    </div>
+    {{ quick_form(page_form, page=page, class_map={"Submit": "btn-success"}) }}
 {% endblock %}

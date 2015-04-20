@@ -1,31 +1,33 @@
-from flask.ext.login import UserMixin, AnonymousUserMixin
+from flask.ext.login import AnonymousUserMixin
 from flask import current_app
 from flask_user import UserMixin
 from silverflask import user_manager
 from silverflask import db
-from sqlalchemy.orm import synonym
 from . import DataObject
 from wtforms import fields, validators
-
+from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 
 
 class User(DataObject, UserMixin, db.Model):
     """
     The base User model.
     """
-    password = db.Column(db.String)
     username = db.Column(db.String, unique=True)
 
-    email = db.Column(db.String, unique=True)
-    
     firstname = db.Column(db.String)
     lastname = db.Column(db.String)
-    
+
+    email = db.Column(db.String, unique=True)
+
+    password = db.Column(db.String)
+
     confirmed_at = db.Column(db.DateTime)
     is_enabled = db.Column(db.Boolean(), nullable=False, server_default='1') 
 
     roles = db.relationship('Role', secondary='user_roles',
                              backref=db.backref('users', lazy='dynamic'))
+
+    auto_form_exclude = DataObject.auto_form_exclude + ['confirmed_at', 'is_enabled']
 
     def __init__(self, username, password, email=None, is_enabled=True):
         self.username = username
@@ -59,7 +61,7 @@ class User(DataObject, UserMixin, db.Model):
         return '<User %r>' % self.username
 
     def set_password(self, new_password):
-        self.password = user_manager.hash_password(new_password)
+        self.password = current_app.user_manager.hash_password(new_password)
 
     def as_dict(self):
         d = super().as_dict()
@@ -71,10 +73,21 @@ class User(DataObject, UserMixin, db.Model):
     @classmethod
     def get_cms_form(cls):
         form = super().get_cms_form()
-        if form.password:
-            del form.password
-        form.new_password = fields.PasswordField("New Password", [validators.EqualTo('new_password_confirmation', message='Passwords must match')])
-        form.new_password_confirmation = fields.PasswordField("Repeat New Password")
+        roles =  [(r.id, r.name) for r in db.session.query(Role).all()]
+        form.add_to_tab("Root.Main", fields.PasswordField("New Password",
+                                                          [validators.EqualTo('new_password_confirmation',
+                                                                              message='Passwords must match')],
+                                                          name='new_password'))
+        form.add_to_tab("Root.Main", fields.PasswordField("Repeat New Password", name='new_password_confirmation'))
+        form.add_to_tab("Root.Main", QuerySelectMultipleField('Role', query_factory=lambda: Role.query,
+                                                              get_label=lambda x: x.name,
+                                                              get_pk=lambda x: x.id,
+                                                              name='roles'))
+        # print(form.fields["password"])
+        # print(form.fields["new_password_confirmation"])
+        del form.fields["password"]
+        # form.new_password =
+        # form.new_password_confirmation = fields.PasswordField("Repeat New Password")
         return form
 
 class Role(DataObject, db.Model):

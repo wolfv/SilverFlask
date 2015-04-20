@@ -6,6 +6,7 @@ from sqlalchemy_continuum import get_versioning_manager, make_versioned, \
 from sqlalchemy_continuum.utils import version_obj
 from sqlalchemy_continuum.plugins import TransactionMetaPlugin
 from sqlalchemy.orm import mapper
+from sqlalchemy.orm.interfaces import *
 from sqlalchemy import event
 from flask import current_app
 import copy
@@ -56,9 +57,17 @@ def create_live_table(cls):
     for c in cls.__table__.columns:
         # What is happening
         # TODO: Check if this also works with different relationships...
+        new_keys = []
         if c.foreign_keys:
+            for k in c.foreign_keys:
+                key_target = k.column.table.name
+                if key_target in versioned_tables:
+                    new_keys.append(db.ForeignKey(key_target + "_live." + k.column.key))
+                else:
+                    new_keys.append(db.ForeignKey(k.target_fullname))
+
             columns.append(db.Column(c.key, db.Integer(),
-                                     db.ForeignKey(versioned_basetable + ".id"),
+                                     new_keys[0],
                                      primary_key=c.primary_key,
                                      default=c.default))
         else:
@@ -88,8 +97,8 @@ def create_live_table(cls):
     for r in rs:
         if r.parent == cls.__mapper__:
             print("There is a relation defined %s with Key: %r" % (cls.__name__, r))
-
-            if r.target.fullname.endswith("version"):
+            print(r.target)
+            if hasattr(r.target, 'fullname') and r.target.fullname.endswith("version"):
                 continue
 
             if r.key in backrefs:
@@ -97,14 +106,20 @@ def create_live_table(cls):
 
             key = r.key
             target = ""
-            if r.target.fullname in versioned_tables:
+            if hasattr(r.target, 'fullname') and r.target.fullname in versioned_tables:
                 target = r.mapper.entity.__name__ + "Live"
             else:
-                primaryjoin = copy.copy(r.primaryjoin)
-                primaryjoin.left = args[primaryjoin.left.key]
-                args[key] = db.relationship(r.mapper, viewonly=True, primaryjoin=primaryjoin,
-                                            foreign_keys=[primaryjoin.right])
+                if r.direction == MANYTOONE:
+                    args[key] = db.relationship(r.mapper)
+                else:
+                    primaryjoin = copy.copy(r.primaryjoin)
+                    primaryjoin.left = args[primaryjoin.left.key]
+                    args[key] = db.relationship(r.mapper,
+                                                viewonly=True,
+                                                primaryjoin=primaryjoin,
+                                                foreign_keys=[primaryjoin.right])
                 continue
+
             if hasattr(r, "backref") and r.backref:
                 print(r.backref)
                 backref_key = r.backref[0]

@@ -1,0 +1,22 @@
+{
+  "name": "livingdocs-design-boilerplate",
+  "version": "0.3.0",
+  "devDependencies": {
+    "livingdocs-engine": "git@github.com:upfrontIO/livingdocs-engine.git#~0.8.1",
+    "jquery": "~2.1.1"
+  },
+  "ignore": [
+    "**/**",
+    "!dist/**/**"
+  ],
+  "homepage": "https://github.com/upfrontIO/livingdocs-design-boilerplate",
+  "_release": "0.3.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.3.0",
+    "commit": "bfa0743b98e2fa3160738c283edd7e215ed66b49"
+  },
+  "_source": "https://github.com/upfrontIO/livingdocs-design-boilerplate.git",
+  "_target": "*",
+  "_originalSource": "https://github.com/upfrontIO/livingdocs-design-boilerplate.git"
+}

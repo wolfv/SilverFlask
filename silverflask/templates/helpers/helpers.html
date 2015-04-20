@@ -3,7 +3,7 @@
     {%- if form.errors %}
         {%- for fieldname, errors in form.errors.items() %}
                 {%- for error in errors %}
-                    <p class="error">{{ error }}</p>
+                    <p class="alert" data-type="error">{{ error }}</p>
                 {%- endfor %}
         {%- endfor %}
     {%- endif %}
@@ -58,7 +58,7 @@
         {% call _hz_form_wrap(horizontal_columns, form_type, True) %}
             {{ field(class='btn btn-%s %s' % (button_map.get(field.name, 'default'), class_map.get(field.name, ''))) }}
         {% endcall %}
-    {% elif field.type == "HiddenField" %}
+    {% elif field.type == "HiddenField" or field.type == "CSRFTokenField" %}
         {{ field() }}
     {% else -%}
         <div class="form-group {% if field.errors %} has-error{% endif %}">

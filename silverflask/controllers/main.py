@@ -1,11 +1,7 @@
 from flask import Blueprint, render_template, abort, session, current_app
-from flask_user import login_required
-from silverflask import cache, db
-from silverflask.forms import LoginForm
 from silverflask.models import User, SiteTree
-from flask import jsonify
 from silverflask.models import SiteConfig
-from flask_user import current_user
+from flask import send_from_directory
 
 main = Blueprint('main', __name__)
 
@@ -33,26 +29,22 @@ def setup_processors(app):
 
 
 @main.route('/')
-def home():
-    page = SiteTree.query.filter(
-        SiteTree.parent_id == None,
-        SiteTree.urlsegment == current_app.config["HOME_URLSEGMENT"]).scalar()
-    if not page:
-        page = SiteTree.query.first()
-    if not page:
-        abort(404)
-    return render_template(page.template, page=page, **page.as_dict()   )
-
-
-@main.route('/<path:urlsegment>')
-def get_page(urlsegment):
-    print("Getting Page \n\n\n\n")
+@main.route('/<path:url_segment>')
+def silverflask_page(url_segment=None):
+    if not url_segment:
+        url_segment = current_app.config["HOME_URLSEGMENT"]
     if session.get("draft"):
-        page = SiteTree.get_by_url(urlsegment)
+        page = SiteTree.get_by_url(url_segment)
     else:
-        page = SiteTree.get_by_url(urlsegment, SiteTree.LiveType)
+        page = SiteTree.get_by_url(url_segment, SiteTree.LiveType)
     if not page:
-        return "Not found", 404
+        return abort(404, "Page not found")
+
     template = page.template
-    print(page.as_dict())
     return render_template(template, page=page, **page.as_dict())
+
+
+@main.route('/uploads/<path:filename>')
+def serve_file(filename):
+    return send_from_directory(current_app.config['SILVERFLASK_ABSOLUTE_UPLOAD_PATH'],
+                               filename)

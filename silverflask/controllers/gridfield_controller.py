@@ -1,13 +1,15 @@
 from .cms import bp
 from flask import abort, request, jsonify, render_template
 from silverflask import db
+from silverflask.models.OrderedForm import OrderedFormFactory
 
 def get_gridfield_context(cls, record_id, formname, fieldname, id=None):
-    print("GETTING GrIDFILEDL\n\n\n")
     from silverflask import models
     _class = getattr(models, cls)
     inst = db.session.query(_class).get(record_id)
     form = getattr(inst, formname)()
+    if type(form) == OrderedFormFactory:
+        form = form.create()
     forminstance = form()
     field, query = None, None
     if form.tabbed_form:
