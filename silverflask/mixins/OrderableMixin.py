@@ -8,7 +8,7 @@ class OrderableMixin(object):
     """
     sort_order = db.Column(db.Integer, nullable=False, default=1)
 
-    default_sort = sort_order.desc()
+    default_order = "sort_order ASC"
 
     def insert_after(self, index, orderable_base_class=None, index_absolute=True, query=None):
         """

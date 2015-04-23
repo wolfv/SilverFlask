@@ -5,6 +5,7 @@ from wtforms.ext.sqlalchemy.orm import model_fields
 from sqlalchemy import event
 from silverflask import db
 from silverflask.models.OrderedForm import OrderedFormFactory
+from silverflask.helper import uncamel
 
 from flask import request
 from flask_user import current_user
@@ -48,14 +49,22 @@ class DataObject(object):
     created_on = db.Column(db.DateTime, default=db.func.now())
     last_modified = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-    has_one = {}
-    has_many = {}
-    many_many = {}
-    belongs_many_many = {}
+    singular_name = None
+    plural_name = None
 
-    default_order = ""
+    # has_one = {}
+    # has_many = {}
+    # many_many = {}
+    # belongs_many_many = {}
+
+    default_order = None
 
     auto_form_exclude = ['id', 'created_on', 'last_modified']
+
+    # summary_fields = []
+    # searchable_fields = []
+    # allowed_actions = []
+
     # class CMSForm(Form):
     # name = fields.StringField("asdsadsa")
     #     submit = fields.SubmitField("Submit")
@@ -64,7 +73,6 @@ class DataObject(object):
         def before_insert_listener(mapper, connection, target):
             for c in target.__class__.mro():
                 if hasattr(c, "before_insert"):
-                    print(c, mapper, connection, target)
                     c.before_insert(mapper, connection, target)
 
         def before_update_listener(mapper, connection, target):
@@ -78,6 +86,11 @@ class DataObject(object):
         event.listen(cls, 'before_insert', lambda m, c, t: t.can_create(m, c))
         event.listen(cls, 'before_update', lambda m, c, t: t.can_edit(m, c))
         event.listen(cls, 'before_delete', lambda m, c, t: t.can_delete(m, c))
+
+        if not cls.singular_name:
+            cls.singular_name = uncamel(cls.__name__)
+            cls.plural_name = uncamel(cls.__name__ + "s")
+
         return super().__new__(cls)
 
 

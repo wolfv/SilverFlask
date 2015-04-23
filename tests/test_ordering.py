@@ -5,8 +5,9 @@ from tests.test_base import BaseTest
 from silverflask.models import DataObject
 from silverflask.mixins import OrderableMixin
 
-class OrderedItem(DataObject, OrderableMixin, db.Model):
-    pass
+class OrderedItem(OrderableMixin, DataObject, db.Model):
+    def __repr__(self):
+        return "<OrderedItem id: %s, sort_order: %s>" % (self.id, self.sort_order)
 
 def deepequal(l1, l2):
     for i in range(0, len(l1)):
@@ -21,17 +22,35 @@ class TestOrdering(BaseTest):
         # db.session.remove()
 
     def test_ordering(self):
-        print("SAdkaJKJ J AJS D")
         o1 = OrderedItem()
         db.session.add(o1)
         db.session.commit()
         o2 = OrderedItem()
         db.session.add(o2)
         db.session.commit()
+        print(OrderedItem.singular_name, OrderedItem.plural_name)
+        assert OrderedItem.default_order is not None
         assert(o1.sort_order == 1)
-        print(o1.sort_order, o2.sort_order)
         assert(o2.sort_order == 2)
-        o2.insert_after(o1.id)
+
+        o1.insert_after(o2.sort_order)
         db.session.commit()
-        OrderedItem.query.all()
+        print(o1.sort_order)
+        assert(o1.sort_order == 3)
+        print(OrderedItem.query.all())
         assert deepequal(OrderedItem.query.all(), [o2, o1])
+
+        o2.insert_after(o1.sort_order)
+        db.session.commit()
+        assert deepequal(OrderedItem.query.all(), [o1, o2])
+
+        o3 = OrderedItem()
+        db.session.add(o3)
+        db.session.commit()
+
+        assert deepequal(OrderedItem.query.all(), [o1, o2, o3])
+
+        o3.insert_after(0)
+        db.session.commit()
+        assert deepequal(OrderedItem.query.all(), [o3, o1, o2])
+
