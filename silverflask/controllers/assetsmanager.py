@@ -37,7 +37,7 @@ def assets():
         gridfield = GridField(
             urls={"get": url_for(".assets_get")},
             buttons=[],
-            display_rows=["id", "name"]
+            display_cols=["id", "name"]
         )
     return render_template("assetmanager.html", form=AssetsForm())
 

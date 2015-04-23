@@ -39,7 +39,7 @@ def securitymanager():
         gridfield = GridField(
             urls={"get": url_for(".user_get")},
             buttons=[],
-            display_rows=["id", "name"]
+            display_cols=["id", "name"]
         )
     return render_template("assetmanager.html", form=SecurityForm())
 

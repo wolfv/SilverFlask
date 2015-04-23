@@ -1,22 +1,12 @@
-from .DataObject import DataObject
+from silverflask.models import DataObject
 from flask import abort
 from slugify import slugify
-from .OrderableMixin import OrderableMixin
-from .VersionedMixin import VersionedMixin
-from sqlalchemy import event
 
 from silverflask import db
-
-registered_subclasses = []
-
-class MetaClass(type):
-    def __new__(cls, clsname, bases, attrs):
-        newclass = super(MetaClass, cls).__new__(cls, clsname, bases, attrs)
-        registered_subclasses.append(newclass)  # here is your register function
-        return newclass
+from silverflask.mixins import OrderableMixin, VersionedMixin, PolymorphicMixin
 
 
-class SiteTree(VersionedMixin, DataObject, OrderableMixin, db.Model):
+class SiteTree(VersionedMixin, PolymorphicMixin, OrderableMixin, DataObject, db.Model):
     """
     The SiteTree is the database model from which all pages have to inherit.
     It defines the parent/children relationships of the page tree.
@@ -25,16 +15,9 @@ class SiteTree(VersionedMixin, DataObject, OrderableMixin, db.Model):
 
     parent_id = db.Column(db.Integer, db.ForeignKey('sitetree.id'))
     name = db.Column(db.String)
-    database = ["parent_id", "name"]
-    type = db.Column(db.String(50))
     urlsegment = db.Column(db.String(250), nullable=False)
 
     template = "page.html"
-
-    __mapper_args__ = {
-        'polymorphic_identity': 'sitetree',
-        'polymorphic_on': type
-    }
 
     children = db.relationship('SiteTree',
                                cascade="all",
@@ -84,9 +67,9 @@ class SiteTree(VersionedMixin, DataObject, OrderableMixin, db.Model):
     @classmethod
     def get_cms_form(cls):
         form = super().get_cms_form()
-        del form.children
-        del form.sort_order
-        del form.urlsegment
+        # del form.children
+        # del form.sort_order
+        # del form.urlsegment
         return form
 
     def append_child(self, child):
@@ -96,8 +79,16 @@ class SiteTree(VersionedMixin, DataObject, OrderableMixin, db.Model):
         d = dict()
         try:
             d = super().as_dict()
-        except:
-            d = super(self.__class__, self).as_dict()
+        except Exception as e:
+            """
+            This is due to problems with wsgi and reloading:
+            http://stackoverflow.com/questions/9722343/python-super-behavior-not-dependable
+            """
+            for c in self.__class__.mro():
+                if c != self.__class__:
+                    super_object = super(c, self)
+                    if hasattr(super_object, 'as_dict'):
+                        d.update(super_object.as_dict())
         d.update({
             "parent_id": self.parent_id,
             "name": self.name,
@@ -194,8 +185,10 @@ class SiteTree(VersionedMixin, DataObject, OrderableMixin, db.Model):
                 }
         return sitetree_props
 
-    def before_insert(self, mapper, context, target):
-        self.create_slug(target)
+    @classmethod
+    def before_insert(cls, mapper, context, target):
+        target.create_slug(target)
 
-    def before_update(self, mapper, context, target):
-        self.create_slug(target, self.id)
+    @classmethod
+    def before_update(cls, mapper, context, target):
+        target.create_slug(target, target.id)

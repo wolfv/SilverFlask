@@ -19,6 +19,15 @@ class CannotUpdateError(PermissionError):
 class CannotDeleteError(PermissionError):
     pass
 
+# class DataObjectMetaQuery(cls):
+#     """
+#     This should return a query that conforms to
+#     the class based parameters like:
+#     default_sort
+#     etc.
+#     """
+#     pass
+
 class DataObject(object):
     """
     The DataObject class is the basic building block of any CMS
@@ -46,10 +55,6 @@ class DataObject(object):
 
     default_order = ""
 
-    __mapper_args__ = {'always_refresh': True}
-
-    database = ["id", "created_on", "last_modified"]
-
     auto_form_exclude = ['id', 'created_on', 'last_modified']
     # class CMSForm(Form):
     # name = fields.StringField("asdsadsa")
@@ -57,12 +62,15 @@ class DataObject(object):
 
     def __new__(cls, *args, **kwargs):
         def before_insert_listener(mapper, connection, target):
-            if hasattr(target, "before_insert"):
-                target.before_insert(mapper, connection, target)
+            for c in target.__class__.mro():
+                if hasattr(c, "before_insert"):
+                    print(c, mapper, connection, target)
+                    c.before_insert(mapper, connection, target)
 
         def before_update_listener(mapper, connection, target):
-            if hasattr(target, "before_update"):
-                target.before_update(mapper, connection, target)
+            for c in target.__class__.mro():
+                if hasattr(c, "before_update"):
+                    c.before_update(mapper, connection, target)
 
         event.listen(cls, 'before_insert', before_insert_listener)
         event.listen(cls, 'before_update', before_update_listener)
@@ -70,7 +78,6 @@ class DataObject(object):
         event.listen(cls, 'before_insert', lambda m, c, t: t.can_create(m, c))
         event.listen(cls, 'before_update', lambda m, c, t: t.can_edit(m, c))
         event.listen(cls, 'before_delete', lambda m, c, t: t.can_delete(m, c))
-
         return super().__new__(cls)
 
 
@@ -115,17 +122,15 @@ class DataObject(object):
     def can_create(self, mapper, connection):
         if request and not current_user:
             raise CannotCreateError
-
         return True
 
     def can_edit(self, mapper, connection):
         if request and not current_user:
             raise CannotUpdateError
-
         return True
 
     def can_delete(self, mapper, connection):
         if request and not current_user:
             raise CannotDeleteError
-
         return True
+

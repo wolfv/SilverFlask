@@ -8,14 +8,11 @@ from silverflask.models import ImageObject
 
 
 class Page(SiteTree):
-    __tablename__ = 'page'
     id = db.Column(db.Integer, db.ForeignKey('sitetree.id'), primary_key=True)
     content = db.Column(db.UnicodeText)
     content_json = db.Column(db.UnicodeText)
+
     template = "page.html"
-    __mapper_args__ = {
-        'polymorphic_identity': __tablename__,
-    }
 
     def get_cms_form(self):
         form = OrderedFormFactory()
@@ -30,16 +27,10 @@ class Page(SiteTree):
 
 class SuperPage(SiteTree):
 
-    __tablename__ = 'superpage'
-
     id = db.Column(db.Integer, db.ForeignKey('sitetree.id'), primary_key=True)
     content = db.Column(db.UnicodeText)
     second_content = db.Column(db.UnicodeText)
     subtitle = db.Column(db.String)
-
-    __mapper_args__ = {
-        'polymorphic_identity': __tablename__
-    }
 
     images = db.relationship("GalleryImage")
 
@@ -61,8 +52,9 @@ class SuperPage(SiteTree):
             query=lambda: GalleryImage.query_factory().filter(GalleryImage.page_id == self.id),
             buttons=button_list,
             field_name="images",
-            display_rows=["id", "caption", "sort_order"],
-            name="images")
+            display_cols=["id", "caption", {"name": "sort_order", "hidden": False}],
+            name="images",
+            sortable=True)
 
         form = OrderedFormFactory()
         form.add_to_tab("Root.Main", fields.StringField(name="name", default=1))

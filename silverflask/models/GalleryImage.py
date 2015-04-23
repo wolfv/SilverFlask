@@ -1,7 +1,7 @@
 # Just a test
 
-from .DataObject import DataObject
-from .OrderableMixin import OrderableMixin
+from silverflask.models import DataObject
+from silverflask.mixins import OrderableMixin
 from . import FileObject, ImageObject
 
 from silverflask import db

@@ -14,20 +14,14 @@ from silverflask.extensions import (
 )
 
 from silverflask.filestorage_backend import LocalFileStorageBackend
-from flask.ext.sqlalchemy import SQLAlchemy
+from silverflask.sqlalchemy import SQLAlchemy
 
 from flask_user import UserManager, SQLAlchemyAdapter
 
 db = SQLAlchemy()
 
-db_adapter = SQLAlchemyAdapter(db, "User")
-user_manager = None
-
-import logging
-logger = logging.getLogger("silverflask")
-
-
 def create_app(object_name, env="prod"):
+
     """
     An flask application factory, as explained here:
     http://flask.pocoo.org/docs/patterns/appfactories/
@@ -38,8 +32,8 @@ def create_app(object_name, env="prod"):
 
         env: The name of the current environment, e.g. prod or dev
     """
-    app = Flask(__name__)
 
+    app = Flask(__name__)
     app.config.from_object(object_name)
 
     upload_path = os.path.join(app.instance_path, app.config["SILVERFLASK_UPLOAD_FOLDER"])
@@ -48,17 +42,19 @@ def create_app(object_name, env="prod"):
     app.config['ENV'] = env
 
     db.init_app(app)
-    logger.debug("DB Initialized")
+    app.logger.debug("DB Initialized")
 
     # init the cache
     cache.init_app(app)
 
     debug_toolbar.init_app(app)
 
+    # Setup user handling
     from silverflask.models import User
+
     user_adapter = SQLAlchemyAdapter(db, User)
-    user_manager = UserManager(user_adapter, app)
-    user_manager.enable_login_without_confirm_email = True
+    user_manager = UserManager(user_adapter)
+    user_manager.init_app(app)
 
     # Import and register the different asset bundles
     assets_env.init_app(app)
@@ -67,10 +63,10 @@ def create_app(object_name, env="prod"):
         assets_env.register(name, bundle)
 
     # register our blueprints
-    from silverflask.controllers.main import main
-    from silverflask.controllers.main import setup_processors
-    setup_processors(app)
+    from silverflask.controllers.main import main, setup_processors
     from silverflask.controllers.cms import bp as cms_bp
+
+    setup_processors(app)
     app.register_blueprint(main)
     app.register_blueprint(cms_bp, url_prefix='/admin')
 

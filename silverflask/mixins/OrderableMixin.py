@@ -1,6 +1,5 @@
-from sqlalchemy.ext.declarative import declared_attr
 from silverflask import db
-from sqlalchemy import func, text
+from sqlalchemy import func
 
 class OrderableMixin(object):
     """
@@ -9,10 +8,7 @@ class OrderableMixin(object):
     """
     sort_order = db.Column(db.Integer, nullable=False, default=1)
 
-    @classmethod
-    def query_factory(cls):
-        # query = super().query
-        return db.session.query(cls).order_by(cls.sort_order.asc())
+    default_sort = sort_order.desc()
 
     def insert_after(self, index, orderable_base_class=None, index_absolute=True, query=None):
         """
@@ -33,9 +29,11 @@ class OrderableMixin(object):
             print(index_el.name)
             index = index_el.sort_order
             print("INDEX: ", index)
+
         db.session.query(cls)\
             .filter(cls.sort_order > index)\
             .update({cls.sort_order: cls.sort_order + 1})
+
         print(self.sort_order, self, index)
         self.sort_order = index + 1
 
@@ -62,14 +60,18 @@ class OrderableMixin(object):
         if duplicates > 0:
             cls.reindex()
 
-    def move_after(self, index):
+    def move_after(self, sort_order):
         """
         Move current DataObject after index (= sort_order) of another element
 
         :param index: sort_order of element where it should be moved after
         :return: nothing
         """
-        self.insert_after(index)
+        self.insert_after(sort_order)
+
+    @classmethod
+    def before_insert(cls, mapper, connection, target=None):
+        target.init_order()
 
     def init_order(self):
         """

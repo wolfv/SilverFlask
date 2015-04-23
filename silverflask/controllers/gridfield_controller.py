@@ -86,10 +86,3 @@ def gridfield_sort_record(cls, record_id, form, fieldname):
     db.session.commit()
     data = gridfield_get_return_dict(query, cls, record_id, form, fieldname)
     return jsonify(data=data)
-    # element_form = elem.get_cms_form()
-    return "OK"
-
-    # element_form_instance = element_form(request.form, obj=elem)
-    # if element_form_instance.validate_on_submit():
-    #     element_form_instance.populate_obj(elem)
-    #     db.session.commit()

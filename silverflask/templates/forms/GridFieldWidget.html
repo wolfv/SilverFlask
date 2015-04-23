@@ -1,15 +1,16 @@
 {% for button in buttons %}
 <a href="{{ urls["add"] }}">{{ button.name }}</a>
 {% endfor %}
+{{ sortable }}
 <table id="assets" class="table gridfield"
        data-ajax-url="{{ urls["get"] }}"
        data-sort-url="{{ urls["sort"] }}"
-       sortable="{{ sortable }}"
+       data-sortable="{% if sortable -%}True{%- endif %}"
        cellspacing="0" width="100%">
     <thead>
     <tr>
-        {% for row in display_rows %}
-            <th data-col="{{ row.name }}">{{ row.label if row.label else row.name }}</th>
+        {% for col in display_cols %}
+            <th data-col="{{ col.name }}" data-hidden="{{ col.hidden }}">{{ col.label if col.label else col.name }}</th>
         {% endfor %}
         <th data-col="edit_url" data-renderer="render_actions"></th>
     </tr>

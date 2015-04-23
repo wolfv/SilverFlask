@@ -33,14 +33,18 @@ class GridField:
     def __init__(self, node):
         self.columns = []
         self.node = node
+
         for header in j('th', node):
             header = j(header)
             renderer = None
             if header.data('renderer'):
                 renderer = GridField[header.data('renderer')]
-
+            visible = True
+            if j(header).data('hidden') == "True":
+                visible = False
             self.columns.append({'data': j(header).data('col'),
-                                 'render': renderer})
+                                 'render': renderer,
+                                 'visible': visible})
 
         self.table = self.node.DataTable(
             ajax=self.node.data("ajax-url"),

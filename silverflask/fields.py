@@ -36,15 +36,15 @@ class LivingDocsWidget(object):
 
 class GridFieldWidget(object):
 
-    def unpack_display_rows(self, display_rows):
-        self.display_rows = []
-        for d in display_rows:
+    def unpack_display_cols(self, display_cols):
+        self.display_cols = []
+        for d in display_cols:
             if isinstance(d, str):
-                self.display_rows.append({"name": d})
+                self.display_cols.append({"name": d})
             elif isinstance(d, dict):
-                self.display_rows.append(d)
+                self.display_cols.append(d)
             else:
-                raise TypeError("Display Row must be str or dict")
+                raise TypeError("Display Col must be str or dict")
 
     def _generate_urls(self, **kwargs):
         def url():
@@ -61,18 +61,19 @@ class GridFieldWidget(object):
                 "sort": url() + "/sort"
             }
 
-    def __init__(self, query=None, display_rows=None, buttons=None,
+    def __init__(self, query=None, display_cols=None, buttons=None,
                  function_name="get_cms_form", field_name=None,
-                 record_id=None, record_classname=None, urls=None, **kwargs):
+                 record_id=None, record_classname=None, urls=None, sortable=False, **kwargs):
         # super().__init__(**kwargs)
         self.query = query
         self.buttons = buttons
-        self.unpack_display_rows(display_rows)
+        self.unpack_display_cols(display_cols)
         self.function_name = function_name
         self.field_name = field_name
         self.record_id = record_id
         self.record_classname = record_classname
         self.urls = urls
+        self.sortable = sortable
         self._generate_urls()
 
     def __call__(self, field, **kwargs):
@@ -81,8 +82,9 @@ class GridFieldWidget(object):
                                field_name=self.field_name,
                                buttons=self.buttons,
                                # entries=self.query(),
-                               display_rows=self.display_rows,
+                               display_cols=self.display_cols,
                                urls=self.urls,
+                               sortable=self.sortable,
                                **kwargs)
 
 
@@ -111,7 +113,7 @@ class GridField(Field):
     record_classname = None
 
     def __init__(self, parent_record=None, query=None, buttons=None,
-                 urls=None, display_rows=None, field_name=None, sortable=False, **kwargs):
+                 urls=None, display_cols=None, field_name=None, sortable=False, **kwargs):
         super().__init__(**kwargs)
         if parent_record:
             self.record_id = parent_record.id
@@ -122,7 +124,7 @@ class GridField(Field):
                                       buttons=self.buttons,
                                       record_id=self.record_id,
                                       record_classname=self.record_classname,
-                                      display_rows=display_rows,
+                                      display_cols=display_cols,
                                       field_name=field_name,
                                       sortable=sortable,
                                       urls=urls,

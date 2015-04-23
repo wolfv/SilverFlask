@@ -398,7 +398,7 @@
     };
     GridField.prototype.__init__ = function __init__(node){
         var self = this;
-        var header, renderer;
+        var header, renderer, visible;
         self.columns = [];
         self.node = node;
         var _$rapyd$_Iter6 = j("th", node);
@@ -409,9 +409,14 @@
             if (header.data("renderer")) {
                 renderer = GridField[header.data("renderer")];
             }
+            visible = true;
+            if (j(header).data("hidden") === "True") {
+                visible = false;
+            }
             self.columns.append({
                 "data": j(header).data("col"),
-                "render": renderer
+                "render": renderer,
+                "visible": visible
             });
         }
         self.table = self.node.DataTable({ajax: self.node.data("ajax-url"), columns: self.columns, ordering: false, order: [ 2, "asc" ]});

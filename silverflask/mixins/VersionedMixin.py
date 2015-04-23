@@ -8,11 +8,16 @@ from sqlalchemy_continuum.plugins import TransactionMetaPlugin
 from sqlalchemy.orm import mapper
 from sqlalchemy.orm.interfaces import *
 from sqlalchemy import event
-from flask import current_app
+from flask import current_app, app
 import copy
 import types
-from sqlalchemy import inspect as  sainspect
+from sqlalchemy import inspect as sainspect
 import inspect
+
+import logging
+logger = logging.getLogger('VersionedLogger')
+logger.setLevel(logging.DEBUG)
+
 
 from silverflask import db
 from silverflask.helper import classproperty
@@ -21,23 +26,17 @@ meta_plugin = TransactionMetaPlugin()
 
 make_versioned(plugins=[meta_plugin])
 
-import logging
-logger = logging.getLogger("SilverFlask")
-
-
 versioned_classes = []
 versioned_tables = []
 created_tables = []
 
 def create_live_table(cls):
-
     tablename = cls.__tablename__ + "_live"
     if tablename in created_tables or cls.__tablename__ in created_tables:
         return
     created_tables.append(tablename)
     columns = []
-
-    print("Creating Live table for: %s" % cls.__tablename__)
+    logger.debug("Creating Live table for: %s" % cls.__tablename__)
 
     ins = sainspect(cls)
 
@@ -52,7 +51,6 @@ def create_live_table(cls):
 
     # Reverse baseclass mro
     baseclass = baseclass[::-1]
-
 
     for c in cls.__table__.columns:
         # What is happening
@@ -80,7 +78,6 @@ def create_live_table(cls):
     )
 
     args = {}
-
     for key, value in cls.__dict__.items():
         if type(value) is types.FunctionType:
             args.update({key: value})
@@ -97,7 +94,7 @@ def create_live_table(cls):
     for r in rs:
         if r.parent == cls.__mapper__:
             print("There is a relation defined %s with Key: %r" % (cls.__name__, r))
-            print(r.target)
+
             if hasattr(r.target, 'fullname') and r.target.fullname.endswith("version"):
                 continue
 
@@ -121,26 +118,20 @@ def create_live_table(cls):
                 continue
 
             if hasattr(r, "backref") and r.backref:
-                print(r.backref)
                 backref_key = r.backref[0]
                 backrefs.append(backref_key)
                 backref = r.backref[1]
-                print(backref["remote_side"].arg)
                 remote_side = None
                 if hasattr(backref["remote_side"].cls, "LiveType") or backref["remote_side"].cls == cls:
                     orig_arg = backref["remote_side"].arg
                     arg_v = orig_arg.split(".")
                     arg_v[0] += "Live"
                     remote_side = ".".join(arg_v)
-                    print(remote_side)
                     args[key] = db.relationship(target, backref=db.backref(backref_key, remote_side=remote_side), cascade="none, ")
                 else:
                     args[key] = db.relationship(target, cascade="none, ")
             else:
                 args[key] = db.relationship(target, cascade="none, ")
-
-    if args.get("__create_live__"):
-        del args["__create_live__"]
 
     if args.get("before_insert"): del args["before_insert"]
     if args.get("before_update"): del args["before_update"]
@@ -148,23 +139,24 @@ def create_live_table(cls):
 
     args["template"] = getattr(cls, "template") if hasattr(cls, "template") else ""
 
-    # print(methods)
+    mapper_args = {}
+    if hasattr(cls, "__mapper_args__"):
+        mapper_args = cls.__mapper_args__
+
+    args['__versioned_draft_class__'] = cls
+    args['__create_live__'] = False
+
     cls.LiveType = type(
         '%sLive' % cls.__name__,
         baseclass,
         args
     )
+
     cls.LiveType.__create_live__ = False
-    mapper_args = {}
-    if hasattr(cls, "__mapper_args__"):
-        mapper_args = cls.__mapper_args__
 
     for key, arg in mapper_args.items():
         if key == "polymorphic_on":
-            # remap column!
-            mapper_args[key] = table.columns[arg.name]
-        elif key == "polymorphic_identity":
-            mapper_args[key] += "_live"
+            mapper_args[key] = table.columns[arg]
 
     live_mapper = mapper(cls, cls.LiveTable,
                          non_primary=True,
@@ -225,6 +217,7 @@ class VersionedMixin(object):
 
         for column in ins.columns:
             setattr(t_obj, column.name, getattr(self, column.name))
+
         if new_object:
             db.session.add(t_obj)
         db.session._enable_transaction_accounting = False

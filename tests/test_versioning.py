@@ -42,7 +42,7 @@ class TestVersioning(BaseTest):
         p.mark_as_published()
         db.session.commit()
 
-        assert Page.LiveType.query.filter(Page.name == "Test Page").first() is not None
+        assert Page.LiveType.query.filter(Page.LiveType.name == "Test Page").first() is not None
 
         p.name = "Test 123"
         p.content = "aaa"

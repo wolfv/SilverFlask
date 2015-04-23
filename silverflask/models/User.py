@@ -1,12 +1,15 @@
 from flask.ext.login import AnonymousUserMixin
 from flask import current_app
 from flask_user import UserMixin
-from silverflask import user_manager
 from silverflask import db
 from . import DataObject
 from wtforms import fields, validators
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 
+class UserRoles(db.Model):
+    __tablename__ = "user_role"
+    user_id = db.Column(db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
+    role_id = db.Column(db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE'), primary_key=True)
 
 class User(DataObject, UserMixin, db.Model):
     """
@@ -24,7 +27,7 @@ class User(DataObject, UserMixin, db.Model):
     confirmed_at = db.Column(db.DateTime)
     is_enabled = db.Column(db.Boolean(), nullable=False, server_default='1') 
 
-    roles = db.relationship('Role', secondary='user_roles',
+    roles = db.relationship('Role', secondary=UserRoles.__tablename__,
                              backref=db.backref('users', lazy='dynamic'))
 
     auto_form_exclude = DataObject.auto_form_exclude + ['confirmed_at', 'is_enabled']
@@ -73,7 +76,7 @@ class User(DataObject, UserMixin, db.Model):
     @classmethod
     def get_cms_form(cls):
         form = super().get_cms_form()
-        roles =  [(r.id, r.name) for r in db.session.query(Role).all()]
+        roles = [(r.id, r.name) for r in db.session.query(Role).all()]
         form.add_to_tab("Root.Main", fields.PasswordField("New Password",
                                                           [validators.EqualTo('new_password_confirmation',
                                                                               message='Passwords must match')],
@@ -83,12 +86,9 @@ class User(DataObject, UserMixin, db.Model):
                                                               get_label=lambda x: x.name,
                                                               get_pk=lambda x: x.id,
                                                               name='roles'))
-        # print(form.fields["password"])
-        # print(form.fields["new_password_confirmation"])
         del form.fields["password"]
-        # form.new_password =
-        # form.new_password_confirmation = fields.PasswordField("Repeat New Password")
         return form
+
 
 class Role(DataObject, db.Model):
     name = db.Column(db.String(50), unique=True)
@@ -99,7 +99,3 @@ class Role(DataObject, db.Model):
         self.description = description
 
 
-class UserRoles(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE'))
-    role_id = db.Column(db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE'))

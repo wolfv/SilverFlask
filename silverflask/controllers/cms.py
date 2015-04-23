@@ -17,9 +17,11 @@ def pagetypes():
 
 @bp.before_request
 def restrict_access():
+    current_app.logger.debug("Restricting access: %s" % str(current_user.is_authenticated()))
     if not current_user.is_authenticated():
         return redirect(url_for("user.login", next=request.url))
     elif not current_user.has_roles("admin"):
+        current_app.logger.debug("%s, %s" % (current_user.has_roles("admin"), str(current_user.roles)))
         return abort(403)
 
 
