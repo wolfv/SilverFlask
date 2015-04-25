@@ -109,8 +109,10 @@ def filemanager_delete(self, file_id):
 @bp.route("/upload", methods=["POST"])
 def upload():
     print(request.files)
-    for f in request.files.getlist("files[]"):
-        print(f)
+    files = request.files
+    if len(request.files.getlist("files[]")):
+        files = request.files.getlist("files[]")
+    def _create_file(f):
         fo = create_file(f)
         db.session.add(fo)
         db.session.commit()
@@ -122,8 +124,19 @@ def upload():
             "deleteUrl": url_for(".filemanager_delete", file_id=fo.id),
             "deleteType": "DELETE"
         }
-        return jsonify(files=[return_dict])
-    return "No File uploaded"
+        return return_dict
+    res = []
+    if type(files) == list:
+        for f in files:
+            res.append(_create_file(f))
+    else:
+        for k in files:
+            res.append(_create_file(files[k]))
+
+    if len(res):
+        return jsonify(files=res)
+    else:
+        abort(403, "No Files Uploaded")
 
 
 @bp.route("/sitetree/sort", methods=["POST"])

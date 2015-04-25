@@ -72,25 +72,14 @@
             var iNewPosition = -1; // fnGetStartPosition(sSelector);
             var sDirection;
             var trPrevious = tr.prev(sSelector);
+            var api = oTable.dataTable().api()
             if (trPrevious.length > 0) {
-                iNewPosition = parseInt(oTable.fnGetData(trPrevious[0], properties.iIndexColumn));
-                if (iNewPosition < iCurrentPosition) {
-                    iNewPosition = iNewPosition + 1;
-                }
+                var row_id = oTable.dataTable().api().row(trPrevious).data()['id']
+                iNewPosition = parseInt(row_id);
             } else {
-                var trNext = tr.next(sSelector);
-                if (trNext.length > 0) {
-                    iNewPosition = parseInt(oTable.fnGetData(trNext[0], properties.iIndexColumn));
-                    if (iNewPosition > iCurrentPosition)//moved back
-                        iNewPosition = iNewPosition - 1;
-                }
+                iNewPosition = 0;
             }
-            if (iNewPosition < iCurrentPosition)
-                sDirection = "back";
-            else
-                sDirection = "forward";
-
-            return { sDirection: sDirection, iCurrentPosition: iCurrentPosition, iNewPosition: iNewPosition };
+            return { newPosition: iNewPosition };
 
         }
 
@@ -217,7 +206,7 @@
                     }
                         sSelector = "tbody tr[" + properties.sDataGroupAttribute + " ='" + sGroup + "']";
                     }
-
+                    var row_id = oTable.dataTable().api().row(document.getElementById(ui.item.context.id)).data()['id'];
                     var oState = fnGetState($dataTable, sSelector, ui.item.context.id);
                     if(oState.iNewPosition == -1)
                     {
@@ -230,10 +219,8 @@
 						var oAjaxRequest = {
                             url: properties.sURL,
                             type: properties.sRequestType,
-                            data: { id: ui.item.context.id,
-                                fromPosition: oState.iCurrentPosition,
-                                toPosition: oState.iNewPosition,
-                                direction: oState.sDirection,
+                            data: { id: row_id,
+                                new_position: oState.newPosition,
                                 group: sGroup
                             },
                             success: function (data) {

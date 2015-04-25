@@ -26,15 +26,12 @@ class OrderableMixin(object):
         query = query if query else db.session.query(cls)
         if not index_absolute:
             index_el = query.order_by(cls.sort_order.asc()).limit(1).offset(index).scalar()
-            print(index_el.name)
             index = index_el.sort_order
-            print("INDEX: ", index)
 
         db.session.query(cls)\
             .filter(cls.sort_order > index)\
             .update({cls.sort_order: cls.sort_order + 1})
 
-        print(self.sort_order, self, index)
         self.sort_order = index + 1
 
     @classmethod
@@ -60,14 +57,23 @@ class OrderableMixin(object):
         if duplicates > 0:
             cls.reindex()
 
-    def move_after(self, sort_order):
+    def move_after(self, obj):
         """
         Move current DataObject after index (= sort_order) of another element
 
-        :param index: sort_order of element where it should be moved after
+        :param index: obj element where to move after or sort order of other elements
         :return: nothing
         """
-        self.insert_after(sort_order)
+        if hasattr(obj, 'sort_order'):
+            self.insert_after(obj.sort_order)
+        else:
+            _id = int(obj)
+            if _id <= 0:
+                sort_order = 0
+            else:
+                sort_order = db.session.query(self.__class__).get(_id).sort_order
+            self.insert_after(sort_order)
+
 
     @classmethod
     def before_insert(cls, mapper, connection, target=None):

@@ -49,10 +49,10 @@ class SuperPage(SiteTree):
         button_list.append(GridField.AddButton())
         g = GridField(
             parent_record=self,
-            query=lambda: GalleryImage.query_factory().filter(GalleryImage.page_id == self.id),
+            query=lambda: GalleryImage.query.filter(GalleryImage.page_id == self.id),
             buttons=button_list,
             field_name="images",
-            display_cols=["id", "caption", {"name": "sort_order", "hidden": False}],
+            display_cols=[{"name": "id", "hidden": True}, "caption", {"name": "sort_order", "hidden": True}],
             name="images",
             sortable=True)
 

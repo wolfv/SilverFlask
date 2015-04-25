@@ -7,22 +7,24 @@ class AsyncFileUploadWidget(object):
     """
     Renders a file input chooser field.
     """
-    def __init__(self, query=None, relation=None, **kwargs):
+    def __init__(self, query=None, relation=None, multiple=False, **kwargs):
         super().__init__(**kwargs)
         self.query = query
         self.relation = relation
+        self.multiple = multiple
         print(self.query)
 
     def __call__(self, field, **kwargs):
         kwargs.setdefault('id', field.id)
         elem = None
-        print(field._value)
+
         if field._value():
             elem = db.session.query(self.relation).get(field._value())
 
         return render_template("forms/AsyncFileUploadWidget.html",
                                value=field._value(),
                                elem=elem,
+                               multiple=self.multiple,
                                **kwargs)
 
 

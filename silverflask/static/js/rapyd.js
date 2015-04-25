@@ -419,6 +419,7 @@
                 "visible": visible
             });
         }
+        _$rapyd$_print(self.columns);
         self.table = self.node.DataTable({ajax: self.node.data("ajax-url"), columns: self.columns, ordering: false, order: [ 2, "asc" ]});
         if (self.node.data("sortable")) {
             self.node.dataTable().rowReordering({
@@ -437,6 +438,11 @@
         self.url = "/admin/upload";
         self.node = node;
         self.input = j("input[type='file']", self.node);
+        self.button = j(".btn", self.node);
+        self.button.on("click", function(e) {
+            console.log(self.input);
+            self.input.trigger("click", e);
+        });
         self.preview_container = j(".preview_image", self.node);
         on_add = j.proxy(self.on_add, self);
         on_progress = j.proxy(self.on_progress, self);
@@ -463,9 +469,13 @@
         var reader;
         data.context = j("<p>").text("Uploading ... ");
         self.node.parent().append(data.context);
-        self.current_image = j("<img>").addClass("obj");
+        if (j("img", self.node).length) {
+            self.current_image = j("img", self.node);
+        } else {
+            self.current_image = j("<img>").addClass("obj");
+            self.preview_container.append(self.current_image);
+        }
         self.current_image.get(0).file = data.files[0];
-        self.preview_container.append(self.current_image);
         reader = new FileReader();
         reader.onload = function(event) {
             self.current_image.get(0).src = event.target.result;
@@ -483,7 +493,7 @@
         console.log(event, data);
         url = "http://" + window.location.host + data.result.files[0].url;
         console.log("Setting val to ", data.result.files[0].id);
-        self.node.children("input[type='hidden']").val(data.result.files[0].id);
+        j("input[type='hidden']", self.node).val(data.result.files[0].id);
         var _$rapyd$_Iter7 = data.result.files;
         for (var _$rapyd$_Index7 = 0; _$rapyd$_Index7 < _$rapyd$_Iter7.length; _$rapyd$_Index7++) {
             file = _$rapyd$_Iter7[_$rapyd$_Index7];

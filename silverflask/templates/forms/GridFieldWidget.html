@@ -1,7 +1,13 @@
-{% for button in buttons %}
-<a href="{{ urls["add"] }}">{{ button.name }}</a>
-{% endfor %}
-{{ sortable }}
+<div class="row">
+<div class="col-md-12">
+  {% for button in buttons %}
+    <a class='btn btn-primary' href="{{ urls["add"] }}">{{ button.name }}</a>
+  {% endfor %}
+  <hr/>
+</div>
+</div>
+<div class="row">
+<div class="col-md-12">
 <table id="assets" class="table gridfield"
        data-ajax-url="{{ urls["get"] }}"
        data-sort-url="{{ urls["sort"] }}"
@@ -19,3 +25,5 @@
     </tbody>
 
 </table>
+</div>
+</div>

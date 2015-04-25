@@ -67,12 +67,14 @@
 
         function fnGetState(oTable, sSelector, id) {
 
+
             var tr = $("#" + id, oTable);
             var iCurrentPosition = oTable.fnGetData(tr[0], properties.iIndexColumn);
             var iNewPosition = -1; // fnGetStartPosition(sSelector);
             var sDirection;
             var trPrevious = tr.prev(sSelector);
             if (trPrevious.length > 0) {
+                var row = oTable.dataTable().api().row(tr)
                 iNewPosition = parseInt(oTable.fnGetData(trPrevious[0], properties.iIndexColumn));
                 if (iNewPosition < iCurrentPosition) {
                     iNewPosition = iNewPosition + 1;

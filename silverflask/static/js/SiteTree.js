@@ -360,7 +360,7 @@
     };
     Notification.init_from_node = function init_from_node(node){
         node.hide();
-        return new Notification(node.text(), node.class());
+        return new Notification(node.text(), node.data("type"));
     };
 
     function Request() {
@@ -480,7 +480,7 @@
                     "data": self.get_data
                 }
             },
-            "plugins": [ "contextmenu", "dnd", "types" ],
+            "plugins": [ "contextmenu", "dnd", "types", "wholerow" ],
             "contextmenu": {
                 "items": self.get_menu_items
             },

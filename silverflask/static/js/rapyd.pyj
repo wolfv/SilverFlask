@@ -42,10 +42,11 @@ class GridField:
             visible = True
             if j(header).data('hidden') == "True":
                 visible = False
+
             self.columns.append({'data': j(header).data('col'),
                                  'render': renderer,
                                  'visible': visible})
-
+        print(self.columns)
         self.table = self.node.DataTable(
             ajax=self.node.data("ajax-url"),
             columns=self.columns,
@@ -68,7 +69,13 @@ class UploadField:
         self.url = '/admin/upload'
 
         self.node = node
+
         self.input = j("input[type='file']", self.node)
+        self.button = j(".btn", self.node)
+        self.button.on('click', def (e):
+            console.log(self.input)
+            self.input.trigger('click', e);
+        )
         self.preview_container = j('.preview_image', self.node)
         on_add = j.proxy(self.on_add, self)
         on_progress = j.proxy(self.on_progress, self)
@@ -100,10 +107,13 @@ class UploadField:
         data.context = j('<p>').text("Uploading ... ")
         self.node.parent().append(data.context)
 
-        self.current_image = j("<img>").addClass("obj")
-        self.current_image.get(0).file = data.files[0]
+        if j("img", self.node).length:
+            self.current_image = j("img", self.node)
+        else:
+            self.current_image = j("<img>").addClass("obj")
+            self.preview_container.append(self.current_image)
 
-        self.preview_container.append(self.current_image)
+        self.current_image.get(0).file = data.files[0]
 
         reader = new FileReader()
 
@@ -120,7 +130,7 @@ class UploadField:
         console.log(event, data)
         url = "http://" + window.location.host + data.result.files[0].url
         console.log("Setting val to ", data.result.files[0].id)
-        self.node.children("input[type='hidden']").val(data.result.files[0].id)
+        j("input[type='hidden']", self.node).val(data.result.files[0].id)
 
         for file in data.result.files:
             j('<p/>').text(file.name).appendTo(j('body'))

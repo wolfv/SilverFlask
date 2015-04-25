@@ -74,15 +74,15 @@ def gridfield_edit_record(cls, record_id, form, fieldname, id):
 def gridfield_sort_record(cls, record_id, form, fieldname):
     elem, forminstance, field, query = get_gridfield_context(cls, record_id, form, fieldname)
 
-    to = int(request.form["toPosition"])
+    to = int(request.form["new_position"])
     _id = int(request.form["id"])
 
     elem_type = query.column_descriptions[0]["type"]
-    prev_elem = query.offset(to - 1).first()
 
     curr_elem = db.session.query(elem_type).get(_id)
     curr_elem.move_after(to)
 
     db.session.commit()
+
     data = gridfield_get_return_dict(query, cls, record_id, form, fieldname)
     return jsonify(data=data)

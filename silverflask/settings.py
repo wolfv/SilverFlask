@@ -16,7 +16,7 @@ class ProdConfig(Config):
 
 class DevConfig(Config):
     DEBUG = True
-    DEBUG_TB_INTERCEPT_REDIRECTS = True
+    DEBUG_TB_INTERCEPT_REDIRECTS = False
     ASSETS_DEBUG = True
 
     SQLALCHEMY_DATABASE_URI = 'sqlite:///../database.db'

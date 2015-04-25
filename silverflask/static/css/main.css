@@ -89,13 +89,24 @@ body {
         display: block;
         text-decoration: none; }
 
-.async-upload-container .preview_image {
-  overflow: hidden;
-  height: 100%;
-  width: 100%; }
-  .async-upload-container .preview_image img {
-    max-width: 100%;
-    min-height: 100%; }
+.async-upload-container {
+  background: #FAFAFA;
+  height: 60px;
+  padding: 10px; }
+  .async-upload-container input[type='file'] {
+    height: 0px;
+    width: 0px;
+    opacity: 0; }
+  .async-upload-container .drop-zone {
+    border: #f0ad4e; }
+  .async-upload-container .preview_image {
+    overflow: hidden;
+    width: 50px;
+    height: 50px;
+    float: left; }
+    .async-upload-container .preview_image img {
+      max-width: 100%;
+      min-height: 100%; }
 
 .main-flex {
   position: relative;

@@ -1,11 +1,13 @@
-from .DataObject import DataObject
 import os
+import mimetypes
 from werkzeug import secure_filename
 from werkzeug.datastructures import FileStorage
 from silverflask import db
 from PIL import Image
 import uuid
 from flask import current_app, url_for
+
+from silverflask.models.DataObject import DataObject
 
 class FileObject(DataObject, db.Model):
     """
@@ -155,7 +157,7 @@ class ImageObject(FileObject):
         return img
 
 def create_file(f):
-    import mimetypes
+    print(f)
     mime = mimetypes.guess_type(f.filename)
     if mime[0].startswith("image"):
         return ImageObject(f)

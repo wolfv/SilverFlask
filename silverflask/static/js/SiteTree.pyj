@@ -102,7 +102,7 @@ class SiteTree:
                     'data': self.get_data
                 },
                 },
-            'plugins': ['contextmenu', 'dnd', 'types'],
+            'plugins': ['contextmenu', 'dnd', 'types', 'wholerow'],
             'contextmenu': {
                 'items': self.get_menu_items
             },
@@ -116,6 +116,7 @@ class SiteTree:
 
         self.node.on('dblclick.jstree', j.proxy(self.on_dblclick, self))
         self.node.on('move_node.jstree', j.proxy(self.on_move_node, self))
+
 
 def init():
     if document.querySelector("#tree"):
