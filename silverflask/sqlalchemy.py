@@ -21,26 +21,6 @@ def merge_dicts(d1, d2):
 class _BoundDeclarativeMeta(DeclarativeMeta):
 
     def __new__(cls, name, bases, d):
-        # new_bases = []
-        # for b in bases:
-        #     if b.__name__ == "Page":
-        #         class_dict = dict(b.__dict__)
-        #         functions_dict = dict()
-        #         for key in class_dict:
-        #             if type(class_dict[key]) == types.FunctionType and not key.startswith("__"):
-        #                 print(key.startswith("__"))
-        #                 functions_dict[key] = class_dict[key]
-        #                 print(functions_dict)
-        #         functions_dict["__abstract__"] = True
-        #         t = type("PageAbstract", (b.mro()[1], ),
-        #             functions_dict
-        #         )
-        #     else:
-        #         t = b
-        #     new_bases.append(t)
-        #     print(t.__dict__)
-        # print(new_bases)
-        # new_bases = tuple(new_bases)
         if d.get("__abstract_inherit__"):
             inherit = d['__abstract_inherit__'][0].__dict__
             d['super'] = {}
@@ -59,13 +39,18 @@ class _BoundDeclarativeMeta(DeclarativeMeta):
 
         return DeclarativeMeta.__new__(cls, name, bases, d)
 
+    @staticmethod
+    def get_assoc_tablename(from_cls, from_key, to):
+        from_key = '_' + from_key if from_key else ''
+        return "assoc_" + from_cls.lower() + from_key.lower() + "_" + to.lower()
 
+    @staticmethod
+    def get_assoc_tablename_backref(from_cls, to):
+        return "assoc_" + from_cls.replace(".", "_").lower() + "_" + to.lower()
 
     def __init__(self, name, bases, d):
         bind_key = d.pop('__bind_key__', None)
-        print(d)
         abstract_inherit = d.get("__abstract_inherit__")
-        print(abstract_inherit)
         if abstract_inherit:
             inherit = d['__abstract_inherit__'][0].__dict__
             d['super'] = {}
@@ -138,66 +123,35 @@ class _BoundDeclarativeMeta(DeclarativeMeta):
             rel = sqlalchemy.orm.relationship(ref)
             setattr(self, key, rel)
 
-
-
-        # if not d.get("__versioned__"):
-        #     db = {}
-        #     for b in bases:
-        #         if hasattr(b, 'db'):
-        #             db.update(b.db)
-        #     if d.get('db'):
-        #         db.update(d.get('db'))
-        #         for b in bases:
-        #             print("BASE: ", b)
-        #
-        #     print(db)
-        #     if db:
-        #         for key in db:
-        #             if type(db[key]) == str:
-        #                 col = sqlalchemy.Column(getattr(sqlalchemy, db[key]))
-        #             else:
-        #                 v = db[key]
-        #                 t = v['type']
-        #                 fk = v.get('foreign_key')
-        #                 pk = v.get('primary_key') if v.get('primary_key') else False
-        #                 col = sqlalchemy.Column(getattr(sqlalchemy, t), sqlalchemy.ForeignKey(fk), primary_key=pk)
-        #
-        #             setattr(self, key, col)
-        # i = 0
-        # new_bases = list()
-        # for b in bases:
-        #     if b.__name__ == "Page":
-        #         class_dict = dict(b.__dict__)
-        #         functions_dict = dict()
-        #         for key in class_dict:
-        #             if type(class_dict[key]) == types.FunctionType and not key.startswith("__"):
-        #                 print(key.startswith("__"))
-        #                 functions_dict[key] = class_dict[key]
-        #                 print(functions_dict)
-        #         t = type("PageAbstract", (object, ),
-        #             functions_dict
-        #         )
-        #     else:
-        #         t = b
-        #     new_bases.append(t)
-        #     print(t.__dict__)
-        # print(new_bases)
-        # new_bases = tuple(new_bases)
-
+        for key in belongs_many_many:
+            ref = belongs_many_many[key]
+            split_ref = ref.split(".")
+            many_many_cls = split_ref[0]
+            table_name = self.get_assoc_tablename_backref(ref, self.__name__)
+            rel = sqlalchemy.orm.relationship(many_many_cls, secondary=table_name)
+            setattr(self, key, rel)
 
         DeclarativeMeta.__init__(self, name, bases, d)
         if bind_key is not None:
             self.__table__.info['bind_key'] = bind_key
 
+        many_many_values = list(many_many.values())
+        many_many_duplicates = [x for x in many_many_values if many_many_values.count(x) > 1]
+        self.assoc_tables = []
         for key in many_many:
             ref = many_many[key]
-            print("REF: ", ref)
             fk2 = ref.lower() + ".id"
-            print(fk2)
-            self.assoc_table = sqlalchemy.Table('assoc_' + ref + "_" + self.__name__, self.metadata,
-                                                sqlalchemy.Column(self.__tablename__ + '_id', sqlalchemy.Integer, sqlalchemy.ForeignKey(self.__tablename__ + '.id')),
+            if ref in many_many_duplicates:
+                table_name = self.get_assoc_tablename(self.__name__, key, ref)
+            else:
+                table_name = self.get_assoc_tablename(self.__name__, '', ref)
+
+            table = sqlalchemy.Table(table_name, self.metadata,
+                                                sqlalchemy.Column(name.lower() + '_id', sqlalchemy.Integer, sqlalchemy.ForeignKey(name.lower() + '.id')),
                                                 sqlalchemy.Column(ref + '_id', sqlalchemy.Integer, sqlalchemy.ForeignKey(fk2)))
-            rel = sqlalchemy.orm.relationship(ref, secondary=self.assoc_table)
+
+            self.assoc_tables.append(table)
+            rel = sqlalchemy.orm.relationship(ref, secondary=table_name)
             setattr(self, key, rel)
 
 
@@ -233,5 +187,3 @@ class SQLAlchemy(SQLAlchemy):
                                 metaclass=_BoundDeclarativeMeta)
         base.query = _QueryProperty(self)
         return base
-
-

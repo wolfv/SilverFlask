@@ -9,11 +9,6 @@ class OrderedItem(OrderableMixin, DataObject, db.Model):
     def __repr__(self):
         return "<OrderedItem id: %s, sort_order: %s>" % (self.id, self.sort_order)
 
-def deepequal(l1, l2):
-    for i in range(0, len(l1)):
-        if l1[i] != l2[i]:
-            return False
-    return True
 
 class TestOrdering(BaseTest):
     def teardown(self):
@@ -38,19 +33,19 @@ class TestOrdering(BaseTest):
         print(o1.sort_order)
         assert(o1.sort_order == 3)
         print(OrderedItem.query.all())
-        assert deepequal(OrderedItem.query.all(), [o2, o1])
+        assert self.deepequal(OrderedItem.query.all(), [o2, o1])
 
         o2.insert_after(o1.sort_order)
         db.session.commit()
-        assert deepequal(OrderedItem.query.all(), [o1, o2])
+        assert self.deepequal(OrderedItem.query.all(), [o1, o2])
 
         o3 = OrderedItem()
         db.session.add(o3)
         db.session.commit()
 
-        assert deepequal(OrderedItem.query.all(), [o1, o2, o3])
+        assert self.deepequal(OrderedItem.query.all(), [o1, o2, o3])
 
         o3.insert_after(0)
         db.session.commit()
-        assert deepequal(OrderedItem.query.all(), [o3, o1, o2])
+        assert self.deepequal(OrderedItem.query.all(), [o3, o1, o2])
 

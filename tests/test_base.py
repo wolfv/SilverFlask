@@ -43,3 +43,10 @@ class BaseTest(TestCase):
             db.session.commit()
             page.mark_as_published()
             db.session.commit()
+
+    @staticmethod
+    def deepequal(l1, l2):
+        for i in range(0, len(l1)):
+            if l1[i] != l2[i]:
+                return False
+        return True
