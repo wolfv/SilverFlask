@@ -108,6 +108,20 @@ def create_live_table(cls):
             else:
                 if r.direction == MANYTOONE:
                     args[key] = db.relationship(r.mapper)
+                elif r.direction == MANYTOMANY:
+                    # if hasattr(r, 'secondary') and r.secondary:
+                    #     print("SECONDARY for ... ", r)
+                    #     kwargs['secondary'] = r.secondary
+                    primaryjoin = copy.copy(r.primaryjoin)
+                    primaryjoin.left = args[primaryjoin.left.key]
+                    secondaryjoin = copy.copy(r.secondaryjoin)
+                    args[key] = db.relationship(r.mapper,
+                                                viewonly=True,
+                                                primaryjoin=primaryjoin,
+                                                foreign_keys=[primaryjoin.right, secondaryjoin.right],
+                                                secondary=r.secondary,
+                                                secondaryjoin=secondaryjoin
+                                                )
                 else:
                     primaryjoin = copy.copy(r.primaryjoin)
                     primaryjoin.left = args[primaryjoin.left.key]
@@ -117,6 +131,7 @@ def create_live_table(cls):
                                                 foreign_keys=[primaryjoin.right])
                 continue
 
+            kwargs = {}
             if hasattr(r, "backref") and r.backref:
                 backref_key = r.backref[0]
                 backrefs.append(backref_key)
@@ -127,11 +142,10 @@ def create_live_table(cls):
                     arg_v = orig_arg.split(".")
                     arg_v[0] += "Live"
                     remote_side = ".".join(arg_v)
-                    args[key] = db.relationship(target, backref=db.backref(backref_key, remote_side=remote_side), cascade="none, ")
-                else:
-                    args[key] = db.relationship(target, cascade="none, ")
-            else:
-                args[key] = db.relationship(target, cascade="none, ")
+                    backref = db.relationship(target, backref=db.backref(backref_key, remote_side=remote_side), cascade="none, ")
+
+
+            args[key] = db.relationship(target, cascade="none, ", **kwargs)
 
     if args.get("before_insert"): del args["before_insert"]
     if args.get("before_update"): del args["before_update"]

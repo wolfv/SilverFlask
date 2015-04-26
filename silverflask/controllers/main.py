@@ -48,3 +48,13 @@ def silverflask_page(url_segment=None):
 def serve_file(filename):
     return send_from_directory(current_app.config['SILVERFLASK_ABSOLUTE_UPLOAD_PATH'],
                                filename)
+
+@main.errorhandler(404)
+def page_not_found(e):
+    print(e)
+    try:
+        error_page = ErrorPage.query.filter(ErrorPage.error_code == 404).one()
+        return render_template(error_page.template, error_page)
+    except:
+        # No error page ...
+        return "Sorry!", 404

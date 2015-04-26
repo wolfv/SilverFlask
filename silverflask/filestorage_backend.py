@@ -82,7 +82,8 @@ class LocalFileStorageBackend(FileStorageBackend):
     def store(self, read_pointer, path, filename=None):
         if not filename and isinstance(read_pointer, FileStorage):
             filename = read_pointer.filename
-
+        elif not filename:
+            filename = read_pointer.name
         absolute_path = self.get_store_path(filename, path)
         try:
             folder_path = os.path.dirname(absolute_path)

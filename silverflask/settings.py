@@ -35,4 +35,4 @@ class TestConfig(DevConfig):
     WTF_CSRF_ENABLED = False
     DEBUG_TB_ENABLED = False
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
-    SQLALCHEMY_ECHO = True
+    # SQLALCHEMY_ECHO = True
