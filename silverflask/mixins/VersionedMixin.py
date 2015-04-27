@@ -142,7 +142,7 @@ def create_live_table(cls):
                     arg_v = orig_arg.split(".")
                     arg_v[0] += "Live"
                     remote_side = ".".join(arg_v)
-                    backref = db.relationship(target, backref=db.backref(backref_key, remote_side=remote_side), cascade="none, ")
+                    kwargs['backref'] =db.backref(backref_key, remote_side=remote_side)
 
 
             args[key] = db.relationship(target, cascade="none, ", **kwargs)

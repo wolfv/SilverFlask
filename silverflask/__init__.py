@@ -71,6 +71,15 @@ def create_app(object_name, env="prod"):
     app.register_blueprint(main)
     app.register_blueprint(cms_bp, url_prefix='/admin')
 
+    from silverflask.controllers.page_controller import Controller, SiteTreeController
+    c = Controller()
+    stc = SiteTreeController()
+    app.register_blueprint(c.create_blueprint())
+    app.register_blueprint(stc.create_blueprint())
+
     with app.app_context():
         db.create_all()
+
+    # for rule in app.url_map.iter_rules():
+    #     print(rule)
     return app
