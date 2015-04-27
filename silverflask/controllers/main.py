@@ -41,10 +41,10 @@ def setup_processors(app):
     @app.context_processor
     def utilities():
         def themed_css(arg):
-            return url_for('main.serve_theme_file', filename="css/" + arg)
+            return url_for('main.theme_file', filename="css/" + arg)
 
         def themed_js(arg):
-            return url_for('main.serve_theme_file', filename="js/" + arg)
+            return url_for('main.theme_file', filename="js/" + arg)
 
         return {
             'themed_css': themed_css,
@@ -76,7 +76,7 @@ def serve_file(filename):
                                filename)
 
 @main.route('/theme/<path:filename>')
-def serve_theme_file(filename):
+def theme_file(filename):
     theme = SiteConfig.get_current().theme
     filename = theme + '/' + filename
     return send_from_directory(main.template_folder,

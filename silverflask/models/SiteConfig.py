@@ -29,7 +29,6 @@ class SiteConfig(DataObject, db.Model):
         tupled_themes = [(name, name) for name in themes]
         return tupled_themes
 
-
     def get_cms_form(cls):
         form = OrderedFormFactory()
         form.add_to_tab("Root.Main", fields.StringField(name='title'))

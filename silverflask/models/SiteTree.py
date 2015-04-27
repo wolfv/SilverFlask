@@ -83,6 +83,33 @@ class SiteTree(VersionedMixin, PolymorphicMixin, OrderableMixin, DataObject, db.
     def append_child(self, child):
         self.children.append(child)
 
+    def parent_at_level(self, level=1):
+        level = level - 1
+        parents = self.parents()
+        n_parents = len(parents)
+        if n_parents > level:
+            return parents[level]
+        if n_parents == level:
+            return self
+        else:
+            return False
+
+    def menu(self, level=1):
+        # This returns the menu with
+        # self as reference
+        level = level - 1
+        parents = self.parents()
+        n_parents = len(parents)
+        if n_parents > level:
+            cls = self.__class__
+            level_parent = parents[level]
+            result = cls.query.filter(cls.parent_id == level_parent.id).all()
+            return result
+        if n_parents == level:
+            return self.children
+        else:
+            return False
+
     def as_dict(self):
         d = dict()
         try:
@@ -137,11 +164,14 @@ class SiteTree(VersionedMixin, PolymorphicMixin, OrderableMixin, DataObject, db.
     def get_url(self):
         if self.urlsegment == current_app.config["SILVERFLASK_HOME_URLSEGMENT"]:
             return "/"
-        url = "/" + self.urlsegment
+        self_url = "/" + self.urlsegment
+        url = ""
         el = self
+
         while el.parent:
-            url = "/" + el.parent.url_segment  + url
+            url = "/" + el.parent.urlsegment
             el = el.parent
+        url += self_url
         return url
 
 

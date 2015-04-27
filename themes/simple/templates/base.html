@@ -6,24 +6,30 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta charset="UTF-8">
   <title>Test abc</title>
+  <link rel="icon" href="{{ url_for('main.theme_file', filename='images/favicon.ico') }}"/>
   <link rel="stylesheet" href="{{ themed_css('reset.css') }}"/>
   <link rel="stylesheet" href="{{ themed_css('typography.css') }}"/>
   <link rel="stylesheet" href="{{ themed_css('form.css') }}"/>
   <link rel="stylesheet" href="{{ themed_css('layout.css') }}"/>
 </head>
-<body class="{{ class_name }} Page {% if not menu(2) %}no-sidebar{% endif %}"
+<body class="{{ class_name }} Page {% if not page.menu(level=1) %}no-sidebar{% endif %}"
 <header>
   {% include 'simple/templates/includes/header.html' %}
 </header>
-
 <div class="main" role="main">
-  <div class="inner typography line">
-    {% block content %}
-    {% endblock %}
+    <div class="inner typography line">
+      {% if page.menu(level=1) %}
+        <aside class="sidebar unit size1of4">
+          {% include 'simple/templates/includes/sidebar.html' %}
+        </aside>
+      {% endif %}
+      {% block content %}
+      {% endblock %}
   </div>
 </div>
 
 {% include 'simple/templates/includes/footer.html' %}
+{% include 'silverflask_navigator.html' %}
 
 </body>
 </html>

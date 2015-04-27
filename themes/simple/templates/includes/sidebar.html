@@ -1,0 +1,15 @@
+<nav class="secondary">
+<h3>
+  {{ page.parent_at_level(1).name }}
+</h3>
+<ul>
+  {% for child in page.menu(level=1) %}
+    <li class="{{ linking_mode(child) }}">
+        <a href="{{ child.get_url() }}" class="{{ linking_mode(child) }}" title="Go to the {{ child.name }} page">
+            <span class="arrow">→</span>
+            <span class="text">{{ child.name }}</span>
+        </a>
+    </li>
+  {% endfor %}
+</ul>
+</nav>

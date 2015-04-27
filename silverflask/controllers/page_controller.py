@@ -98,7 +98,7 @@ class SiteTreeController(Controller):
         print(self.current_page, page)
         if page.id == self.current_page.id:
             return "current"
-        parent_ids = [parent.id for parent in page.parents()]
+        parent_ids = [parent.id for parent in self.current_page.parents()]
         if self.current_page.id in parent_ids:
             return "section"
         return "link"
