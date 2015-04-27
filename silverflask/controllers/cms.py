@@ -1,3 +1,4 @@
+from os import listdir
 from flask import Blueprint, render_template, flash, request, json, \
     redirect, make_response, url_for, \
     abort, session, current_app, send_from_directory
@@ -176,6 +177,9 @@ def deduplicate():
     SiteTree.reindex()
     return "Successful?"
 
+
+
+
 @bp.route("/siteconfig", methods=["POST", "GET"])
 def edit_siteconfig():
     # In the current configuration there is only one SiteConfig
@@ -185,7 +189,9 @@ def edit_siteconfig():
         siteconfig = SiteConfig()
         db.session.add(siteconfig)
         db.session.commit()
+
     form = siteconfig.get_cms_form()
+    # form.fields['theme'].choices = get_available_themes()
     form = form(request.form, obj=siteconfig)
     if form.validate_on_submit():
         form.populate_obj(siteconfig)

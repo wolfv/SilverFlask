@@ -3,6 +3,7 @@ class Config(object):
 
     # Silver Flask
     SILVERFLASK_UPLOAD_FOLDER = "uploads/"
+    SILVERFLASK_THEME_DIRECTORY = "themes/"
 
     # User
     USER_LOGIN_TEMPLATE = "user/login.html"

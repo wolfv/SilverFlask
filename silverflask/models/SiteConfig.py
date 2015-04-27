@@ -1,8 +1,9 @@
 from . import DataObject
+from flask import current_app
 from flask_wtf import Form
 from wtforms import fields
 from silverflask import db
-
+from silverflask.models.OrderedForm import OrderedFormFactory
 
 class SiteConfig(DataObject, db.Model):
     """
@@ -20,10 +21,23 @@ class SiteConfig(DataObject, db.Model):
     tagline = db.Column(db.String(250))
     theme = db.Column(db.String(250))
 
+    @staticmethod
+    def get_available_themes():
+        import os
+        theme_dir = current_app.config['SILVERFLASK_THEME_DIRECTORY']
+        themes = os.listdir(theme_dir)
+        tupled_themes = [(name, name) for name in themes]
+        return tupled_themes
+
+
     def get_cms_form(cls):
-        form = type("SiteConfigForm", (Form, ), {})
-        form.title = fields.StringField()
-        form.tagline = fields.StringField()
-        form.theme = fields.SelectField(choices=[("Test", "Test")])
-        form.submit = fields.SubmitField("Save")
+        form = OrderedFormFactory()
+        form.add_to_tab("Root.Main", fields.StringField(name='title'))
+        form.add_to_tab("Root.Main", fields.StringField(name='tagline'))
+        form.add_to_tab("Root.Main", fields.SelectField(name='theme', choices=cls.get_available_themes()))
+        form.add_to_tab("Root.Buttons", fields.SubmitField("Save", name='Save'))
         return form
+
+    @classmethod
+    def get_current(cls):
+        return cls.query.one()

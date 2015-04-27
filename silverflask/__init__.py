@@ -63,10 +63,11 @@ def create_app(object_name, env="prod"):
         assets_env.register(name, bundle)
 
     # register our blueprints
-    from silverflask.controllers.main import main, setup_processors
+    from silverflask.controllers.main import setup_processors, init_blueprint
     from silverflask.controllers.cms import bp as cms_bp
 
     setup_processors(app)
+    main = init_blueprint(app)
     app.register_blueprint(main)
     app.register_blueprint(cms_bp, url_prefix='/admin')
 
