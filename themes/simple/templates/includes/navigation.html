@@ -1,0 +1,8 @@
+<nav class="primary">
+  <span class="nav-open-button">²</span>
+  <ul>
+    {% for entry in menu(0) %}
+      <li class="{{ linking_mode(entry) }}"><a href="{{ entry.get_url() }}" title="">{{ entry.name }}</a></li>
+    {% endfor %}
+  </ul>
+</nav>

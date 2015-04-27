@@ -52,22 +52,22 @@ def setup_processors(app):
         }
         # main.static_folder
 
-@main.route('/')
-@main.route('/<path:url_segment>')
-def silverflask_page(url_segment=None):
-    if not url_segment:
-        url_segment = current_app.config["HOME_URLSEGMENT"]
-    if session.get("draft"):
-        page = SiteTree.get_by_url(url_segment)
-    else:
-        page = SiteTree.get_by_url(url_segment, SiteTree.LiveType)
-    if not page:
-        return abort(404, "Page not found")
-
-    template = page.template
-    theme = SiteConfig.get_current().theme
-    template_path = theme + '/templates/' + template
-    return render_template(template_path, page=page, **page.as_dict())
+# @main.route('/')
+# @main.route('/<path:url_segment>')
+# def silverflask_page(url_segment=None):
+#     if not url_segment:
+#         url_segment = current_app.config["HOME_URLSEGMENT"]
+#     if session.get("draft"):
+#         page = SiteTree.get_by_url(url_segment)
+#     else:
+#         page = SiteTree.get_by_url(url_segment, SiteTree.LiveType)
+#     if not page:
+#         return abort(404, "Page not found")
+#
+#     template = page.template
+#     theme = SiteConfig.get_current().theme
+#     template_path = theme + '/templates/' + template
+#     return render_template(template_path, page=page, **page.as_dict())
 
 
 @main.route('/uploads/<path:filename>')

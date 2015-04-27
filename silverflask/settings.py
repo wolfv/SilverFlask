@@ -4,11 +4,11 @@ class Config(object):
     # Silver Flask
     SILVERFLASK_UPLOAD_FOLDER = "uploads/"
     SILVERFLASK_THEME_DIRECTORY = "themes/"
+    SILVERFLASK_HOME_URLSEGMENT = 'home'
 
     # User
     USER_LOGIN_TEMPLATE = "user/login.html"
     USER_ENABLE_LOGIN_WITHOUT_CONFIRM_EMAIL = True
-
 
 class ProdConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///../database.db'
@@ -23,7 +23,6 @@ class DevConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///../database.db'
     SQLALCHEMY_ECHO = False
 
-    HOME_URLSEGMENT = 'home'
 
     CACHE_TYPE = 'null'
 

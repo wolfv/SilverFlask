@@ -1,0 +1,20 @@
+<header class="header" role="banner">
+  <div class="inner">
+    <div class="unit size4of4 lastUnit">
+      <a href="/" class="brand" rel="home">
+        <h1>{{ siteconfig.title }}</h1>
+        {% if siteconfig.tagline %}
+          <p>{{ siteconfig.tagline }}</p>
+        {% endif %}
+      </a>
+{#      <% if $SearchForm %>#}
+{#      <span class="search-dropdown-icon">L</span>#}
+{##}
+{#      <div class="search-bar">#}
+{#        $SearchForm#}
+{#      </div>#}
+{#      <% end_if %>#}
+      {% include 'simple/templates/includes/navigation.html' %}
+    </div>
+  </div>
+</header>

@@ -20,25 +20,13 @@
 
     <body>
         <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <nav class="navbar navbar-default">
-                    <ul class="nav navbar-nav">
-                        {% for el in menu(0) %}
-                            <li><a href="{{ el.get_url() }}">{{ el.name }}</a></li>
-                        {% endfor %}
-
-                    </ul>
-                    </nav>
-
-                </div>
-            </div>
             {% block body %}
 
             {% endblock %}
-            {% block content %}
-            {% endblock %}
 
+            {% block content %}
+
+            {% endblock %}
         </div>
         {% assets "common_js" %}
             <script type="text/javascript" src="{{ ASSET_URL }}"></script>

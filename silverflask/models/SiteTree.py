@@ -1,8 +1,8 @@
-from silverflask.models import DataObject
-from flask import abort
+from flask import abort, current_app
 from slugify import slugify
 
 from silverflask import db
+from silverflask.models import DataObject
 from silverflask.mixins import OrderableMixin, VersionedMixin, PolymorphicMixin
 
 
@@ -38,6 +38,14 @@ class SiteTree(VersionedMixin, PolymorphicMixin, OrderableMixin, DataObject, db.
     @classmethod
     def default_template(cls):
         return cls.__name__.lower() + ".html"
+
+    def parents(self):
+        tree_el = self.parent
+        parents = []
+        while tree_el:
+            parents.append(tree_el)
+            tree_el = tree_el.parent
+        return parents
 
     @staticmethod
     def get_sitetree(parent_id=None):
@@ -127,6 +135,8 @@ class SiteTree(VersionedMixin, PolymorphicMixin, OrderableMixin, DataObject, db.
         return node
 
     def get_url(self):
+        if self.urlsegment == current_app.config["SILVERFLASK_HOME_URLSEGMENT"]:
+            return "/"
         url = "/" + self.urlsegment
         el = self
         while el.parent:

@@ -1,0 +1,10 @@
+{% if level(2) %}
+<div id="Breadcrumbs">
+  {% set current = page %}
+  {% for parent in current.parent %}
+      {{ parent.name }}
+      {% set current = current.parent %}
+  {% endfor %}
+
+</div>
+{% endif %}

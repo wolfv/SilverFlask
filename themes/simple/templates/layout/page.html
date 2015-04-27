@@ -1,0 +1,13 @@
+{% extends 'simple/templates/base.html' %}
+
+{% block content %}
+  <div class="content-container unit size3of4 lastUnit">
+    <article>
+      <h1>{{ name }}</h1>
+
+      <div class="content">{{ content|safe }}</div>
+    </article>
+    {#  $Form#}
+    {#  $CommentsForm#}
+  </div>
+{% endblock %}

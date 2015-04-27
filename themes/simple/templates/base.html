@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>{% if MetaTitle %}{{ MetaTitle }}{% else %}{{ name }}{% endif %} &raquo; {{ siteconfig.title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta charset="UTF-8">
+  <title>Test abc</title>
+  <link rel="stylesheet" href="{{ themed_css('reset.css') }}"/>
+  <link rel="stylesheet" href="{{ themed_css('typography.css') }}"/>
+  <link rel="stylesheet" href="{{ themed_css('form.css') }}"/>
+  <link rel="stylesheet" href="{{ themed_css('layout.css') }}"/>
+</head>
+<body class="{{ class_name }} Page {% if not menu(2) %}no-sidebar{% endif %}"
+<header>
+  {% include 'simple/templates/includes/header.html' %}
+</header>
+
+<div class="main" role="main">
+  <div class="inner typography line">
+    {% block content %}
+    {% endblock %}
+  </div>
+</div>
+
+{% include 'simple/templates/includes/footer.html' %}
+
+</body>
+</html>
