@@ -16,6 +16,7 @@ from silverflask.extensions import (
 from silverflask.filestorage_backend import LocalFileStorageBackend
 from silverflask.sqlalchemy import SQLAlchemy
 
+from flask.ext.migrate import Migrate
 from flask_user import UserManager, SQLAlchemyAdapter
 
 db = SQLAlchemy()
@@ -74,6 +75,11 @@ def create_app(object_name, env="prod"):
     from silverflask.core.theme import init_themes
     init_themes(app)
 
+    migrate = Migrate(app, db)
+    from silverflask.core.migrations import bp as migrations_bp
+    app.register_blueprint(migrations_bp)
+    print(migrations_bp)
+
     from silverflask.controllers.main import setup_processors, init_blueprint
     from silverflask.controllers.cms import bp as cms_bp
 
@@ -82,10 +88,10 @@ def create_app(object_name, env="prod"):
     app.register_blueprint(main)
     app.register_blueprint(cms_bp, url_prefix='/admin')
 
+    # Prefer migrations for now
+    # with app.app_context():
+    #     db.create_all()
 
-    with app.app_context():
-        db.create_all()
-
-    # for rule in app.url_map.iter_rules():
-    #     print(rule)
+    for rule in app.url_map.iter_rules():
+        print(rule)
     return app

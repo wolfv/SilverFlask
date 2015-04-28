@@ -2,6 +2,7 @@
 import os
 
 from flask.ext.script import Manager, Server
+from flask.ext.migrate import Migrate, MigrateCommand
 from silverflask import create_app, db
 from silverflask.models import User, Page
 
@@ -13,6 +14,8 @@ app = create_app('silverflask.settings.%sConfig' % env.capitalize(), env=env)
 manager = Manager(app)
 manager.add_command("server", Server())
 
+migrate = Migrate(app, db)
+manager.add_command('db', MigrateCommand)
 
 @manager.shell
 def make_shell_context():

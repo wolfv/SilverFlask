@@ -3,7 +3,7 @@ __author__ = 'wolf'
 from .FileObject import FileObject, ImageObject
 from .DataObject import DataObject
 from .SiteTree import SiteTree
-from .models import Page, SuperPage
+from .models import Page, SuperPage, ErrorPage
 from .GalleryImage import GalleryImage
 from .User import User, Role
 from .SiteConfig import SiteConfig

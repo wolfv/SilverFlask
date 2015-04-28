@@ -33,3 +33,4 @@ git+https://github.com/morgan-del/flask-triangle.git@develop
 SQLAlchemy-Continuum
 alembic
 Flask-Testing
+Flask-Migrate

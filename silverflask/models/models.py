@@ -103,3 +103,18 @@ class ErrorPage(SiteTree):
     content_json = alchemy.Column(alchemy.UnicodeText)
     error_code = alchemy.Column(alchemy.Integer, nullable=False)
 
+
+class FantasticPage(SiteTree):
+    __abstract_inherit__ = [Page]
+    db = {
+        'test': 'Boolean',
+        'anzeige': 'Text',
+        'votes': 'Integer'
+    }
+
+
+class CrazyPage(SiteTree):
+    __abstract_inherit__ = [Page]
+    db = {
+        'reddit_id': 'Integer'
+    }

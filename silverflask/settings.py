@@ -1,3 +1,4 @@
+import os
 class Config(object):
     SECRET_KEY = 'secret key'
 
@@ -11,7 +12,9 @@ class Config(object):
     USER_ENABLE_LOGIN_WITHOUT_CONFIRM_EMAIL = True
 
 class ProdConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///../database.db'
+    sqlite_db_path = os.path.abspath('./database.db')
+
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + sqlite_db_path
     CACHE_TYPE = 'simple'
 
 
@@ -19,8 +22,10 @@ class DevConfig(Config):
     DEBUG = True
     DEBUG_TB_INTERCEPT_REDIRECTS = False
     ASSETS_DEBUG = True
+    sqlite_db_path = os.path.abspath('./database.db')
+    print(sqlite_db_path)
 
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///../database.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + sqlite_db_path
     SQLALCHEMY_ECHO = False
 
 
