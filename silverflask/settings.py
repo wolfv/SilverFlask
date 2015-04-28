@@ -2,8 +2,8 @@ class Config(object):
     SECRET_KEY = 'secret key'
 
     # Silver Flask
-    SILVERFLASK_UPLOAD_FOLDER = "uploads/"
-    SILVERFLASK_THEME_DIRECTORY = "themes/"
+    SILVERFLASK_UPLOAD_PATH = "uploads/"
+    SILVERFLASK_THEME_PATH = "themes/"
     SILVERFLASK_HOME_URLSEGMENT = 'home'
 
     # User

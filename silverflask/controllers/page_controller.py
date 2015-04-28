@@ -1,5 +1,7 @@
 from flask import Blueprint, request, render_template, session, current_app, abort
 from silverflask.models import SiteTree, SiteConfig
+from silverflask.core.theme import ThemeTemplateLoader
+
 class Controller(object):
 
     urlprefix = None
@@ -16,13 +18,10 @@ class Controller(object):
         self.endpoint = self.__class__.__name__
         urlprefix = self.urlprefix or self.__class__.__name__
 
-        template_folder = app.root_path + "/../themes"
-        static_folder = app.root_path + "/../themes"
-
         self.blueprint = Blueprint(self.endpoint, __name__,
-                                   url_prefix=self.route_base,
-                                   template_folder=template_folder,
-                                   static_folder=static_folder)
+                                   url_prefix=self.route_base)
+        self.blueprint.jinja_loader = ThemeTemplateLoader()
+
         for url in self.urls:
             self.blueprint.add_url_rule(url, self.urls[url], getattr(self, self.urls[url]))
 
@@ -93,13 +92,11 @@ class SiteTreeController(Controller):
                 cls.query.filter(cls.parent_id == parent).all()]
 
     def linking_mode(self, page):
-        print("GETTING URLS ... ")
         cls = SiteTreeController.class_from_session()
-        print(self.current_page, page)
         if page.id == self.current_page.id:
             return "current"
-        parent_ids = [parent.id for parent in self.current_page.parents()]
-        if self.current_page.id in parent_ids:
+
+        if page in self.current_page.parents():
             return "section"
         return "link"
 

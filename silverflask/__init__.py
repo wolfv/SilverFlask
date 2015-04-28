@@ -36,7 +36,7 @@ def create_app(object_name, env="prod"):
     app = Flask(__name__)
     app.config.from_object(object_name)
 
-    upload_path = os.path.join(app.instance_path, app.config["SILVERFLASK_UPLOAD_FOLDER"])
+    upload_path = os.path.join(app.instance_path, app.config["SILVERFLASK_UPLOAD_PATH"])
     app.config["SILVERFLASK_ABSOLUTE_UPLOAD_PATH"] = upload_path
     app.storage_backend = LocalFileStorageBackend(upload_path)
     app.config['ENV'] = env
@@ -71,6 +71,9 @@ def create_app(object_name, env="prod"):
         assets_env.register(name, bundle)
 
     # register our blueprints
+    from silverflask.core.theme import init_themes
+    init_themes(app)
+
     from silverflask.controllers.main import setup_processors, init_blueprint
     from silverflask.controllers.cms import bp as cms_bp
 

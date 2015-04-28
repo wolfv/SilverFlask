@@ -23,11 +23,7 @@ class SiteConfig(DataObject, db.Model):
 
     @staticmethod
     def get_available_themes():
-        import os
-        theme_dir = current_app.config['SILVERFLASK_THEME_DIRECTORY']
-        themes = os.listdir(theme_dir)
-        tupled_themes = [(name, name) for name in themes]
-        return tupled_themes
+        return [(theme.identifier, theme.name) for theme in current_app.silverflask_theme_manager.themes.values()]
 
     def get_cms_form(cls):
         form = OrderedFormFactory()

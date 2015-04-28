@@ -1,0 +1,11 @@
+{
+    "name": "Simple - SilverFlask",
+    "description": "The SilverFlask simple theme (derived from a SilverStripe 3 theme)",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Sara Tušar (Innovaif)",
+            "homepage": "http://www.saratusar.com"
+        }
+    ]
+}

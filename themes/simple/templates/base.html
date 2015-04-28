@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta charset="UTF-8">
-  <title>Test abc</title>
-  <link rel="icon" href="{{ url_for('main.theme_file', filename='images/favicon.ico') }}"/>
+  <link rel="icon" href="{{ url_for('theme.static', filename='images/favicon.ico') }}"/>
   <link rel="stylesheet" href="{{ themed_css('reset.css') }}"/>
   <link rel="stylesheet" href="{{ themed_css('typography.css') }}"/>
   <link rel="stylesheet" href="{{ themed_css('form.css') }}"/>
@@ -14,13 +13,13 @@
 </head>
 <body class="{{ class_name }} Page {% if not page.menu(level=1) %}no-sidebar{% endif %}"
 <header>
-  {% include 'simple/templates/includes/header.html' %}
+  {% include theme('includes/header.html') %}
 </header>
 <div class="main" role="main">
     <div class="inner typography line">
       {% if page.menu(level=1) %}
         <aside class="sidebar unit size1of4">
-          {% include 'simple/templates/includes/sidebar.html' %}
+          {% include theme('includes/sidebar.html') %}
         </aside>
       {% endif %}
       {% block content %}
@@ -28,7 +27,7 @@
   </div>
 </div>
 
-{% include 'simple/templates/includes/footer.html' %}
+{% include theme('includes/footer.html') %}
 {% include 'silverflask_navigator.html' %}
 
 </body>

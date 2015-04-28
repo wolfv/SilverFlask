@@ -26,13 +26,36 @@ class OrderableMixin(object):
         query = query if query else db.session.query(cls)
         if not index_absolute:
             index_el = query.order_by(cls.sort_order.asc()).limit(1).offset(index).scalar()
-            index = index_el.sort_order
+            sort_order_index = index_el.sort_order
 
         db.session.query(cls)\
-            .filter(cls.sort_order > index)\
+            .filter(cls.sort_order > sort_order_index)\
             .update({cls.sort_order: cls.sort_order + 1})
 
         self.sort_order = index + 1
+
+        if hasattr(cls, 'LiveType'):
+            # Repeat the same for the live version of the page
+            cls = cls.LiveType
+            cls.check_duplicates()
+            live_self = cls.query.get(self.id)
+            live_self.check_duplicates()
+            db.session.commit()
+
+            query = db.session.query(cls)
+            if not index_absolute:
+                print(query)
+                print(index)
+                print(str(query.order_by(cls.sort_order.asc()).limit(1).offset(index)))
+                print(query.order_by(cls.sort_order.asc()).all())
+                index_el = query.order_by(cls.sort_order.asc()).limit(1).offset(index).scalar()
+                index = index_el.sort_order
+
+            db.session.query(cls) \
+                .filter(cls.sort_order > index) \
+                .update({cls.sort_order: cls.sort_order + 1})
+            live_self.sort_order = index + 1
+
 
     @classmethod
     def reindex(cls):
