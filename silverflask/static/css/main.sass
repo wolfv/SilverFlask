@@ -69,6 +69,8 @@ body
     flex: 1 100%
   .main
     flex: 3 0px
+    order: 3
+    background: #F0F0F0
   .aside-1
     order: 1
     flex: 1 100px
@@ -79,8 +81,6 @@ body
     order: 2
     flex: 1 auto
     max-width: 200px
-  .main
-    order: 3
 
   .aside-1
     background: #0081c2
@@ -89,13 +89,22 @@ body
       padding: 0
       li
         display: block
-        border-bottom: 1px solid #F3f3f3
+        border-bottom: 1px solid #00b3ee
         list-style: none
       a
         color: #fff
         padding: 10px 10px
         display: block
         text-decoration: none
+
+  .silverflask-head
+    background: #003147
+    padding: 5px 0
+    border-bottom: 1px solid #00b3ee
+    h3, div
+      margin: 0
+      color: #F2F3FF
+      text-align: center
 
 .async-upload-container
   background: #FAFAFA
@@ -116,6 +125,11 @@ body
       max-width: 100%
       min-height: 100%
 
+.aside-2
+  padding: 5px
+  .mui-btn
+    width: 100%
+    margin-top: 0
 //.button-row
 //  position: fixed
 //  bottom: 0
@@ -152,3 +166,4 @@ $btn-bar-height: 50px
 
 
 @import '_livingdocs_field'
+@import '_material'

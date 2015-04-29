@@ -99,7 +99,7 @@ class OrderableMixin(object):
 
 
     @classmethod
-    def before_insert(cls, mapper, connection, target=None):
+    def before_insert(cls, mapper, connection, target):
         target.init_order()
 
     def init_order(self):

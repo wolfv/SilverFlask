@@ -13,14 +13,12 @@ common_css = Bundle(
     output='public/css/common.css'
 )
 
-
 common_js = Bundle(
     'js/bower_components/jquery/dist/jquery.js',
     'js/bower_components/bootstrap/dist/js/bootstrap.js',
     'js/bower_components/datatables/media/js/jquery.dataTables.js',
     'js/bower_components/Plugins/integration/bootstrap/3/dataTables.bootstrap.js',
     'js/bower_components/jquery-ui/jquery-ui.js',
-    'js/vendor/jquery.dataTables.rowReordering.js',
     'js/bower_components/jstree/dist/jstree.min.js',
     'js/bower_components/noty/js/noty/packaged/jquery.noty.packaged.js',
     'js/bower_components/noty/js/noty/themes/bootstrap.js',
@@ -32,6 +30,8 @@ common_js = Bundle(
     'js/bower_components/editable/editable.js',
     'js/bower_components/livingdocs-design-boilerplate/dist/design.js',
     'js/bower_components/livingdocs-engine/dist/livingdocs-engine.js',
+    'css/mui/dist/js/mui.js',
+    'js/vendor/jquery.dataTables.rowReordering.js',
     Bundle(
         'js/rapyd.js',
         'js/SiteTree.js',
@@ -41,3 +41,6 @@ common_js = Bundle(
     ),
     output='public/js/common.js'
 )
+
+
+

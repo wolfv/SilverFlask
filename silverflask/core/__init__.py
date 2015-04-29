@@ -1,1 +1,2 @@
-__author__ = 'wolfv'
+from .controller import Controller
+from .theme import render_themed

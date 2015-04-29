@@ -44,10 +44,12 @@ def setup_processors(app):
 
         def themed_js(arg):
             return url_for('theme.static', filename="js/" + arg)
-
+        def linking_mode(*args, **kwargs):
+            return ''
         return {
             'themed_css': themed_css,
-            'themed_js': themed_js
+            'themed_js': themed_js,
+            'linking_mode': linking_mode
         }
         # main.static_folder
 

@@ -11,13 +11,13 @@
   <link rel="stylesheet" href="{{ themed_css('form.css') }}"/>
   <link rel="stylesheet" href="{{ themed_css('layout.css') }}"/>
 </head>
-<body class="{{ class_name }} Page {% if not page.menu(level=1) %}no-sidebar{% endif %}"
+<body class="{{ class_name }} Page {% if page and not page.menu(level=1) %}no-sidebar{% endif %}"
 <header>
   {% include theme('includes/header.html') %}
 </header>
 <div class="main" role="main">
     <div class="inner typography line">
-      {% if page.menu(level=1) %}
+      {% if page and page.menu(level=1) %}
         <aside class="sidebar unit size1of4">
           {% include theme('includes/sidebar.html') %}
         </aside>

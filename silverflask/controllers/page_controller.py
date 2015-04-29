@@ -1,48 +1,12 @@
-from flask import Blueprint, request, render_template, session, current_app, abort
+from flask import request, render_template, session, current_app, abort
 from silverflask.models import SiteTree, SiteConfig
-from silverflask.core.theme import ThemeTemplateLoader
-
-class Controller(object):
-
-    urlprefix = None
-    route_base = '/'
-    urls = {
-        'controller': 'index'
-    }
-    template_functions = {}
-
-    def index(self):
-        return "Top sache"
-
-    def create_blueprint(self, app):
-        self.endpoint = self.__class__.__name__
-        urlprefix = self.urlprefix or self.__class__.__name__
-
-        self.blueprint = Blueprint(self.endpoint, __name__,
-                                   url_prefix=self.route_base)
-        self.blueprint.jinja_loader = ThemeTemplateLoader()
-
-        for url in self.urls:
-            self.blueprint.add_url_rule(url, self.urls[url], getattr(self, self.urls[url]))
-
-        template_functions = {}
-        for fun in self.template_functions:
-            template_functions[fun] = getattr(self, self.template_functions[fun])
-
-        self.blueprint.context_processor(lambda: template_functions)
-
-        for m in self.__class__.mro():
-            if hasattr(m, 'init_blueprint'):
-                m.init_blueprint(self.blueprint)
-
-        return self.blueprint
-
+from silverflask.core import Controller, render_themed
 
 class SiteTreeController(Controller):
 
     urls = {
-        '': 'index',
-        '<path:url_segment>': 'index'
+        '/': 'index',
+        '/<path:url_segment>': 'index'
     }
 
     template_functions = {
@@ -116,9 +80,8 @@ class SiteTreeController(Controller):
                 print(rule, rule.endpoint)
 
         template = page.template
-        theme = SiteConfig.get_current().theme
-        template_path = theme + '/templates/layout/' + template
 
-        return render_template(template_path, page=page, **page.as_dict())
+
+        return render_themed(template, page=page, **page.as_dict())
 
 

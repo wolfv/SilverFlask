@@ -1,9 +1,9 @@
 <div class="dropdown">
-    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+    <button class="mui-btn mui-btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-mui-toggle="dropdown">
         Add Page
         <span class="caret"></span>
     </button>
-    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+    <ul class="mui-dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
         {% for pagetype in pagetypes %}
             <li role="presentation"><a role="menuitem" tabindex="-1" href="/admin/add_page/{{ pagetype }}">{{ pagetype }}</a></li>
         {% endfor %}

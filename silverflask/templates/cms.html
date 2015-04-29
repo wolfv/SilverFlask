@@ -1,24 +1,23 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>{% block title %}{% endblock %}</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    {% block meta %}
-        <meta name="description" content="">
-        <meta name="author" content="">
-    {% endblock %}
+        {% block meta %}
+            <meta name="description" content="">
+            <meta name="author" content="">
+        {% endblock %}
 
-    {% assets "common_css" %}
-        <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"/>
-    {% endassets %}
+        {% assets "common_css" %}
+            <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"/>
+        {% endassets %}
 
-    {% block css %}
-    {% endblock %}
-</head>
-
+        {% block css %}
+        {% endblock %}
+    </head>
 <body>
 
 <div class="wrapper" >
@@ -38,23 +37,23 @@
         </div>
     </article>
     <aside class="aside aside-1">
-        <h3>SilverFlask</h3>
-        <p>{% if current_user %}
-            {{ current_user.name }}
-            <a href="{{ url_for("user.logout") }}">Logout</a>
-        {% endif %}
-        </p>
+        <div class="silverflask-head">
+            <h3>SilverFlask</h3>
+            <div class="current_user">
+                {{ current_user.name }}
+                <a href="{{ url_for("user.logout") }}">Logout</a>
+            </div>
+        </div>
         <ul>
             <li><a href="{{ url_for("cms.pages") }}">Pages</a></li>
             <li><a href="{{ url_for("cms.assets") }}">Assets</a></li>
             <li><a href="{{ url_for("cms.edit_siteconfig") }}">Site Config</a></li>
-            <li><a href="{{ url_for("cms.securitymanager") }}">User</a></li>
+            <li><a href="{{ url_for("SecurityController.form") }}">User</a></li>
         </ul>
     </aside>
-    <aside class="aside aside-2">
-        {% block aside_two %}
-        {% endblock %}
-    </aside>
+
+    {% block aside_two %}
+    {% endblock %}
 </div>
 
 <div class="modal" id="cropModal">

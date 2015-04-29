@@ -75,7 +75,7 @@ def edit_page(page_id):
 
 @bp.route("/add_page/<page_type>", methods=["GET", "POST"])
 def add_page(page_type):
-    import silverflask.models as models
+    import silverflask.models.models as models
     _class = getattr(models, page_type)
     page = _class()
     page.content = "Super Düper"

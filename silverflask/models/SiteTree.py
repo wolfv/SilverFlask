@@ -71,13 +71,9 @@ class SiteTree(VersionedMixin, PolymorphicMixin, OrderableMixin, DataObject, db.
         else:
             return
 
-
     @classmethod
     def get_cms_form(cls):
         form = super().get_cms_form()
-        # del form.children
-        # del form.sort_order
-        # del form.urlsegment
         return form
 
     def append_child(self, child):

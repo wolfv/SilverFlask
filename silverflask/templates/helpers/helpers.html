@@ -56,7 +56,7 @@
     {%- elif field.type == 'SubmitField' -%}
         {# note: same issue as above - should check widget, not field type #}
         {% call _hz_form_wrap(horizontal_columns, form_type, True) %}
-            {{ field(class='btn btn-%s %s' % (button_map.get(field.name, 'default'), class_map.get(field.name, ''))) }}
+            {{ field(class='mui-btn mui-btn-%s %s' % (button_map.get(field.name, 'default'), class_map.get(field.name, ''))) }}
         {% endcall %}
     {% elif field.type == "HiddenField" or field.type == "CSRFTokenField" %}
         {{ field() }}

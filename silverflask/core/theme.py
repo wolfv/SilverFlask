@@ -5,7 +5,7 @@ import json
 import logging
 
 from jinja2.loaders import BaseLoader, FileSystemLoader
-from flask import send_from_directory, current_app, url_for
+from flask import send_from_directory, current_app, url_for, render_template
 from flask import Blueprint
 from werkzeug.utils import cached_property
 
@@ -25,7 +25,15 @@ class ThemeManager(object):
         else:
             self.themes = {}
 
+    def current_theme(self):
+        theme = current_app.silverflask_theme_manager[SiteConfig.get_current().theme]
+        if not theme:
+            theme = current_app.silverflask_theme_manager['simple']
+        return theme
+
     def __getitem__(self, item):
+        if not item:
+            return None
         return self.themes[item]
 
 
@@ -39,7 +47,9 @@ class ThemeTemplateLoader(BaseLoader):
         BaseLoader.__init__(self)
 
     def get_source(self, environment, template):
-        theme = current_app.silverflask_theme_manager[SiteConfig.get_current().theme]
+        theme = current_app.silverflask_theme_manager.current_theme()
+        if not theme:
+            theme = current_app.silverflask_theme_manager['simple']
         return theme.jinja_loader.get_source(environment, template)
 
     def list_templates(self):
@@ -52,9 +62,8 @@ class ThemeTemplateLoader(BaseLoader):
 
 
 def static_file(filename):
-    theme = current_app.silverflask_theme_manager[SiteConfig.get_current().theme]
+    theme = current_app.silverflask_theme_manager.current_theme()
     directory = os.path.join(theme.path, 'static')
-    print(directory, filename)
     return send_from_directory(directory, filename)
 
 
@@ -64,7 +73,7 @@ blueprint.add_url_rule('/theme/<path:filename>', 'static', view_func=static_file
 
 
 def global_theme_template(templatename):
-    theme = current_app.silverflask_theme_manager[SiteConfig.get_current().theme]
+    theme = current_app.silverflask_theme_manager.current_theme()
     return os.path.join(theme.folder, 'templates', templatename)
 
 
@@ -78,6 +87,7 @@ def init_themes(app):
     app.jinja_env.globals['theme_static'] = global_theme_static
 
     app.register_blueprint(blueprint)
+
 
 class Theme(object):
     """
@@ -157,6 +167,9 @@ class Theme(object):
         """
         return os.path.join(self.path, 'templates')
 
+    def template_path(self, template):
+        return os.path.join(self.folder, 'templates/layout', template)
+
     @cached_property
     def license_text(self):
         """
@@ -178,3 +191,8 @@ class Theme(object):
         ``templates`` directory.
         """
         return FileSystemLoader(self.templates_path)
+
+
+def render_themed(template, **context):
+    theme = current_app.silverflask_theme_manager.current_theme()
+    return render_template(theme.template_path(template), **context)

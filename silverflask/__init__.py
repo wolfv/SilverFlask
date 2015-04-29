@@ -21,8 +21,8 @@ from flask_user import UserManager, SQLAlchemyAdapter
 
 db = SQLAlchemy()
 
-def create_app(object_name, env="prod"):
 
+def create_app(object_name, env="prod"):
     """
     An flask application factory, as explained here:
     http://flask.pocoo.org/docs/patterns/appfactories/
@@ -37,26 +37,19 @@ def create_app(object_name, env="prod"):
     app = Flask(__name__)
     app.config.from_object(object_name)
 
-    upload_path = os.path.join(app.instance_path, app.config["SILVERFLASK_UPLOAD_PATH"])
-    app.config["SILVERFLASK_ABSOLUTE_UPLOAD_PATH"] = upload_path
-    app.storage_backend = LocalFileStorageBackend(upload_path)
     app.config['ENV'] = env
 
     db.init_app(app)
-    app.logger.debug("DB Initialized")
-
-    # init the cache
     cache.init_app(app)
-
     debug_toolbar.init_app(app)
 
-    from silverflask.controllers.page_controller import Controller, SiteTreeController
+    migrate = Migrate(app, db)
 
-    c = Controller()
-    stc = SiteTreeController()
-    app.register_blueprint(c.create_blueprint(app))
-    app.register_blueprint(stc.create_blueprint(app))
-
+    # Import and register the different asset bundles
+    assets_env.init_app(app)
+    assets_loader = PythonAssetsLoader(assets)
+    for name, bundle in list(assets_loader.load_bundles().items()):
+        assets_env.register(name, bundle)
 
     # Setup user handling
     from silverflask.models import User
@@ -65,20 +58,30 @@ def create_app(object_name, env="prod"):
     user_manager = UserManager(user_adapter)
     user_manager.init_app(app)
 
-    # Import and register the different asset bundles
-    assets_env.init_app(app)
-    assets_loader = PythonAssetsLoader(assets)
-    for name, bundle in list(assets_loader.load_bundles().items()):
-        assets_env.register(name, bundle)
+    ###
+    #  SILVERFLASK
+    ###
 
-    # register our blueprints
+    upload_path = os.path.join(app.instance_path, app.config["SILVERFLASK_UPLOAD_PATH"])
+    app.config["SILVERFLASK_ABSOLUTE_UPLOAD_PATH"] = upload_path
+    app.storage_backend = LocalFileStorageBackend(upload_path)
+
+
+    from silverflask.controllers.page_controller import SiteTreeController
+    stc = SiteTreeController()
+    app.register_blueprint(stc.create_blueprint(app))
+
+    from silverflask.core.dev_controller import DevController
+    dev_controller = DevController()
+    app.register_blueprint(dev_controller.create_blueprint(app))
+
+    from silverflask.controllers.security_controller import SecurityController
+    security_controller = SecurityController()
+    app.register_blueprint(security_controller.create_blueprint(app))
+
+
     from silverflask.core.theme import init_themes
     init_themes(app)
-
-    migrate = Migrate(app, db)
-    from silverflask.core.migrations import bp as migrations_bp
-    app.register_blueprint(migrations_bp)
-    print(migrations_bp)
 
     from silverflask.controllers.main import setup_processors, init_blueprint
     from silverflask.controllers.cms import bp as cms_bp
@@ -88,10 +91,4 @@ def create_app(object_name, env="prod"):
     app.register_blueprint(main)
     app.register_blueprint(cms_bp, url_prefix='/admin')
 
-    # Prefer migrations for now
-    # with app.app_context():
-    #     db.create_all()
-
-    for rule in app.url_map.iter_rules():
-        print(rule)
     return app
