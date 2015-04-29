@@ -1,0 +1,316 @@
+// ==========================
+// Normalize non-controls
+// ==========================
+fieldset {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  min-width: 0;
+}
+
+legend {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin-bottom: $mui-base-line-height-computed / 2;
+  font-size: $mui-legend-font-size;
+  color: $mui-legend-font-color;
+  line-height: inherit;
+  border: 0;
+}
+
+label {
+  display: inline-block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+
+// ===========================
+// Normalize form controls
+// ===========================
+input[type="search"] {
+  box-sizing: border-box;
+}
+
+// Position radios and checkboxes better
+input[type="radio"],
+input[type="checkbox"] {
+  margin: 4px 0 0;
+  line-height: normal;
+}
+
+// Set the height of file controls to match text inputs
+input[type="file"] {
+  display: block;
+}
+
+// Make range inputs behave like textual form controls
+input[type="range"] {
+  display: block;
+  width: 100%;
+}
+
+// Make multiple select elements height not fixed
+select[multiple],
+select[size] {
+  height: auto;
+}
+
+// Focus for file, radio, and checkbox
+input[type="file"]:focus,
+input[type="radio"]:focus,
+input[type="checkbox"]:focus {
+  @include tab-focus;
+}
+
+
+// =======================
+// Form controls
+// =======================
+// Common form controls
+//
+// Shared size and type resets for form controls. Apply `.form-control` to any
+// of the following form controls:
+//
+// select
+// textarea
+// input[type="text"]
+// input[type="password"]
+// input[type="datetime"]
+// input[type="datetime-local"]
+// input[type="date"]
+// input[type="month"]
+// input[type="time"]
+// input[type="week"]
+// input[type="number"]
+// input[type="email"]
+// input[type="url"]
+// input[type="search"]
+// input[type="tel"]
+// input[type="color"]
+
+.mui-form-control {
+  display: block;
+  background-color: $mui-input-bg-color;
+  color: $mui-input-font-color;
+  border: none;
+  border-bottom: 1px solid $mui-input-border-color;
+  outline: none;
+  height: $mui-input-height;
+  width: 100%;
+  font-size: $mui-input-font-size;
+  padding: 0;
+  box-shadow: none;
+  border-radius: 0px;
+
+  // bugfix for firefox-android
+  background-image: none; 
+
+  &::placeholder {
+    color: $mui-input-placeholder-color;
+    opacity: 1; // normalize firefox
+  }
+
+  &:focus {
+    border-color: $mui-input-border-color-focus;
+    border-width: 2px;
+  }
+
+  // disabled
+  &[disabled],
+  &[readonly],
+  fieldset[disabled] & {
+    cursor: $mui-cursor-disabled;
+    background-color: $mui-input-bg-color-disabled;
+    opacity: 1; // iOS fix for unreadable disabled content
+  }
+}
+
+// Reset height for `textarea`s
+textarea.mui-form-control {
+  height: auto;
+}
+
+// Compensate for height change on focus
+input.mui-form-control:focus {
+  height: $mui-input-height + 1px;
+  margin-bottom: -1px;
+}
+
+// Search inputs in iOS
+input[type="search"] {
+  -webkit-appearance: none;
+}
+
+
+// =====================
+// Form groups
+// =====================
+.mui-form-group {
+  position: relative;
+  margin-bottom: $mui-form-group-margin-bottom;
+  padding-top: $mui-label-font-size + $mui-label-margin-bottom;
+
+  // position label at top
+  > label {
+    position: absolute;
+    color: $mui-label-font-color;
+    top: 0px;
+    font-size: $mui-label-font-size;
+    font-weight: 400;
+
+    &.mui-form-floating-label {
+      top: 5px + $mui-label-font-size + $mui-label-margin-bottom;
+      font-size: $mui-input-font-size;
+      pointer-events: none;
+      color: $mui-input-placeholder-color;
+
+      animation-duration: 0.001s;
+      animation-name: mui-node-inserted;
+    }
+  }
+
+  > textarea {
+    padding-top: 5px;
+    min-height: $mui-textarea-height;
+  }
+
+  // active floating icon
+  > label.mui-form-floating-label-active {
+    color: $mui-label-font-color;
+  }
+  
+  > label.mui-form-floating-label-active,
+  > .mui-form-control:focus + label.mui-form-floating-label {
+    font-size: $mui-label-font-size;
+    top: 0px;
+  }
+
+  // input focus
+  > .mui-form-control:focus + label {
+    color: $mui-input-border-color-focus;
+  }
+}
+
+
+// ===========================
+// Checkboxes and radios
+// ===========================
+// Indent the labels to position radios/checkboxes as hanging controls.
+
+.mui-radio,
+.mui-checkbox {
+  position: relative;
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 10px;
+
+  label {
+    min-height: $mui-base-line-height-computed;
+    padding-left: 20px;
+    margin-bottom: 0;
+    font-weight: normal;
+    cursor: pointer;
+  }
+}
+
+.mui-radio input[type="radio"],
+.mui-radio-inline input[type="radio"],
+.mui-checkbox input[type="checkbox"],
+.mui-checkbox-inline input[type="checkbox"] {
+  position: absolute;
+  margin-left: -20px;
+  margin-top: 4px;
+}
+
+.mui-radio + .mui-radio,
+.mui-checkbox + .mui-checkbox {
+  margin-top: -5px; // Move up sibling radios or checkboxes for tighter spacing
+}
+
+// Radios and checkboxes on same line
+.mui-radio-inline,
+.mui-checkbox-inline {
+  display: inline-block;
+  padding-left: 20px;
+  margin-bottom: 0;
+  vertical-align: middle;
+  font-weight: normal;
+  cursor: pointer;
+}
+
+.mui-radio-inline + .mui-radio-inline,
+.mui-checkbox-inline + .mui-checkbox-inline {
+  margin-top: 0;
+  margin-left: 10px; // space out consecutive inline controls
+}
+
+// Apply same disabled cursor tweak as for inputs
+input[type="radio"],
+input[type="checkbox"] {
+  &[disabled],
+  fieldset[disabled] & {
+    cursor: $mui-cursor-disabled;
+  }
+}
+
+// These classes are used directly on <label>s
+.mui-radio-inline,
+.mui-checkbox-inline {
+  fieldset[disabled] & {
+    cursor: $mui-cursor-disabled;
+  }
+}
+
+// These classes are used on elements with <label> descendants
+.mui-radio,
+.mui-checkbox {
+  fieldset[disabled] & {
+    label {
+      cursor: $mui-cursor-disabled;
+    }
+  }
+}
+
+
+// =====================
+// Form-inline
+// =====================
+.mui-form-inline {
+
+  // Kick in the inline
+  @media (min-width: $mui-screen-sm-min) {
+    // Inline-block all the things for "inline"
+    .mui-form-group {
+      display: inline-block;
+      margin-bottom: 0;
+      vertical-align: middle;
+    }
+
+    .mui-form-control {
+      display: inline-block;
+      width: auto;
+      vertical-align: middle;
+    }
+    
+    // Remove default margin on radios/checkboxes that were used for stacking
+    .mui-radio,
+    .mui-checkbox {
+      display: inline-block;
+      margin-top: 0;
+      margin-bottom: 0;
+      vertical-align: middle;
+
+      label {
+        padding-left: 0;
+      }
+    }
+    
+    .mui-radio input[type="radio"],
+    .mui-checkbox input[type="checkbox"] {
+      position: relative;
+      margin-left: 0;
+    }
+  }
+}
