@@ -196,7 +196,9 @@ function initialize(labelEl) {
   else labelEl._muiFloatLabel = true;
   
   var inputEl = labelEl.previousElementSibling;
-
+    if(!inputEl || !inputEl.value) {
+        return;
+    }
   if (inputEl.value.length) jqLite.addClass(labelEl, floatingLabelActiveClass);
 
   // handle input events

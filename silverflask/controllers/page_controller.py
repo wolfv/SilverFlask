@@ -64,7 +64,9 @@ class SiteTreeController(Controller):
             return "section"
         return "link"
 
-    def index(self, url_segment=None):
+    def index(self, url_segment=None, three=None):
+        print(self)
+        print("URL_SEG: ", url_segment, 'THREE', three)
         if not url_segment:
             url_segment = current_app.config["SILVERFLASK_HOME_URLSEGMENT"]
         if session.get("draft"):

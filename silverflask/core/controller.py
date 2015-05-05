@@ -18,35 +18,45 @@ class Controller(object):
     def linking_mode():
         return ''
 
-    def create_blueprint(self, app):
-        self.endpoint = self.__class__.__name__
-        url_prefix = self.url_prefix
+    @classmethod
+    def create_blueprint(cls, app):
+        """
+        Method to create a blueprint, derived from a SilverFlask Controller.
+        It is one instance per blueprint. TODO: This might be a bad design and
+        it should probably better be one instance per request.
+        :param app: current app (in flask initialization)
+        :return: Blueprint
+        """
+        inst = cls()
+        endpoint = cls.__name__
+        url_prefix = cls.url_prefix
 
-        self.blueprint = Blueprint(self.endpoint, __name__,
+        blueprint = Blueprint(endpoint, __name__,
                                    url_prefix=url_prefix)
-        self.blueprint.jinja_loader = ThemeTemplateLoader()
+        blueprint.jinja_loader = ThemeTemplateLoader()
 
-        for url in self.urls:
-            action = self.urls[url]
+        view_funcs = {}
+        for url in cls.urls:
+            action = cls.urls[url]
             kwargs = {
                 'methods': ['GET']
             }
-            if action in self.allowed_actions:
+            if action in cls.allowed_actions:
                 kwargs['methods'] += ['POST']
 
-            self.blueprint.add_url_rule(url, self.urls[url], getattr(self, self.urls[url]), **kwargs)
+            blueprint.add_url_rule(url, cls.urls[url], getattr(inst, cls.urls[url]), **kwargs)
 
-        if hasattr(self, 'before_request'):
-            self.blueprint.before_request(getattr(self, self.before_request))
+        if hasattr(cls, 'before_request'):
+            blueprint.before_request(getattr(inst, 'before_request'))
 
         template_functions = {}
-        for fun in self.template_functions:
-            template_functions[fun] = getattr(self, self.template_functions[fun])
+        for fun in cls.template_functions:
+            template_functions[fun] = getattr(inst, inst.template_functions[fun])
 
-        self.blueprint.context_processor(lambda: template_functions)
+        blueprint.context_processor(lambda: template_functions)
 
-        for m in self.__class__.mro():
+        for m in cls.mro():
             if hasattr(m, 'init_blueprint'):
-                m.init_blueprint(self.blueprint)
+                m.init_blueprint(blueprint)
 
-        return self.blueprint
+        return blueprint

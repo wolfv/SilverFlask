@@ -56,21 +56,21 @@
     {%- elif field.type == 'SubmitField' -%}
         {# note: same issue as above - should check widget, not field type #}
         {% call _hz_form_wrap(horizontal_columns, form_type, True) %}
-            {{ field(class='mui-btn mui-btn-%s %s' % (button_map.get(field.name, 'default'), class_map.get(field.name, ''))) }}
+            {{ field(class='mui-btn mui-btn-%s mui-%s' % (button_map.get(field.name, 'default'), class_map.get(field.name, ''))) }}
         {% endcall %}
     {% elif field.type == "HiddenField" or field.type == "CSRFTokenField" %}
         {{ field() }}
     {% else -%}
-        <div class="form-group {% if field.errors %} has-error{% endif %}">
+        <div class="mui-form-group {% if field.errors %} has-error{% endif %}">
             {%- if form_type == "inline" %}
                 {{ field.label(class="sr-only")|safe }}
-                {{ field(class="form-control", placeholder=field.label.text, **kwargs)|safe }}
+                {{ field(class="mui-form-control", placeholder=field.label.text, **kwargs)|safe }}
             {% elif form_type == "horizontal" %}
                 {{ field.label(class="control-label " + (
           " col-%s-%s" % horizontal_columns[0:2]
         ))|safe }}
                 <div class=" col-{{ horizontal_columns[0] }}-{{ horizontal_columns[2] }}">
-                    {{ field(class="form-control", **kwargs)|safe }}
+                    {{ field(class="mui-form-control", **kwargs)|safe }}
                 </div>
                 {%- if field.errors %}
                     {%- for error in field.errors %}
@@ -84,8 +84,8 @@
                     {% endcall %}
                 {%- endif %}
             {%- else -%}
-                {{ field.label(class="control-label")|safe }}
-                {{ field(class="form-control", **kwargs)|safe }}
+                {{ field(class="mui-form-control", **kwargs)|safe }}
+                {{ field.label(class="control-label mui-form-floating-label")|safe }}
 
                 {%- if field.errors %}
                     {%- for error in field.errors %}

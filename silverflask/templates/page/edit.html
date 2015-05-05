@@ -7,6 +7,10 @@
     </aside>
 {% endblock %}
 
+{% block breadcrumbs %}
+  <a href="{{ url_for('PagesCMSController.index') }}">Pages</a> / {{ cms_title }}
+{% endblock %}
+
 {% block body %}
     {{ quick_form(page_form, page=page, class_map={"Submit": "btn-success"}) }}
 {% endblock %}

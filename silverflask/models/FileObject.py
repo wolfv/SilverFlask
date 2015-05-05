@@ -27,11 +27,12 @@ class FileObject(DataObject, db.Model):
         'polymorphic_on': type
     }
 
-    def __init__(self, file, location=None, folder=None):
-        location = current_app.storage_backend.store(file, location)
-        print("Saving Location: ", location)
-        self.location = location
-        self.name = os.path.splitext(location)[0]
+    def __init__(self, file=None, location=None, folder=None):
+        if file:
+            location = current_app.storage_backend.store(file, location)
+            print("Saving Location: ", location)
+            self.location = location
+            self.name = os.path.splitext(location)[0]
 
     def url(self):
         return current_app.storage_backend.get_url(self.location)

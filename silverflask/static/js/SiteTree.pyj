@@ -37,9 +37,9 @@ class SiteTree:
 
     def get_url(self, node):
         if node.id is '#':
-            return '/admin/get_sitetree'
+            return self.node.data('json_url')
         else:
-            return '/admin/get_sitetree/' + node.id
+            return self.node.data('json_url') + node.id
 
     def get_data(self, node):
         return {'id': node.id}
@@ -93,12 +93,12 @@ class SiteTree:
                 'valid_children': self.properties[key].allowed_children,
                 'icon': self.properties[key].icon
             }
-
+        get_url = j.proxy(self.get_url, self)
         self.tree = node.jstree({
             'core': {
                 'check_callback': True,
                 'data': {
-                    'url': self.get_url,
+                    'url': get_url,
                     'data': self.get_data
                 },
                 },

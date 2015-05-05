@@ -1,5 +1,5 @@
 from silverflask.fields import LivingDocsField, AsyncFileUploadField, GridField
-from wtforms.fields import HiddenField, StringField, SubmitField
+from wtforms.fields import HiddenField, StringField, SubmitField, SelectField
 from .SiteTree import SiteTree
 from .GalleryImage import  GalleryImage
 from silverflask import db as alchemy
@@ -11,13 +11,8 @@ from sqlalchemy import event
 
 class Page(SiteTree):
 
-    # id = alchemy.Column(alchemy.Integer(), alchemy.ForeignKey("sitetree.id"), primary_key=True)
-    # content = alchemy.Column(alchemy.UnicodeText)
-    # content_json = alchemy.Column(alchemy.UnicodeText)
-
     template = "page.html"
 
-    # Potential future way of creating models
     db = {
         "id": {
           'type': 'Integer',
@@ -31,6 +26,10 @@ class Page(SiteTree):
     def get_cms_form(self):
         form = OrderedFormFactory()
         form.add_to_tab("Root.Main", StringField(name="name"))
+        form.add_to_tab("Root.Main", StringField(name="asd"))
+        form.add_to_tab("Root.Main", StringField(name="qwe"))
+        form.add_to_tab("Root.Main", StringField(name="qweqwe"))
+        form.add_to_tab("Root.Main", SelectField(name="asd", choices=[('asd', '123123123'), ('adssdasd', '12321313')]))
         form.add_to_tab("Root.Main", LivingDocsField(name="content"))
         form.add_to_tab("Root.Main", HiddenField(name="content_json"))
         form.add_to_tab("Root.Settings", StringField(name="urlsegment"))
@@ -46,9 +45,7 @@ class SuperPage(SiteTree):
     }
 
     __abstract_inherit__ = [Page]
-    # id = alchemy.Column(alchemy.Integer(), alchemy.ForeignKey("sitetree.id"), primary_key=True)
 
-    # content = alchemy.Column(alchemy.UnicodeText)
     second_content = alchemy.Column(alchemy.UnicodeText)
     subtitle = alchemy.Column(alchemy.String)
 
@@ -63,37 +60,36 @@ class SuperPage(SiteTree):
     many_many = {
         'sample_images': 'GalleryImage'
     }
-    # header_image_id = alchemy.Column(alchemy.Integer, alchemy.ForeignKey('imageobject.id'))
-    # header_image = alchemy.relationship("ImageObject")
 
     # template = "superpage.html"
     allowed_children = ["SuperPage"]
     icon = 'glyphicon glyphicon-flash'
 
-    # def get_cms_form(self):
-    #     from wtforms import fields
-    #     from silverflask.fields import AsyncFileUploadField
-    #     # Setup Gridfield
-    #     button_list = []
-    #     button_list.append(GridField.AddButton())
-    #     g = GridField(
-    #         parent_record=self,
-    #         query=lambda: GalleryImage.query.filter(GalleryImage.page_id == self.id),
-    #         buttons=button_list,
-    #         field_name="images",
-    #         display_cols=[{"name": "id", "hidden": True}, "caption", {"name": "sort_order", "hidden": True}],
-    #         name="images",
-    #         sortable=True)
-    #
-    #     form = OrderedFormFactory()
-    #     form.add_to_tab("Root.Main", fields.StringField(name="name", default=1))
-    #     form.add_to_tab("Root.Main", fields.TextAreaField(name="content"), before="asdasd")
-    #     form.add_to_tab("Root.Main", AsyncFileUploadField(ImageObject, name="header_image_id"))
-    #     form.add_to_tab("Root.Gallery", g)
-    #     form.add_to_tab("Root.Buttons", SubmitField("Save", name="Submit"))
-    #     form.add_to_tab("Root.Buttons", SubmitField("Publish", name="Publish"))
-    #
-    #     return form
+    def get_cms_form(self):
+        from wtforms import fields
+        from silverflask.fields import AsyncFileUploadField
+        # Setup Gridfield
+        button_list = []
+        button_list.append(GridField.AddButton())
+        g = GridField(
+            parent_record=self,
+            query=self.images,
+            controlled_class=GalleryImage,
+            buttons=button_list,
+            field_name="images",
+            display_cols=[{"name": "id", "hidden": True}, "caption", {"name": "sort_order", "hidden": True}],
+            name="images",
+            sortable=True)
+
+        form = OrderedFormFactory()
+        form.add_to_tab("Root.Main", fields.StringField(name="name", default=1))
+        form.add_to_tab("Root.Main", fields.TextAreaField(name="content"), before="asdasd")
+        form.add_to_tab("Root.Main", AsyncFileUploadField(ImageObject, name="header_image_id"))
+        form.add_to_tab("Root.Gallery", g)
+        form.add_to_tab("Root.Buttons", SubmitField("Save", name="Submit"))
+        form.add_to_tab("Root.Buttons", SubmitField("Publish", name="Publish"))
+
+        return form
 
 
 class ErrorPage(SiteTree):

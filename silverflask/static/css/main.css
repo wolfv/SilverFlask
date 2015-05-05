@@ -19,7 +19,7 @@ body {
 
 .snippet-controls {
   padding: 5px;
-  border: 1px solid #aaaaaa;
+  border: 1px solid #AAA;
   background: #f6f6f6; }
   .snippet-controls h4 {
     margin-top: 0; }
@@ -64,7 +64,7 @@ body {
   .wrapper .main {
     flex: 3 0px;
     order: 3;
-    background: #f0f0f0; }
+    background: #F0F0F0; }
   .wrapper .aside-1 {
     order: 1;
     flex: 1 100px;
@@ -73,7 +73,14 @@ body {
   .wrapper .aside-2 {
     order: 2;
     flex: 1 auto;
-    max-width: 200px; }
+    max-width: 200px;
+    position: relative; }
+  .wrapper .page-tree-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50px;
+    bottom: 0; }
   .wrapper .aside-1 {
     background: #0081c2; }
     .wrapper .aside-1 ul {
@@ -84,7 +91,7 @@ body {
         border-bottom: 1px solid #00b3ee;
         list-style: none; }
       .wrapper .aside-1 ul a {
-        color: white;
+        color: #fff;
         padding: 10px 10px;
         display: block;
         text-decoration: none; }
@@ -94,11 +101,11 @@ body {
     border-bottom: 1px solid #00b3ee; }
     .wrapper .silverflask-head h3, .wrapper .silverflask-head div {
       margin: 0;
-      color: #f2f3ff;
+      color: #F2F3FF;
       text-align: center; }
 
 .async-upload-container {
-  background: #fafafa;
+  background: #FAFAFA;
   height: 60px;
   padding: 10px; }
   .async-upload-container input[type='file'] {
@@ -122,6 +129,14 @@ body {
     width: 100%;
     margin-top: 0; }
 
+.cms-form {
+  margin: 5px; }
+  .cms-form h1 {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    font-size: 15px;
+    font-weight: bold; }
+
 .main-flex {
   position: relative;
   height: 100vh;
@@ -140,10 +155,15 @@ body {
     left: 0;
     right: 0;
     height: 50px;
-    background: #fafafa;
-    padding-top: 5px;
-    border-top: 1px solid #333333;
-    box-shadow: 0 1px 0 #999999; }
+    background: #FAFAFA;
+    padding-top: 0px;
+    box-shadow: 0 1px 0 #999; }
+
+.mui-tab-pane {
+  padding: 10px; }
+  .mui-tab-pane .row {
+    margin: 0;
+    padding: 0; }
 
 .livingdocs_EditorField {
   position: relative;
@@ -160,11 +180,11 @@ body {
   margin: 5px 0;
   cursor: move;
   border-radius: 3px;
-  background: #0e74af;
-  color: white;
+  background: #0E74AF;
+  color: #FFF;
   text-align: left; }
   .toolbar-entry .toolbar-entry .add-button {
-    background: #0b6294;
+    background: #0B6294;
     float: right;
     padding: 3px 6px;
     margin-top: -3px;
@@ -549,7 +569,7 @@ body {
   line-height: 1.429;
   letter-spacing: 0.001em;
   color: rgba(0, 0, 0, 0.87);
-  background-color: white; }
+  background-color: #FFF; }
 
 input,
 button,
@@ -560,10 +580,10 @@ textarea {
   line-height: inherit; }
 
 a {
-  color: #2196f3;
+  color: #2196F3;
   text-decoration: none; }
   a:hover, a:focus {
-    color: #1976d2;
+    color: #1976D2;
     text-decoration: underline; }
   a:focus {
     outline: thin dotted;
@@ -1565,7 +1585,7 @@ hr {
   padding: 15px;
   margin-bottom: 20px;
   border-radius: 0;
-  background-color: white;
+  background-color: #FFF;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0px 2px 0 rgba(0, 0, 0, 0.12); }
   .mui-panel:before, .mui-panel:after {
     content: " ";
@@ -1650,13 +1670,13 @@ hr {
 
 .mui-btn-default {
   color: rgba(0, 0, 0, 0.87);
-  background-color: white; }
+  background-color: #FFF; }
   .mui-btn-default:hover, .mui-btn-default:focus, .mui-btn-default:active, .mui-open > .mui-btn-default.mui-dropdown-toggle {
     color: rgba(0, 0, 0, 0.87);
     background-color: white; }
   .mui-btn-default[disabled], .mui-btn-default[disabled]:hover, .mui-btn-default[disabled]:focus, .mui-btn-default[disabled]:active, fieldset[disabled] .mui-btn-default, fieldset[disabled] .mui-btn-default:hover, fieldset[disabled] .mui-btn-default:focus, fieldset[disabled] .mui-btn-default:active {
     color: rgba(0, 0, 0, 0.87);
-    background-color: white; }
+    background-color: #FFF; }
   .mui-btn-default.mui-btn-flat {
     color: rgba(0, 0, 0, 0.87);
     background-color: transparent; }
@@ -1668,60 +1688,79 @@ hr {
       background-color: transparent; }
 
 .mui-btn-primary {
-  color: white;
-  background-color: #2196f3; }
+  color: #FFF;
+  background-color: #2196F3; }
   .mui-btn-primary:hover, .mui-btn-primary:focus, .mui-btn-primary:active, .mui-open > .mui-btn-primary.mui-dropdown-toggle {
-    color: white;
+    color: #FFF;
     background-color: #39a1f4; }
   .mui-btn-primary[disabled], .mui-btn-primary[disabled]:hover, .mui-btn-primary[disabled]:focus, .mui-btn-primary[disabled]:active, fieldset[disabled] .mui-btn-primary, fieldset[disabled] .mui-btn-primary:hover, fieldset[disabled] .mui-btn-primary:focus, fieldset[disabled] .mui-btn-primary:active {
-    color: white;
-    background-color: #2196f3; }
+    color: #FFF;
+    background-color: #2196F3; }
   .mui-btn-primary.mui-btn-flat {
-    color: #2196f3;
+    color: #2196F3;
     background-color: transparent; }
     .mui-btn-primary.mui-btn-flat:hover, .mui-btn-primary.mui-btn-flat:focus, .mui-btn-primary.mui-btn-flat:active, .mui-open > .mui-btn-primary.mui-btn-flat.mui-dropdown-toggle {
-      color: #2196f3;
+      color: #2196F3;
       background-color: #f2f2f2; }
     .mui-btn-primary.mui-btn-flat[disabled], .mui-btn-primary.mui-btn-flat[disabled]:hover, .mui-btn-primary.mui-btn-flat[disabled]:focus, .mui-btn-primary.mui-btn-flat[disabled]:active, fieldset[disabled] .mui-btn-primary.mui-btn-flat, fieldset[disabled] .mui-btn-primary.mui-btn-flat:hover, fieldset[disabled] .mui-btn-primary.mui-btn-flat:focus, fieldset[disabled] .mui-btn-primary.mui-btn-flat:active {
-      color: #2196f3;
+      color: #2196F3;
       background-color: transparent; }
 
 .mui-btn-danger {
-  color: white;
-  background-color: #f44336; }
+  color: #FFF;
+  background-color: #F44336; }
   .mui-btn-danger:hover, .mui-btn-danger:focus, .mui-btn-danger:active, .mui-open > .mui-btn-danger.mui-dropdown-toggle {
-    color: white;
+    color: #FFF;
     background-color: #f55a4e; }
   .mui-btn-danger[disabled], .mui-btn-danger[disabled]:hover, .mui-btn-danger[disabled]:focus, .mui-btn-danger[disabled]:active, fieldset[disabled] .mui-btn-danger, fieldset[disabled] .mui-btn-danger:hover, fieldset[disabled] .mui-btn-danger:focus, fieldset[disabled] .mui-btn-danger:active {
-    color: white;
-    background-color: #f44336; }
+    color: #FFF;
+    background-color: #F44336; }
   .mui-btn-danger.mui-btn-flat {
-    color: #f44336;
+    color: #F44336;
     background-color: transparent; }
     .mui-btn-danger.mui-btn-flat:hover, .mui-btn-danger.mui-btn-flat:focus, .mui-btn-danger.mui-btn-flat:active, .mui-open > .mui-btn-danger.mui-btn-flat.mui-dropdown-toggle {
-      color: #f44336;
+      color: #F44336;
       background-color: #f2f2f2; }
     .mui-btn-danger.mui-btn-flat[disabled], .mui-btn-danger.mui-btn-flat[disabled]:hover, .mui-btn-danger.mui-btn-flat[disabled]:focus, .mui-btn-danger.mui-btn-flat[disabled]:active, fieldset[disabled] .mui-btn-danger.mui-btn-flat, fieldset[disabled] .mui-btn-danger.mui-btn-flat:hover, fieldset[disabled] .mui-btn-danger.mui-btn-flat:focus, fieldset[disabled] .mui-btn-danger.mui-btn-flat:active {
-      color: #f44336;
+      color: #F44336;
+      background-color: transparent; }
+
+.mui-btn-success {
+  color: #333;
+  background-color: #FF6D00; }
+  .mui-btn-success:hover, .mui-btn-success:focus, .mui-btn-success:active, .mui-open > .mui-btn-success.mui-dropdown-toggle {
+    color: #333;
+    background-color: #ff7c1a; }
+  .mui-btn-success[disabled], .mui-btn-success[disabled]:hover, .mui-btn-success[disabled]:focus, .mui-btn-success[disabled]:active, fieldset[disabled] .mui-btn-success, fieldset[disabled] .mui-btn-success:hover, fieldset[disabled] .mui-btn-success:focus, fieldset[disabled] .mui-btn-success:active {
+    color: #333;
+    background-color: #FF6D00; }
+  .mui-btn-success.mui-btn-flat {
+    color: #333;
+    background-color: transparent; }
+    .mui-btn-success.mui-btn-flat:hover, .mui-btn-success.mui-btn-flat:focus, .mui-btn-success.mui-btn-flat:active, .mui-open > .mui-btn-success.mui-btn-flat.mui-dropdown-toggle {
+      color: #333;
+      background-color: #FF6D00; }
+    .mui-btn-success.mui-btn-flat[disabled], .mui-btn-success.mui-btn-flat[disabled]:hover, .mui-btn-success.mui-btn-flat[disabled]:focus, .mui-btn-success.mui-btn-flat[disabled]:active, fieldset[disabled] .mui-btn-success.mui-btn-flat, fieldset[disabled] .mui-btn-success.mui-btn-flat:hover, fieldset[disabled] .mui-btn-success.mui-btn-flat:focus, fieldset[disabled] .mui-btn-success.mui-btn-flat:active {
+      color: #333;
       background-color: transparent; }
 
 .mui-btn-accent {
-  color: white;
-  background-color: #ff4081; }
+  color: #FFF;
+  background-color: #FF4081; }
   .mui-btn-accent:hover, .mui-btn-accent:focus, .mui-btn-accent:active, .mui-open > .mui-btn-accent.mui-dropdown-toggle {
-    color: white;
+    color: #FFF;
     background-color: #ff5a92; }
   .mui-btn-accent[disabled], .mui-btn-accent[disabled]:hover, .mui-btn-accent[disabled]:focus, .mui-btn-accent[disabled]:active, fieldset[disabled] .mui-btn-accent, fieldset[disabled] .mui-btn-accent:hover, fieldset[disabled] .mui-btn-accent:focus, fieldset[disabled] .mui-btn-accent:active {
-    color: white;
-    background-color: #ff4081; }
+    color: #FFF;
+    background-color: #FF4081; }
   .mui-btn-accent.mui-btn-flat {
-    color: #ff4081;
+    color: #FF4081;
     background-color: transparent; }
     .mui-btn-accent.mui-btn-flat:hover, .mui-btn-accent.mui-btn-flat:focus, .mui-btn-accent.mui-btn-flat:active, .mui-open > .mui-btn-accent.mui-btn-flat.mui-dropdown-toggle {
-      color: #ff4081;
+      color: #FF4081;
       background-color: #f2f2f2; }
     .mui-btn-accent.mui-btn-flat[disabled], .mui-btn-accent.mui-btn-flat[disabled]:hover, .mui-btn-accent.mui-btn-flat[disabled]:focus, .mui-btn-accent.mui-btn-flat[disabled]:active, fieldset[disabled] .mui-btn-accent.mui-btn-flat, fieldset[disabled] .mui-btn-accent.mui-btn-flat:hover, fieldset[disabled] .mui-btn-accent.mui-btn-flat:focus, fieldset[disabled] .mui-btn-accent.mui-btn-flat:active {
-      color: #ff4081;
+      color: #FF4081;
       background-color: transparent; }
 
 .mui-btn-floating {
@@ -1732,16 +1771,16 @@ hr {
   line-height: 55px;
   padding: 0;
   border-radius: 50%;
-  color: white;
-  background-color: #ff4081; }
+  color: #FFF;
+  background-color: #FF4081; }
   .mui-btn-floating:not(:disabled):hover, .mui-btn-floating:not(:disabled):focus, .mui-btn-floating:not(:disabled):active {
-    color: white;
+    color: #FFF;
     background-color: #ff5a92; }
   .mui-btn-floating i {
     width: inherit;
     display: inline-block;
     text-align: center;
-    color: white;
+    color: #FFF;
     font-size: 1.6rem;
     line-height: 55px; }
 
@@ -1763,7 +1802,6 @@ hr {
   from {
     transform: scale(1);
     opacity: 0.4; }
-
   to {
     transform: scale(100);
     opacity: 0; } }
@@ -1771,19 +1809,19 @@ hr {
   background-color: #a6a6a6; }
 
 .mui-btn-primary > .mui-ripple-effect {
-  background-color: white; }
+  background-color: #FFF; }
 
 .mui-btn-danger > .mui-ripple-effect {
-  background-color: white; }
+  background-color: #FFF; }
 
 .mui-btn-accent > .mui-ripple-effect {
-  background-color: white; }
+  background-color: #FFF; }
 
 .mui-btn-flat > .mui-ripple-effect {
   background-color: #a6a6a6; }
 
 .mui-btn-floating > .mui-ripple-effect {
-  background-color: white; }
+  background-color: #FFF; }
 
 .mui-appbar-height {
   height: 56px; }
@@ -1813,15 +1851,15 @@ hr {
       line-height: 64px; } }
 
 .mui-appbar {
-  background-color: #2196f3;
-  color: white; }
+  background-color: #2196F3;
+  color: #FFF; }
 
 strong {
   font-weight: 700; }
 
 abbr[title] {
   cursor: help;
-  border-bottom: 1px dotted #2196f3; }
+  border-bottom: 1px dotted #2196F3; }
 
 h1, h2, h3 {
   margin-top: 20px;
@@ -1913,7 +1951,7 @@ input[type="checkbox"]:focus {
     color: rgba(0, 0, 0, 0.26);
     opacity: 1; }
   .mui-form-control:focus {
-    border-color: #2196f3;
+    border-color: #2196F3;
     border-width: 2px; }
   .mui-form-control[disabled], .mui-form-control[readonly], fieldset[disabled] .mui-form-control {
     cursor: not-allowed;
@@ -1957,7 +1995,7 @@ input[type="search"] {
     font-size: 12px;
     top: 0px; }
   .mui-form-group > .mui-form-control:focus + label {
-    color: #2196f3; }
+    color: #2196F3; }
 
 .mui-radio,
 .mui-checkbox {
@@ -2078,7 +2116,7 @@ th {
   list-style: none;
   font-size: 14px;
   text-align: left;
-  background-color: white;
+  background-color: #FFF;
   border-radius: 2px;
   z-index: 1;
   background-clip: padding-box; }
@@ -2095,9 +2133,9 @@ th {
     .mui-dropdown-menu > li > a:hover, .mui-dropdown-menu > li > a:focus {
       text-decoration: none;
       color: rgba(0, 0, 0, 0.87);
-      background-color: #eeeeee; }
+      background-color: #EEEEEE; }
   .mui-dropdown-menu > .mui-disabled > a, .mui-dropdown-menu > .mui-disabled > a:hover, .mui-dropdown-menu > .mui-disabled > a:focus {
-    color: #eeeeee; }
+    color: #EEEEEE; }
   .mui-dropdown-menu > .mui-disabled > a:hover, .mui-dropdown-menu > .mui-disabled > a:focus {
     text-decoration: none;
     background-color: transparent;
@@ -2131,9 +2169,9 @@ th {
       .mui-tabs > li > a:hover {
         text-decoration: none; }
     .mui-tabs > li.mui-active {
-      border-bottom: 2px solid #2196f3; }
+      border-bottom: 2px solid #2196F3; }
       .mui-tabs > li.mui-active > a {
-        color: #2196f3; }
+        color: #2196F3; }
   .mui-tabs.mui-tabs-justified {
     display: table;
     width: 100%;
@@ -2170,7 +2208,6 @@ th {
 @keyframes mui-node-inserted {
   from {
     opacity: 0.99; }
-
   to {
     opacity: 1; } }
 .mui-notransition {
@@ -2388,3 +2425,5 @@ th {
 @media (min-width: 1200px) {
   .mui-hidden-lg {
     display: none !important; } }
+
+/*# sourceMappingURL=main.css.map */

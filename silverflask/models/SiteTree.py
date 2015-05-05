@@ -1,4 +1,4 @@
-from flask import abort, current_app
+from flask import abort, current_app, url_for
 from slugify import slugify
 
 from silverflask import db
@@ -137,7 +137,7 @@ class SiteTree(VersionedMixin, PolymorphicMixin, OrderableMixin, DataObject, db.
                 "data-pageid": str(self.id)
             },
             "a_attr": {
-                "href": "/admin/edit/page/{0}".format(self.id)
+                "href": url_for("PagesCMSController.edit_page", page_id=self.id)
             }
         }
 

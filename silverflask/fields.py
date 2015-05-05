@@ -3,6 +3,8 @@ from wtforms.widgets.core import HTMLString, html_params
 from flask import render_template
 from silverflask import db
 
+import urllib.parse
+
 class AsyncFileUploadWidget(object):
     """
     Renders a file input chooser field.
@@ -48,20 +50,31 @@ class GridFieldWidget(object):
             else:
                 raise TypeError("Display Col must be str or dict")
 
-    def _generate_urls(self, **kwargs):
-        def url():
-            return "/admin/gridfield/{0}/{1}/{2}/{3}".format(
-                self.record_classname,
-                self.record_id,
-                self.function_name,
-                self.field_name
-            )
+    def generate_urls(self, form_name, field_name):
+        current_url = urllib.parse.urlparse(request.url)
+        params = urllib.parse.parse_qs(request.url)
+        def url(action):
+            params.update({
+                'form': form_name,
+                'field': field_name,
+                'action': action
+            })
+            # current_url.params = urllib.parse.urlencode(params)
+
+            return request.url + '?' + urllib.parse.urlencode(params)
+            # return request.url + "?form={}&field={}&action={}".format(
+            #     form_name,
+            #     field_name,
+            #     action,
+            # )
+        print("Generating URL")
         if not self.urls:
             self.urls = {
-                "get": url(),
-                "add": url() + "/add",
-                "sort": url() + "/sort"
+                "get": url('get_entries'),
+                "add": url('add_entry'),
+                "sort": url('sort')
             }
+
 
     def __init__(self, query=None, display_cols=None, buttons=None,
                  function_name="get_cms_form", field_name=None,
@@ -76,7 +89,7 @@ class GridFieldWidget(object):
         self.record_classname = record_classname
         self.urls = urls
         self.sortable = sortable
-        self._generate_urls()
+        # self._generate_urls()
 
     def __call__(self, field, **kwargs):
         print(self.field_name)
@@ -106,6 +119,40 @@ class AsyncFileUploadField(FileField):
 class LivingDocsField(TextAreaField):
     widget = LivingDocsWidget()
 
+from flask import jsonify, request, redirect, url_for
+import types
+
+class GridFieldController():
+    def __init__(self, gridfield, form):
+        self.gridfield = gridfield
+        self.form = form
+        self.controlled_class = self.gridfield.controlled_class
+
+    def get_entries(self):
+        if issubclass(self.gridfield.query.__class__, types.FunctionType):
+            data = [r.as_dict() for r in self.gridfield.query()]
+        else:
+            data = [r.as_dict() for r in self.gridfield.query]
+        for d in data:
+            d["edit_url"] = url_for('DataObjectCMSController.edit', cls=self.gridfield.controlled_class.__name__, id_=d.id)
+            d["DT_RowId"] = str(d["id"])
+        return jsonify(data=data)
+
+    def add_entry(self):
+        cls = self.gridfield.controlled_class
+        return redirect(url_for('DataObjectCMSController.add', cls=cls.__name__, relation_id=self.gridfield.record_id))
+        elem = cls()
+        elem.page_id = self.gridfield.record_id
+        element_form = elem.get_cms_form()
+        element_form_instance = element_form(request.form, obj=elem)
+        if element_form_instance.validate_on_submit():
+            element_form_instance.populate_obj(elem)
+            db.session.add(elem)
+            db.session.commit()
+            return "elem " + str(elem.__dict__)
+
+        return render_template("page/edit.html",
+                               page_form=element_form_instance)
 
 class GridField(Field):
     class AddButton():
@@ -114,12 +161,15 @@ class GridField(Field):
     record_id = None
     record_classname = None
 
-    def __init__(self, parent_record=None, query=None, buttons=None,
+    controller_class = GridFieldController
+
+    def __init__(self, controlled_class=None, parent_record=None, query=None, buttons=None,
                  urls=None, display_cols=None, field_name=None, sortable=False, **kwargs):
         super().__init__(**kwargs)
         if parent_record:
             self.record_id = parent_record.id
             self.record_classname = parent_record.__class__.__name__
+        self.controlled_class = controlled_class
         self.query = query
         self.buttons = buttons
         self.widget = GridFieldWidget(query=self.query,
@@ -131,3 +181,4 @@ class GridField(Field):
                                       sortable=sortable,
                                       urls=urls,
                                       **kwargs)
+

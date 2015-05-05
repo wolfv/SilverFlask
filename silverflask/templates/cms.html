@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>{% block title %}{% endblock %}</title>
+        <title>{%- if siteconfig.title -%}
+          {{ siteconfig.title }} -
+        {%- endif %} SilverFlask</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -31,8 +33,16 @@
 
     <article class="main">
         <div class="">
-        {% block body %}
+        {% block main %}
+          <div class="cms-breadcrumbs">
+          {% block breadcrumbs %}
+            {{ cms_title }}
+          {% endblock %}
+          </div>
 
+          {% block body %}
+          
+          {% endblock %}
         {% endblock %}
         </div>
     </article>
@@ -45,8 +55,8 @@
             </div>
         </div>
         <ul>
-            <li><a href="{{ url_for("cms.pages") }}">Pages</a></li>
-            <li><a href="{{ url_for("cms.assets") }}">Assets</a></li>
+            <li><a href="{{ url_for("PagesCMSController.index") }}">Pages</a></li>
+            <li><a href="{{ url_for("FilesCMSController.index") }}">Assets</a></li>
             <li><a href="{{ url_for("cms.edit_siteconfig") }}">Site Config</a></li>
             <li><a href="{{ url_for("SecurityController.form") }}">User</a></li>
         </ul>

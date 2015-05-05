@@ -24,7 +24,6 @@ def get_gridfield_context(cls, record_id, formname, fieldname, id=None):
 
 def gridfield_get_return_dict(query, cls, record_id, formname, fieldname):
     data = [r.as_dict() for r in query]
-    print(data)
     for d in data:
         d["edit_url"] = "/admin/gridfield/{0}/{1}/{2}/{3}/edit/{4}".format(cls, record_id, formname, fieldname, d["id"])
         d["DT_RowId"] = str(d["id"])

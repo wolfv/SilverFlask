@@ -6,8 +6,8 @@ from silverflask.models import User, SiteTree, Page, SuperPage, \
     FileObject, GalleryImage, SiteConfig
 from silverflask import db
 from flask import jsonify
-from silverflask.models.FileObject import create_file
 from flask_user import current_user
+from silverflask.models.FileObject import create_file
 from silverflask.models.OrderedForm import OrderedFormFactory
 
 bp = Blueprint('cms', __name__)
@@ -172,12 +172,10 @@ class SiteConfigExtension(db.Model):
         """overwrite methods of parent class"""
         pass
 
-@bp.route("/deduplicate")
-def deduplicate():
-    SiteTree.reindex()
-    return "Successful?"
-
-
+# @bp.route("/deduplicate")
+# def deduplicate():
+#     SiteTree.reindex()
+#     return "Successful?"
 
 
 @bp.route("/siteconfig", methods=["POST", "GET"])

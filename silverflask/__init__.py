@@ -68,16 +68,20 @@ def create_app(object_name, env="prod"):
 
 
     from silverflask.controllers.page_controller import SiteTreeController
-    stc = SiteTreeController()
-    app.register_blueprint(stc.create_blueprint(app))
+    app.register_blueprint(SiteTreeController.create_blueprint(app))
 
     from silverflask.core.dev_controller import DevController
-    dev_controller = DevController()
-    app.register_blueprint(dev_controller.create_blueprint(app))
+    app.register_blueprint(DevController.create_blueprint(app))
 
+    from silverflask.controllers.cms_controller import CMSController, PagesCMSController, FilesCMSController, \
+        DataObjectCMSController
+
+    app.register_blueprint(CMSController.create_blueprint(app))
+    app.register_blueprint(DataObjectCMSController.create_blueprint(app))
+    app.register_blueprint(PagesCMSController.create_blueprint(app))
+    app.register_blueprint(FilesCMSController.create_blueprint(app))
     from silverflask.controllers.security_controller import SecurityController
-    security_controller = SecurityController()
-    app.register_blueprint(security_controller.create_blueprint(app))
+    app.register_blueprint(SecurityController.create_blueprint(app))
 
 
     from silverflask.core.theme import init_themes
@@ -90,5 +94,9 @@ def create_app(object_name, env="prod"):
     main = init_blueprint(app)
     app.register_blueprint(main)
     app.register_blueprint(cms_bp, url_prefix='/admin')
+
+
+    for rule in app.url_map.iter_rules():
+        print(rule)
 
     return app

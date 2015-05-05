@@ -69,11 +69,15 @@ class OrderedFieldList():
     def find_by_name(self, name, tab=None, unbound=False):
         if not tab:
             tab = self.root
+        print(tab, tab.tabs)
         for c in tab.children:
+            print(c.name, name)
             if c.name == name:
                 return c
         for t in tab.tabs:
-            return self.find_by_name(name, t)
+            elem = self.find_by_name(name, t)
+            if elem:
+                return elem
         return None
 
     def add_to_tab(self, tabname, field, before=None):

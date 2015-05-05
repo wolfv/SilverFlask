@@ -4,12 +4,14 @@
         <span class="caret"></span>
     </button>
     <ul class="mui-dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-        {% for pagetype in pagetypes %}
-            <li role="presentation"><a role="menuitem" tabindex="-1" href="/admin/add_page/{{ pagetype }}">{{ pagetype }}</a></li>
+        {% for page_type in pagetypes() %}
+            <li role="presentation"><a role="menuitem" tabindex="-1" href="{{ url_for('PagesCMSController.add_page', page_type=page_type) }}">{{ page_type }}</a></li>
         {% endfor %}
     </ul>
 </div>
-<div class="page-tree">
-    <div id="tree" data-sort_url="{{ url_for("cms.sitetree_sort") }}" data-properties='{{ pagetypes|tojson }}'>
+<div class="page-tree-container">
+  <div class="page-tree">
+    <div id="tree" data-json_url="{{ url_for('PagesCMSController.sitetree') }}" data-sort_url="{{ url_for("PagesCMSController.sitetree_sort") }}" data-properties='{{ pagetypes()|tojson }}'>
     </div>
+  </div>
 </div>

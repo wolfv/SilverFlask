@@ -22,14 +22,15 @@ def make_shell_context():
     """ Creates a python REPL with several default imports
         in the context of the app
     """
-
     return dict(app=app, db=db, User=User)
 
 
 @manager.command
 def createdb():
-    """ Creates a database with all of the tables defined in
-        your Alchemy models
+    """
+    Creates a database with the defined models
+    and also adds the default records that are needed for the CMS:
+    Admin User, Admin Role, Default first page, and stuff
     """
 
     db.create_all()
@@ -38,21 +39,23 @@ def createdb():
     if not len(Role.query.all()):
         admin_role = Role("admin", "Admin has all privileges")
         db.session.add(admin_role)
-        db.session.commit()
+
     if not len(User.query.all()):
         # create standard user
         u = User("admin", "admin")
+        u.firstname = "Default"
+        u.lastname = "Admin"
         u.email = "admin"
         db.session.add(u)
         admin_role = Role.query.filter(Role.name == "admin").first()
         u.roles.append(admin_role)
-        db.session.commit()
 
     from silverflask.models import SiteConfig
     if not len(SiteConfig.query.all()):
         sc = SiteConfig()
+        sc.title = "Your SilverFlask Website"
+        sc.tagline = "This is a default installation"
         db.session.add(sc)
-        db.session.commit()
 
     if not len(Page.query.all()):
         page = Page()
@@ -60,9 +63,8 @@ def createdb():
         page.name = "home"
         page.urlsegment = "home"
         db.session.add(page)
-        db.session.commit()
         page.mark_as_published()
-        db.session.commit()
+    db.session.commit()
 
 
 if __name__ == "__main__":

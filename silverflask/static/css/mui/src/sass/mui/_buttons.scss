@@ -152,6 +152,13 @@ $mui-btn-box-shadow-active: inset 0 3px 5px rgba(mui-color('black'), .125);
                                $mui-btn-flat-bg-color-hover);
 }
 
+.mui-btn-success {
+  @include button-variant(#333,
+          mui-color('orange', 'A700'));
+
+  @include button-flat-variant(#333,
+          mui-color('orange', 'A700'));
+}
 
 .mui-btn-accent {
   @include button-variant($mui-btn-accent-font-color,

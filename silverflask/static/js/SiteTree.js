@@ -404,9 +404,9 @@
     SiteTree.prototype.get_url = function get_url(node){
         var self = this;
         if (node.id === "#") {
-            return "/admin/get_sitetree";
+            return self.node.data("json_url");
         } else {
-            return "/admin/get_sitetree/" + node.id;
+            return self.node.data("json_url") + node.id;
         }
     };
     SiteTree.prototype.get_data = function get_data(node){
@@ -460,7 +460,7 @@
     };
     SiteTree.prototype.__init__ = function __init__(node){
         var self = this;
-        var types, key;
+        var types, key, get_url;
         self.node = node;
         self.properties = node.data("properties");
         types = {};
@@ -472,11 +472,12 @@
                 "icon": self.properties[key].icon
             };
         }
+        get_url = j.proxy(self.get_url, self);
         self.tree = node.jstree({
             "core": {
                 "check_callback": true,
                 "data": {
-                    "url": self.get_url,
+                    "url": get_url,
                     "data": self.get_data
                 }
             },

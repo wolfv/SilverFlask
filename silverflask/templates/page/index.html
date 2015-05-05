@@ -5,3 +5,7 @@
         {% include "includes/pagetree.html" %}
     </aside>
 {% endblock %}
+
+{% block breadcrumbs %}
+  <a href="{{ url_for('PagesCMSController.index') }}">Pages</a> / Whatever
+{% endblock %}

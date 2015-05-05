@@ -29,20 +29,23 @@
             >
     <div class="cms-form main-flex-top ">
 {#        {{ form.hidden_tag() }}#}
-        {% if page %}
-            <h1>{{ page.name }}</h1>
-        {% endif %}
         {{ form_errors(form, hiddens='only') }}
-        {% if form.tabbed_form  %}
-            <ul class="nav nav-tabs" role="tablist">
+        {% if form.tabbed_form   %}
+            {% if form.get_root().tabs | length > 2 %}
+
+            <ul class="mui-tabs" role="tablist">
 
             {% for tab in form.get_root().tabs if not tab.name == "Buttons" %}
-                <li role="presentation" class="{{ "active" if loop.first }}"><a href="#{{ tab.name }}" role="tab" data-toggle="tab">{{ tab.name }}</a></li>
+                <li role="presentation" class="{{ "mui-active" if loop.first }}"><a href="#{{ tab.name }}" role="tab"
+                                                                                data-mui-controls="{{ tab.name }}" data-mui-toggle="tab">{{ tab.name }}</a></li>
             {% endfor %}
             </ul>
-            <div class="tab-content container-fluid">
+            {% endif %}
+
+
+          <div class="mui-tab-content">
             {% for tab in form.get_root().tabs if not tab.name == "Buttons" %}
-                <div role="tabpanel" class="tab-pane {{ "active" if loop.first }}" id="{{ tab.name }}">
+                <div class="mui-tab-pane {{ "mui-active" if loop.first }}" id="{{ tab.name }}">
                 {%- for field in tab.children %}
                 {{ form_field(field,
                     form_type=form_type,
