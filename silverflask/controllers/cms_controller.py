@@ -145,6 +145,7 @@ class PagesCMSController(CMSController):
         return render_template("page/edit.html",
                                page_form=page_form)
 
+
 class DataObjectCMSController(CMSController):
     url_prefix = CMSController.url_prefix + '/data_object'
     urls = {
@@ -152,6 +153,8 @@ class DataObjectCMSController(CMSController):
         '/edit/<cls>/<int:id_>': 'edit',
     }
     allowed_actions = ['add', 'edit']
+
+
     def add(self, cls):
         import silverflask.models.models as models
 
@@ -176,7 +179,23 @@ class DataObjectCMSController(CMSController):
                                page_form=form)
 
     def edit(self, cls, id_):
-        return cls + id_
+        import silverflask.models.models as models
+
+        _class = getattr(models, cls)
+        do = _class.query.get_or_404(id_)
+
+        form = do.get_cms_form()
+        form = form()
+        form.process(request.form, obj=do)
+
+        if form.validate_on_submit():
+            form.populate_obj(do)
+            db.session.add(do)
+            db.session.commit()
+            # return redirect(url_for(".edit", page_id=do.id))
+
+        return render_template("page/edit.html",
+                               page_form=form)
 
 from silverflask.models.FileObject import create_file
 from silverflask.models import FileObject
@@ -197,16 +216,16 @@ class FilesCMSController(CMSController):
         'upload'
     ]
 
-    forms = ['AssetsForm']
-    class AssetsForm(Form):
-        gridfield = GridField(
-            urls={},
-            buttons=[],
-            display_cols=["id", "name"]
-        )
-
     def index(self):
-        form = self.AssetsForm()
+        class AssetsForm(Form):
+            gridfield = GridField(
+                buttons=[],
+                display_cols=["id", "name"],
+                query=FileObject.query,
+                controlled_class=FileObject
+            )
+
+        form = AssetsForm()
         return render_template("assetmanager.html", form=form)
 
 

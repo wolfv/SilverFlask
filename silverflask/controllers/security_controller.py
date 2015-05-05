@@ -6,24 +6,10 @@ from silverflask import db
 from silverflask.models import User
 from silverflask.fields import GridField
 from silverflask.core import Controller
+from silverflask.controllers.cms_controller import CMSController
 
-
-class AdminController(Controller):
-    url_prefix = '/admin'
-    before_request = 'check_authorization'
-
-    @staticmethod
-    def check_authorization():
-        current_app.logger.debug("Restricting access: %s" % str(current_user.is_authenticated()))
-        if not current_user.is_authenticated():
-            return redirect(url_for("user.login", next=request.url))
-        elif not current_user.has_roles("admin"):
-            current_app.logger.debug("%s, %s" % (current_user.has_roles("admin"), str(current_user.roles)))
-            return abort(403)
-
-
-class SecurityController(AdminController):
-    url_prefix = AdminController.url_prefix + '/security'
+class SecurityController(CMSController):
+    url_prefix = CMSController.url_prefix + '/security'
     urls = {
         '/edit/<int:record_id>': 'edit_user',
         '/gridfield': 'get_users',
