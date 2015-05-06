@@ -9,24 +9,20 @@ SilverFlask is partly named after SilverStripe, one of the best and fully-featur
 On the other hand, Flask is a very mature framework, and python is a lovely programming language.
 
 Installation
------
+------------
 
 .. warning:: SilverFlask is currently in a pre-alpha-stealth state. Don't use it for anything serious.
     That said, feel free to experiment with it as much as you'd like to!
 
-Installation works as following:
-
-- Git clone into ``git clone https://github.com/wolfv/SilverFlask``
+- Clone repo: ``git clone https://github.com/wolfv/SilverFlask``
 - Create a virtualenv: 
-    - Use ``export VIRTUALENV_PYTHON=/usr/bin/python3`` to use Python 3 which I prefer and which is the only supported version
+    - ``export VIRTUALENV_PYTHON=/usr/bin/python3`` (``export VIRTUALENV_PYTHON=/usr/local/bin/python3`` on OS X with `Homebrew <http://brew.sh/>`_). Only Python 3 is supported.
     - I like virtualenvwrapper, instructions for Ubuntu here: `Link <http://roundhere.net/journal/virtualenv-ubuntu-12-10/>`_
     - Toggle the virtualenv with ``workon <yourvirtualenvname>``
-- When in the virtualenv, install all necessary packages via ``pip install -r requirements.txt``
+- When in the virtualenv, install all necessary packages via ``make requirements``
 - Use the manage.py script to create the database (defaults to ``database.db`` in the app folder: ``python manage.py createdb``
 - Start the application server by entering ``python manage.py runserver``
-- Point your webbrowser to ``http://localhost:5000/`` to visit your first SilverFlask website
-
-
+- Point your webbrowser to http://localhost:5000 to visit your first SilverFlask website
 
 The basic building blocks
 ------
