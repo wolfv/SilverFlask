@@ -1,3 +1,55 @@
-@font-face {
-  font-family: "Roboto";
-  src: url('/static/css/fonts/Roboto-Medium.ttf?1430860929') format('truetype'), url('/static/css/fonts/Roboto-Medium.woff?1430860929') format('woff'), url('/static/css/fonts/Roboto-Medium.svg?1430860929') format('svg'); }
+/*
+Error: File to import not found or unreadable: compass/css3/font-face.
+       Load paths:
+         
+        on line 1 of fonts.sass
+
+1: @import "compass/css3/font-face"
+2: 
+3: @include font-face("Roboto", font-files("Roboto-Medium.ttf", "Roboto-Medium.woff", "Roboto-Medium.svg"))
+
+Backtrace:
+fonts.sass:1
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/import_node.rb:66:in `rescue in import'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/import_node.rb:45:in `import'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/import_node.rb:28:in `imported_file'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/import_node.rb:37:in `css_import?'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:311:in `visit_import'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/visitors/base.rb:36:in `visit'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:158:in `block in visit'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/stack.rb:79:in `block in with_base'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/stack.rb:115:in `with_frame'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/stack.rb:79:in `with_base'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:158:in `visit'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/visitors/base.rb:52:in `block in visit_children'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/visitors/base.rb:52:in `map'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/visitors/base.rb:52:in `visit_children'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:167:in `block in visit_children'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:179:in `with_environment'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:166:in `visit_children'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/visitors/base.rb:36:in `block in visit'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:186:in `visit_root'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/visitors/base.rb:36:in `visit'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:157:in `visit'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:8:in `visit'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/root_node.rb:36:in `css_tree'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/tree/root_node.rb:29:in `render_with_sourcemap'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/engine.rb:368:in `_render_with_sourcemap'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/engine.rb:285:in `render_with_sourcemap'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/plugin/compiler.rb:490:in `update_stylesheet'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/plugin/compiler.rb:215:in `block in update_stylesheets'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/plugin/compiler.rb:209:in `each'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/plugin/compiler.rb:209:in `update_stylesheets'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/plugin.rb:82:in `update_stylesheets'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/exec/sass_scss.rb:361:in `watch_or_update'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/exec/sass_scss.rb:51:in `process_result'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/exec/base.rb:52:in `parse'
+/usr/local/share/gems/gems/sass-3.4.13/lib/sass/exec/base.rb:19:in `parse!'
+/usr/local/share/gems/gems/sass-3.4.13/bin/sass:13:in `<top (required)>'
+/usr/local/bin/sass:23:in `load'
+/usr/local/bin/sass:23:in `<main>'
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Error: File to import not found or unreadable: compass/css3/font-face.\A        Load paths:\A          \A         on line 1 of fonts.sass\A \A 1: @import \"compass/css3/font-face\"\A 2: \A 3: @include font-face(\"Roboto\", font-files(\"Roboto-Medium.ttf\", \"Roboto-Medium.woff\", \"Roboto-Medium.svg\"))"; }
