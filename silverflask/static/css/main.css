@@ -1,3 +1,7 @@
+@import url(fonts.css);
+* {
+  font-family: "Roboto"; }
+
 body {
   min-height: 100vh; }
 
@@ -136,6 +140,10 @@ body {
     margin-bottom: 2px;
     font-size: 15px;
     font-weight: bold; }
+
+.cms-breadcrumbs {
+  padding: 5px 10px;
+  border-bottom: 1px solid #999; }
 
 .main-flex {
   position: relative;

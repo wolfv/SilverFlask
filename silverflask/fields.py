@@ -134,25 +134,15 @@ class GridFieldController():
         else:
             data = [r.as_dict() for r in self.gridfield.query]
         for d in data:
-            d["edit_url"] = url_for('DataObjectCMSController.edit', cls=self.gridfield.controlled_class.__name__, id_=d.id)
+            d["edit_url"] = url_for('DataObjectCMSController.edit', cls=self.gridfield.controlled_class.__name__, id_=d['id'])
             d["DT_RowId"] = str(d["id"])
         return jsonify(data=data)
 
     def add_entry(self):
         cls = self.gridfield.controlled_class
-        return redirect(url_for('DataObjectCMSController.add', cls=cls.__name__, relation_id=self.gridfield.record_id))
-        elem = cls()
-        elem.page_id = self.gridfield.record_id
-        element_form = elem.get_cms_form()
-        element_form_instance = element_form(request.form, obj=elem)
-        if element_form_instance.validate_on_submit():
-            element_form_instance.populate_obj(elem)
-            db.session.add(elem)
-            db.session.commit()
-            return "elem " + str(elem.__dict__)
-
-        return render_template("page/edit.html",
-                               page_form=element_form_instance)
+        return redirect(url_for('DataObjectCMSController.add', cls=cls.__name__,
+                                relation_id=self.gridfield.record_id,
+                                back_url=request.url))
 
 class GridField(Field):
     class AddButton():
