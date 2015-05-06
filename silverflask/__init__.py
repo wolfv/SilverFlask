@@ -96,7 +96,7 @@ def create_app(object_name, env="prod"):
     app.register_blueprint(cms_bp, url_prefix='/admin')
 
 
-    for rule in app.url_map.iter_rules():
-        print(rule)
+    # for rule in app.url_map.iter_rules():
+    #     print(rule)
 
     return app

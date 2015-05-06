@@ -5,23 +5,17 @@ from silverflask import db
 from silverflask.models import Page, User, SiteTree, SuperPage, GalleryImage, ImageObject
 from test_base import BaseTest
 
-
 class TestVersioning(BaseTest):
-    def create_app(self):
-        self.app = create_app("silverflask.settings.TestConfig", env="dev")
-        return self.app
-
+    # Test for testing versioning
     def setUp(self):
         admin = User('admin', 'supersafepassword')
         db.session.add(admin)
         db.session.commit()
 
     def teardown(self):
+        # we're working on an in memory sqlite instance
+        # so no teardown needed...
         pass
-        # db.session.remove()
-        # db.drop_all()
-
-
 
     def testversioning(self):
 
@@ -93,7 +87,6 @@ class TestVersioning(BaseTest):
 
         db.session.add(image)
         s.header_image = image
-
 
         db.session.commit()
         s = SuperPage.query.one()

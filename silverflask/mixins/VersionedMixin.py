@@ -216,7 +216,9 @@ class VersionedMixin(object):
     def mark_as_published(self):
         if not self.can_publish():
             return False
-        print("Publishing Page %d \n\n" % self.id)
+        if not self.id:
+            raise Exception("No ID set!")
+        logger.debug('Publishing Page with ID: %s', str(self.id))
 
         live_table_name = self.live_table()
 

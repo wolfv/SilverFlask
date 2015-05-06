@@ -39,6 +39,7 @@ def createdb():
     if not len(Role.query.all()):
         admin_role = Role("admin", "Admin has all privileges")
         db.session.add(admin_role)
+        db.session.commit()
 
     if not len(User.query.all()):
         # create standard user
@@ -49,6 +50,7 @@ def createdb():
         db.session.add(u)
         admin_role = Role.query.filter(Role.name == "admin").first()
         u.roles.append(admin_role)
+        db.session.commit()
 
     from silverflask.models import SiteConfig
     if not len(SiteConfig.query.all()):
@@ -56,6 +58,7 @@ def createdb():
         sc.title = "Your SilverFlask Website"
         sc.tagline = "This is a default installation"
         db.session.add(sc)
+        db.session.commit()
 
     if not len(Page.query.all()):
         page = Page()
@@ -63,8 +66,9 @@ def createdb():
         page.name = "home"
         page.urlsegment = "home"
         db.session.add(page)
+        db.session.commit()
         page.mark_as_published()
-    db.session.commit()
+        db.session.commit()
 
 
 if __name__ == "__main__":

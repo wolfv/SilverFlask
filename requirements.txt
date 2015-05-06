@@ -33,3 +33,4 @@ SQLAlchemy-Continuum
 alembic
 Flask-Testing
 Flask-Migrate
+Flask-Classy

@@ -1,18 +1,25 @@
 #! ../env/bin/python
 # -*- coding: utf-8 -*-
-from silverflask import create_app
-from silverflask import db
+
+from silverflask import create_app, db
 from silverflask.models import Page, User, SiteTree
 import unittest
 import tempfile
 from flask.ext.testing import TestCase
 
+
 class BaseTest(TestCase):
     def create_app(self):
+        print("CREAATING APP")
         self.app = create_app("silverflask.settings.TestConfig", env="dev")
+        db.init_app(self.app)
+        with self.app.app_context():
+            db.create_all()
+
         return self.app
 
     def setUp(self):
+        self.create_app()
         from silverflask.models import User
         from silverflask.models.User import Role
         if not len(Role.query.all()):
