@@ -25,6 +25,7 @@ Installation
 - Use the manage.py script to create the database (defaults to an sqlite ``database.db`` in the app folder: ``python manage.py createdb``
 - Start the application server by entering ``python manage.py runserver``
 - Point your webbrowser to http://localhost:5000 to visit your first SilverFlask website
+- Login as ``admin:admin`` on http://localhost:5000/admin
 
 The basic building blocks
 ------
