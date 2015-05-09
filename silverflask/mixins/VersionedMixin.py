@@ -181,7 +181,13 @@ def create_live_table(cls):
 
 
 class VersionedMixin(object):
-    """Base class for SQL Alchemy continuum objects that supports tagging"""
+    """
+    A mixin that adds versioning support to DataObjects.
+    It adds a new live table that saves the object on a publish operation,
+    a new query_live operator that queries the live versions of the object
+    and a versions relationship that saves all versions of this object (a version
+    is automatically created on a save operation).
+    """
     __versioned__ = {
         'base_classes': (db.Model, )
     }
@@ -192,6 +198,9 @@ class VersionedMixin(object):
 
     @classproperty
     def query_live(cls):
+        """
+        Query the live version of this DataObject
+        """
         return cls.LiveType.query
 
     @classmethod
@@ -208,12 +217,21 @@ class VersionedMixin(object):
     def get_published(self):
         return self
 
-
     def can_publish(self):
+        """
+        Override this function to control who is allowed to publish
+        pages in the CMS
+        :return: Boolean (True if allowed to publish)
+        """
         return True
 
 
     def mark_as_published(self):
+        """
+        Create a copy of the current draft to the live table and
+        publish this DataObject (make it visible to the outside world).
+        :return: empty
+        """
         if not self.can_publish():
             return False
         if not self.id:
@@ -241,7 +259,6 @@ class VersionedMixin(object):
         db.session._enable_transaction_accounting = True
 
 classes_to_create = []
-
 
 @event.listens_for(mapper, "instrument_class")
 def instrumented_class(mapper, cls):
