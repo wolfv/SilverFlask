@@ -74,7 +74,16 @@ will point to the :class:`silverflask.models.ImageObject`.
 The necessary database columns for this relation are automatically added to
 the model.
 
-Now you might wonder how to access this image -- it's easy. Relations are
+Now you might wonder how to access this image -- it's easy. Relations are added
+to the object in the same way as the database columns. So using
+
+::
+
+    s.image
+
+Will return you the image object that is related to the SimplePage.
+There are actually several interesting functions defined on the :class:`silverflask.models.ImageObject`
+which you can utilize e.g. in the template.
 
 
 

@@ -41,19 +41,3 @@ The user model for SilverFlask is already defined and wired up with Flask-Login 
 Query the current user with ``from silverflask.core import current_user``
 
 A Permission model is also included to provide fine-grained access control if needed in :class:`silverflask.models.Role`.
-
-
-
-FileObject
------
-
-The file objects reflect the file items uploaded through the CMS. ImageObject is an inherited class which implements common image functionality, such as cropping and resizing.
-
-FileStorageBackend
------
-
-The `FileStorageBackend` is a class that abstracts away the underlying file storage. At the moment, the only implemented backend is the `LocalFileStorageBackend` which implements methods to save files to the local flask installation (defaults to the `/static/uploads/` folder).
-
-Another FileStorageBackend could, for example, be an implementation for a S3 Backend (e.g. using the boto library).
-
-
