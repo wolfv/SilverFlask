@@ -1,4 +1,5 @@
 from flask_assets import Bundle
+import os
 
 common_css = Bundle(
     'js/bower_components/bootstrap/dist/css/bootstrap.css',
@@ -8,6 +9,7 @@ common_css = Bundle(
     'js/bower_components/Plugins/integration/bootstrap/3/dataTables.bootstrap.css',
     # 'js/bower_components/ngImgCrop/compile/unminified/ng-img-crop.css',
     'js/bower_components/animate.css/animate.css',
+    'css/fonts/fonts.css',
     'css/main.css',
     filters='cssmin',
     output='public/css/common.css'

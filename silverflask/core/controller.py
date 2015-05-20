@@ -31,8 +31,17 @@ class Controller(object):
         endpoint = cls.__name__
         url_prefix = cls.url_prefix
 
+        static_folder = 'static'
+        static_url_path = '/static'
+        if hasattr(cls, 'static_folder'):
+            static_folder = cls.static_folder
+            static_url_path = '/static'
+        print(static_folder)
         blueprint = Blueprint(endpoint, __name__,
-                                   url_prefix=url_prefix)
+                              url_prefix=url_prefix,
+                              static_folder=static_folder,
+                              static_url_path=static_url_path
+                              )
         blueprint.jinja_loader = ThemeTemplateLoader()
 
         view_funcs = {}

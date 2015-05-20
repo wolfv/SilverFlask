@@ -1,3 +1,4 @@
+import os
 from flask import current_app, make_response, redirect, url_for, abort,\
     request, session, json
 from flask_user import current_user
@@ -18,7 +19,7 @@ class CMSController(Controller):
             return abort(403)
 
     url_prefix = '/admin'
-
+    static_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '../static/'))
     template_functions = {
         'pagetypes': 'pagetypes'
     }

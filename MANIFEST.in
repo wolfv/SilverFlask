@@ -1,0 +1,2 @@
+include AUTHORS.txt CHANGES.txt LICENSE.txt README.rst
+recursive-include silverflask *.py *.html *.txt *.css *.js *.woff *.svg *.ttf *.png *.ttf

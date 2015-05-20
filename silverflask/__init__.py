@@ -2,13 +2,13 @@
 
 from flask import Flask
 from webassets.loaders import PythonLoader as PythonAssetsLoader
+from flask.ext.assets import Environment, Bundle
 
 from silverflask import assets
 import os
 
 from silverflask.extensions import (
     cache,
-    assets_env,
     debug_toolbar,
     login_manager
 )
@@ -20,7 +20,6 @@ from flask.ext.migrate import Migrate
 from flask_user import UserManager, SQLAlchemyAdapter
 
 db = SQLAlchemy()
-
 
 def create_app(object_name, env="prod"):
     """
@@ -39,14 +38,23 @@ def create_app(object_name, env="prod"):
 
     app.config['ENV'] = env
 
+    init_app(app)
+
+def init_app(app):
     db.init_app(app)
     cache.init_app(app)
     debug_toolbar.init_app(app)
+    app.template_folder = os.path.join(os.path.dirname(__file__), 'templates/')
 
     migrate = Migrate(app, db)
 
     # Import and register the different asset bundles
-    assets_env.init_app(app)
+    assets_env = Environment(app)
+    assets_env.load_path = [os.path.join(os.path.dirname(__file__), 'static')]
+    assets_env.directory = os.path.join(os.path.dirname(__file__), 'static')
+    assets_env.url = '/admin/static/'
+    # assets_env.register('js_all', js)
+    print("directory ", assets_env.directory, os.path.join(os.path.dirname(__file__), 'static/'))
     assets_loader = PythonAssetsLoader(assets)
     for name, bundle in list(assets_loader.load_bundles().items()):
         assets_env.register(name, bundle)
