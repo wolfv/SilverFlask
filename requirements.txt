@@ -1,4 +1,4 @@
-## The following requirements were added by pip freeze:
+## The following requirements were added by pip freeze: 
 alabaster==0.7.4
 alembic==0.7.5.post2
 argh==0.26.1

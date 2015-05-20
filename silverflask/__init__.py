@@ -38,7 +38,7 @@ def create_app(object_name, env="prod"):
 
     app.config['ENV'] = env
 
-    init_app(app)
+    return init_app(app)
 
 def init_app(app):
     db.init_app(app)
