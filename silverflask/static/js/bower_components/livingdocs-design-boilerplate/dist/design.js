@@ -5,7 +5,7 @@
   "author": "upfront.io",
   "assets": {
     "css": [
-      "/static/js/bower_components/bootstrap/dist/css/bootstrap.css"
+      "/admin/static/js/bower_components/bootstrap/dist/css/bootstrap.css"
     ]
   },
   "wrapper": "<div class='container doc-section'></div>",

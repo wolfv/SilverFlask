@@ -5,9 +5,7 @@ from distutils.dir_util import copy_tree
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
-
-copy_tree('silverflask/static', 'static')
-
+    
 setup(
     name='SilverFlask',
     version='0.0.1alpha',

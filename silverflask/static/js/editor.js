@@ -14,6 +14,10 @@
         }
         return range;
     }
+    function _$rapyd$_Iterable(iterable) {
+        if (iterable instanceof Array || iterable instanceof String || typeof iterable === 'string') return iterable;
+        return Object.keys(iterable);
+    }
     function _$rapyd$_in(val, arr) {
         if (arr instanceof Array || typeof arr === "string") return arr.indexOf(val) != -1;
         else {
@@ -32,8 +36,15 @@
         child.prototype = new parent;
         child.prototype.constructor = child;
     }
-    var str, j, defaultContent;
-            if (!JSON.stringify) {
+    function _$rapyd$_print() {
+        var args, output;
+        args = [].slice.call(arguments, 0);
+        output = JSON.stringify(args);
+        if (typeof console == "object") console.log(output.substr(1, output.length-2));
+    }
+    var JSON, str, j, defaultContent;
+            JSON = JSON || {};
+    if (!JSON.stringify) {
         
     JSON.stringify = function(obj) {
         var t = typeof (obj);
@@ -210,7 +221,7 @@
             if (a.constructor !== b.constructor || a.length !== b.length) {
                 return false;
             }
-            var _$rapyd$_Iter0 = dict.keys(a);
+            var _$rapyd$_Iter0 = _$rapyd$_Iterable(dict.keys(a));
             for (var _$rapyd$_Index0 = 0; _$rapyd$_Index0 < _$rapyd$_Iter0.length; _$rapyd$_Index0++) {
                 i = _$rapyd$_Iter0[_$rapyd$_Index0];
                 if (b.hasOwnProperty(i)) {
@@ -244,7 +255,7 @@
         if (typeof iterable === "undefined") iterable = [];
         var result, i;
         result = [];
-        var _$rapyd$_Iter1 = iterable;
+        var _$rapyd$_Iter1 = _$rapyd$_Iterable(iterable);
         for (var _$rapyd$_Index1 = 0; _$rapyd$_Index1 < _$rapyd$_Iter1.length; _$rapyd$_Index1++) {
             i = _$rapyd$_Iter1[_$rapyd$_Index1];
             result.append(i);
@@ -282,7 +293,7 @@
     function dict(iterable) {
         var result, key;
         result = {};
-        var _$rapyd$_Iter2 = iterable;
+        var _$rapyd$_Iter2 = _$rapyd$_Iterable(iterable);
         for (var _$rapyd$_Index2 = 0; _$rapyd$_Index2 < _$rapyd$_Iter2.length; _$rapyd$_Index2++) {
             key = _$rapyd$_Iter2[_$rapyd$_Index2];
             result[key] = iterable[key];
@@ -310,7 +321,7 @@
     dict.values = function(hash) {
         var vals, key;
         vals = [];
-        var _$rapyd$_Iter3 = dict.keys(hash);
+        var _$rapyd$_Iter3 = _$rapyd$_Iterable(dict.keys(hash));
         for (var _$rapyd$_Index3 = 0; _$rapyd$_Index3 < _$rapyd$_Iter3.length; _$rapyd$_Index3++) {
             key = _$rapyd$_Iter3[_$rapyd$_Index3];
             vals.append(hash[key]);
@@ -320,7 +331,7 @@
     dict.items = function(hash) {
         var items, key;
         items = [];
-        var _$rapyd$_Iter4 = dict.keys(hash);
+        var _$rapyd$_Iter4 = _$rapyd$_Iterable(dict.keys(hash));
         for (var _$rapyd$_Index4 = 0; _$rapyd$_Index4 < _$rapyd$_Iter4.length; _$rapyd$_Index4++) {
             key = _$rapyd$_Iter4[_$rapyd$_Index4];
             items.append([key, hash[key]]);
@@ -330,7 +341,7 @@
     dict.copy = dict;
     dict.clear = function(hash) {
         var key;
-        var _$rapyd$_Iter5 = dict.keys(hash);
+        var _$rapyd$_Iter5 = _$rapyd$_Iterable(dict.keys(hash));
         for (var _$rapyd$_Index5 = 0; _$rapyd$_Index5 < _$rapyd$_Iter5.length; _$rapyd$_Index5++) {
             key = _$rapyd$_Iter5[_$rapyd$_Index5];
             delete hash[key];
@@ -402,7 +413,7 @@
         if (self.active_component.template.styles.length) {
             self.node.append(j("<h5>").text("Properties"));
         }
-        var _$rapyd$_Iter6 = dict.items(self.active_component.template.styles);
+        var _$rapyd$_Iter6 = _$rapyd$_Iterable(dict.items(self.active_component.template.styles));
         for (var _$rapyd$_Index6 = 0; _$rapyd$_Index6 < _$rapyd$_Iter6.length; _$rapyd$_Index6++) {
             _$rapyd$_Unpack = _$rapyd$_Iter6[_$rapyd$_Index6];
             style_name = _$rapyd$_Unpack[0];
@@ -410,7 +421,7 @@
             callback = j.proxy(self.on_property_change, self, style);
             if (style.type === "select") {
                 el = j("<select>");
-                var _$rapyd$_Iter7 = style.options;
+                var _$rapyd$_Iter7 = _$rapyd$_Iterable(style.options);
                 for (var _$rapyd$_Index7 = 0; _$rapyd$_Index7 < _$rapyd$_Iter7.length; _$rapyd$_Index7++) {
                     option = _$rapyd$_Iter7[_$rapyd$_Index7];
                     el.append(j("<option>").val(option.value).text(option.caption));
@@ -504,16 +515,14 @@
     };
     LivingDocsBlockPanel.prototype.render = function render(){
         var self = this;
-        var callback, el, template;
-        var _$rapyd$_Iter8 = self.livingdoc.design.components;
-        for (var _$rapyd$_Index8 = 0; _$rapyd$_Index8 < _$rapyd$_Iter8.length; _$rapyd$_Index8++) {
-            template = _$rapyd$_Iter8[_$rapyd$_Index8];
+        self.livingdoc.design.components.each(function(template) {
+            var callback, el;
             callback = j.proxy(self.on_drag, self, template.name);
             el = j("<div class=\"toolbar-entry\">");
             el.html(template.label);
             self.node.append(el);
             el.on("mousedown", callback);
-        }
+        });
     };
     LivingDocsBlockPanel.prototype.on_drag = function on_drag(component, event){
         var self = this;
@@ -555,20 +564,23 @@
     };
     LivingDocsEditor.prototype.on_view_ready = function on_view_ready(renderer){
         var self = this;
-        var on_text_select, on_component_focus, on_snippet_added, view, snippet;
+        var on_text_select, on_component_focus, on_snippet_added;
         on_text_select = j.proxy(self.on_text_select, self);
         on_component_focus = j.proxy(self.on_component_focus, self);
         on_snippet_added = j.proxy(self.on_snippet_added, self);
         self.livingdoc.interactiveView.page.editableController.selection.add(on_text_select);
         self.livingdoc.interactiveView.page.focus.componentFocus.add(on_component_focus);
         self.livingdoc.componentTree.componentAdded.add(on_snippet_added);
-        var _$rapyd$_Iter9 = self.livingdoc.componentTree.find("image");
-        for (var _$rapyd$_Index9 = 0; _$rapyd$_Index9 < _$rapyd$_Iter9.length; _$rapyd$_Index9++) {
-            snippet = _$rapyd$_Iter9[_$rapyd$_Index9];
-            self.livingdoc.interactiveView.renderer.insertComponent(snippet);
-            view = self.livingdoc.interactiveView.renderer.componentViews[snippet.id];
-            view.uploader = new LivingDocsImageUploader(snippet, view);
-        }
+        self.livingdoc.componentTree.find("image").each(function(snippet) {
+            var view;
+            try {
+                self.livingdoc.interactiveView.renderer.insertComponent(snippet);
+                view = self.livingdoc.interactiveView.renderer.componentViews[snippet.id];
+                view.uploader = new LivingDocsImageUploader(snippet, view);
+            } catch (_$rapyd$_Exception) {
+                _$rapyd$_print("Well there was some erorr");
+            }
+        });
     };
     LivingDocsEditor.prototype.on_snippet_added = function on_snippet_added(snippet_model){
         var self = this;
@@ -623,16 +635,14 @@
     };
 
     function init_editors() {
-        var editors, e;
+        var editors;
         editors = [];
         doc.config({
-            "livingdocsCssFile": "/static/js/bower_components/livingdocs-engine/dist/css/livingdocs.css"
+            "livingdocsCssFile": "/admin/static/js/bower_components/livingdocs-engine/dist/css/livingdocs.css"
         });
-        var _$rapyd$_Iter10 = j(".livingdocs-editor-wrapper");
-        for (var _$rapyd$_Index10 = 0; _$rapyd$_Index10 < _$rapyd$_Iter10.length; _$rapyd$_Index10++) {
-            e = _$rapyd$_Iter10[_$rapyd$_Index10];
-            editors.push(new LivingDocsEditor(j(e)));
-        }
+        j(".livingdocs-editor-wrapper").each(function(e) {
+            editors.push(new LivingDocsEditor(j(this)));
+        });
     }
     j(document).ready(init_editors);
 })();

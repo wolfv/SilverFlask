@@ -146,12 +146,13 @@ class LivingDocsBlockPanel:
         self.render()
 
     def render(self):
-        for template in self.livingdoc.design.components:
+        self.livingdoc.design.components.each(def (template):
             callback = j.proxy(self.on_drag, self, template.name)
             el = j('<div class="toolbar-entry">')
             el.html(template.label)
             self.node.append(el)
             el.on('mousedown', callback)
+        )
 
     def on_drag(self, component, event):
         new_component = self.livingdoc.createComponent(component)
@@ -194,11 +195,15 @@ class LivingDocsEditor:
         self.livingdoc.interactiveView.page.focus.componentFocus.add(on_component_focus)
         self.livingdoc.componentTree.componentAdded.add(on_snippet_added)
         # self.livingdoc.interactiveView.renderer.componentAdded.add(on_snippet_added)
-        for snippet in self.livingdoc.componentTree.find("image"):
-            self.livingdoc.interactiveView.renderer.insertComponent(snippet)
-            view = self.livingdoc.interactiveView.renderer.componentViews[snippet.id]
-            view.uploader = new LivingDocsImageUploader(snippet, view)
-
+        self.livingdoc.componentTree.find("image").each(
+            def (snippet):
+                try:
+                    self.livingdoc.interactiveView.renderer.insertComponent(snippet)
+                    view = self.livingdoc.interactiveView.renderer.componentViews[snippet.id]
+                    view.uploader = new LivingDocsImageUploader(snippet, view)
+                except:
+                    print("Well there was some erorr")
+        )
 
     def on_snippet_added(self, snippet_model):
         if snippet_model.directives.image:
@@ -247,9 +252,9 @@ class LivingDocsEditor:
 
 def init_editors():
     editors = []
-    doc.config({'livingdocsCssFile': "/static/js/bower_components/livingdocs-engine/dist/css/livingdocs.css"})
+    doc.config({'livingdocsCssFile': "/admin/static/js/bower_components/livingdocs-engine/dist/css/livingdocs.css"})
 
-    for e in j(".livingdocs-editor-wrapper"):
-        editors.push(LivingDocsEditor(j(e)))
-
+    j(".livingdocs-editor-wrapper").each(def (e):
+        editors.push(LivingDocsEditor(j(this)))
+    )
 j(document).ready(init_editors)

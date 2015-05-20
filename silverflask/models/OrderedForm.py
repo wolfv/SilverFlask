@@ -1,6 +1,6 @@
 from flask_wtf import Form
 from wtforms.meta import DefaultMeta
-from flask import current_app
+from flask import current_app, session
 
 class TabNode():
 
@@ -125,7 +125,9 @@ class OrderedForm(Form):
     _fields = OrderedFieldList()
     tabbed_form = True
 
-    def __init__(self, formdata=None, obj=None, data=None, csrf_enabled=None, prefix='', meta=DefaultMeta()):
+    def __init__(self, formdata=None, obj=None, data=None, 
+                 csrf_enabled=None, csrf_context=None, secret_key=None,
+                 prefix='', meta=DefaultMeta()):
 
         if csrf_enabled is None:
             csrf_enabled = current_app.config.get('WTF_CSRF_ENABLED', True)
