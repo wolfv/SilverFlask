@@ -35,9 +35,15 @@ class FileObject(DataObject, db.Model):
             self.name = os.path.splitext(location)[0]
 
     def url(self):
+        """
+        Return the url for this file (handled by the :class:`FileStorageBackend`
+        """
         return current_app.storage_backend.get_url(self.location)
 
     def delete_file(self):
+        """
+        Delete this file also from disk.
+        """
         current_app.storage_backend.delete(self.location)
         self.location = ""
         self.name = "DELETED"
@@ -60,7 +66,11 @@ class FileObject(DataObject, db.Model):
 
 
 class ImageObject(FileObject):
-
+    """
+    A basic ImageObject, that inherits all properties from the file object
+    and adds some functionality related to images, such as cropping and resizing,
+    as well as caching the cropped and/or resized images.
+    """
     __tablename__ = "imageobject"
     __mapper_args__ = {
         'polymorphic_identity': __tablename__
@@ -72,6 +82,16 @@ class ImageObject(FileObject):
 
 
     def resize(self, width=None, height=None, mode='crop', background="white"):
+        """
+        Resize image
+
+        :param width: define width in pixels
+        :param height: height in pixels. If no height is set, it will be
+                       set to width (i.e. the result will be a square)
+        :param mode: string, one of 'crop' (default), 'pad', 'fit' or 'reshape'
+        :param background: background color, as string (i.e. 'blue' or hex '#F0F000').
+                           As supported by the ImageColor module of Pillow.
+        """
         if not height:
             height = width
 

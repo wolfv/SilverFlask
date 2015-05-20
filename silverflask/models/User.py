@@ -13,7 +13,16 @@ class UserRoles(db.Model):
 
 class User(DataObject, UserMixin, db.Model):
     """
-    The base User model.
+    The base User model. Defines the following fields:
+
+    username = String, and unique,
+    firstname, lastname = String
+
+    email = String, unique
+
+    The password is set with user.set_password("password"), and then stored with
+    encryption.
+
     """
     username = db.Column(db.String, unique=True)
 
@@ -29,6 +38,7 @@ class User(DataObject, UserMixin, db.Model):
 
     roles = db.relationship('Role', secondary=UserRoles.__tablename__,
                              backref=db.backref('users', lazy='dynamic'))
+
 
     auto_form_exclude = DataObject.auto_form_exclude + ['confirmed_at', 'is_enabled']
 
